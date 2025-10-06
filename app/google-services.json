@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "866728536761",
+    "project_id": "mybizz-1a89b",
+    "storage_bucket": "mybizz-1a89b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:866728536761:android:1931b452da26e1577fc968",
+        "android_client_info": {
+          "package_name": "eu.tutorials.mybizz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8EMLXfOTN-O5_wVGdRgHZL9KohKl5aB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
