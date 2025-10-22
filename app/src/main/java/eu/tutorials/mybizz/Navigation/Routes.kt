@@ -7,6 +7,7 @@ object Routes {
     const val SignUpScreen = "signup_screen"
     const val AdminDashboardScreen = "admin_dashboard"
     const val UserDashboardScreen = "user_dashboard"
+    const val SettingScreen = "settingscreen"
     const val BillsListScreen = "bills_list"
     const val AddBillScreen = "add_bill"
     const val EditBillScreen = "edit_bill/{billId}"

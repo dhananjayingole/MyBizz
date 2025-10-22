@@ -5,18 +5,20 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Model.MenuItem
 import eu.tutorials.mybizz.Navigation.Routes
+import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,14 +29,12 @@ fun AdminDashboardScreen(
     val context = LocalContext.current
 
     val menuItems = listOf(
-        MenuItem("bills", "Bills Management", Routes.BillsListScreen, Icons.Default.ShoppingCart),
-        MenuItem("users", "User Management", "users", Icons.Default.Person),
-        MenuItem("Notification", "Notification", "Notification", Icons.Default.Notifications),
-        MenuItem("settings", "Settings", "settings", Icons.Default.Settings),
-        MenuItem("RentalManagement", "RentalManagement", Routes.RentalListScreen, Icons.Default.Menu) ,
-        MenuItem("Task", "Task", Routes.TaskListScreen, Icons.Default.DateRange),
-        MenuItem("Construction", "Construction", Routes.ConstructionListScreen, Icons.Default.Star),
-        MenuItem("Profile", "Profile", Routes.ProfileScreen, Icons.Default.Person),
+        MenuItem("bills", "Bills Management", Routes.BillsListScreen, R.drawable.img_13), // Replace with your drawable
+        MenuItem("users", "User Management", "users", R.drawable.img_14), // Replace with your drawable
+        MenuItem("RentalManagement", "RentalManagement", Routes.RentalListScreen, R.drawable.img_12), // Replace with your drawable
+        MenuItem("Task", "Task", Routes.TaskListScreen, R.drawable.img_15), // Replace with your drawable
+        MenuItem("Construction", "Construction", Routes.ConstructionListScreen, R.drawable.img_10), // Replace with your drawable
+        MenuItem("Profile", "Profile", Routes.ProfileScreen, R.drawable.img_11), // Replace with your drawable
     )
 
     Scaffold(
@@ -134,10 +134,10 @@ fun MenuItemCard(
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = menuItem.icon,
+                painter = painterResource(id = menuItem.icon),
                 contentDescription = menuItem.title,
                 modifier = Modifier.size(32.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = androidx.compose.ui.graphics.Color.Unspecified // This removes the tint
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(

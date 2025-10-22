@@ -6,16 +6,20 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Model.MenuItem
 import eu.tutorials.mybizz.Navigation.Routes
+import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,12 +28,12 @@ fun UserDashboardScreen(
     authRepo: AuthRepository
 ) {
     val menuItems = listOf(
-        MenuItem("bills", "View Bills", Routes.BillsListScreen, Icons.Default.ShoppingCart),
-        MenuItem("settings", "Settings", "settings", Icons.Default.Settings),
-        MenuItem("RentalManagement", Routes.RentalListScreen, "RentalManagement", Icons.Default.Menu) ,
-        MenuItem("Task", "Task", "Task", Icons.Default.DateRange),
-        MenuItem("Construction", "Construction", "Construction", Icons.Default.Star),
-        MenuItem("Profile", "Profile", "Profile", Icons.Default.Person),
+        MenuItem("bills", "View Bills", Routes.BillsListScreen, R.drawable.img_13), // Replace with your drawable
+        MenuItem("settings", "Settings", Routes.SettingScreen, R.drawable.img_16), // Replace with your drawable
+        MenuItem("RentalManagement", "Rental Management", Routes.RentalListScreen, R.drawable.img_12), // Replace with your drawable
+        MenuItem("Task", "Task", Routes.TaskListScreen, R.drawable.img_15), // Replace with your drawable
+        MenuItem("Construction", "Construction", Routes.ConstructionListScreen, R.drawable.img_10), // Replace with your drawable
+        MenuItem("Profile", "Profile", Routes.ProfileScreen, R.drawable.img_11), // Replace with your drawable
     )
 
     Scaffold(

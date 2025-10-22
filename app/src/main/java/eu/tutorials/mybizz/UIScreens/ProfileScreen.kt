@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Navigation.Routes
+import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +87,8 @@ fun ProfileScreen(
                 onSettings = {
                     // Navigate to settings - you can add this route later
                     // navController.navigate(Routes.SettingsScreen)
-                }
+                },
+                navController = navController
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -110,7 +113,10 @@ fun ProfileScreen(
                     contentColor = MaterialTheme.colorScheme.onErrorContainer
                 )
             ) {
-                Icon(Icons.Default.Close, contentDescription = "Logout")
+                Icon(
+                    painter = painterResource(id = R.drawable.img_9), // Replace with your actual drawable resource
+                    contentDescription = "Logout"
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Logout")
             }
@@ -190,7 +196,7 @@ private fun AnimatedProfileHeader(userName: String, userRole: String) {
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
-                            imageVector = Icons.Default.Person,
+                            painter = painterResource(R.drawable.img_11),
                             contentDescription = "Profile",
                             modifier = Modifier.size(48.dp),
                             tint = MaterialTheme.colorScheme.onPrimary
@@ -403,7 +409,8 @@ private fun StatItem(count: String, label: String, icon: ImageVector) {
 private fun QuickActionsSection(
     onEditProfile: () -> Unit,
     onChangePassword: () -> Unit,
-    onSettings: () -> Unit
+    onSettings: () -> Unit,
+    navController: NavController
 ) {
     Card(
         modifier = Modifier
@@ -437,7 +444,7 @@ private fun QuickActionsSection(
                 icon = Icons.Default.Settings,
                 text = "App Settings",
                 description = "Configure application preferences",
-                onClick = onSettings
+                onClick = {navController.navigate(Routes.SettingScreen)}
             )
         }
     }

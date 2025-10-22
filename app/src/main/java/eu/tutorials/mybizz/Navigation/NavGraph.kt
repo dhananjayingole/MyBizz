@@ -2,6 +2,8 @@
 package eu.tutorials.mybizz.Navigation
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,6 +35,7 @@ import eu.tutorials.mybizz.Navigation.Routes.EditTaskScreen
 import eu.tutorials.mybizz.UIScreens.*
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavGraph(
     navController: NavHostController,
@@ -51,7 +54,6 @@ fun NavGraph(
         navController = navController,
         startDestination = Routes.SplashScreen
     ) {
-        // ------------------ Auth & Main Screens ------------------
         composable(Routes.SplashScreen) { SplashScreen(navController) }
         composable(Routes.LoginScreen) { LoginScreen(navController, authRepository) }
         composable(Routes.SignUpScreen) { SignupScreen(navController, authRepository) }
@@ -60,6 +62,8 @@ fun NavGraph(
         composable(Routes.ProfileScreen) { ProfileScreen(navController, authRepository) }
         composable(Routes.BillsListScreen) { BillsListScreen(navController, authRepository) }
         composable(Routes.AddBillScreen) { AddBillScreen(navController, authRepository) }
+        composable(Routes.SettingScreen) { SettingsScreen(navController, authRepository) }
+
         composable(
             route = Routes.EditBillScreen,
             arguments = listOf(navArgument("billId") { type = NavType.StringType })
@@ -92,7 +96,8 @@ fun NavGraph(
                 onRentalSelected = { rental ->
                     navController.navigate("${Routes.RentalDetailScreen}/${rental.id}")
                 },
-                onAddRental = { navController.navigate(Routes.AddRentalScreen) }
+                onAddRental = { navController.navigate(Routes.AddRentalScreen) },
+                onBack = {navController.popBackStack()}
             )
         }
 
@@ -101,7 +106,7 @@ fun NavGraph(
             AddRentalScreen(
                 sheetsRepo = rentalSheetsRepo,
                 onRentalAdded = { navController.popBackStack() },
-                onCancel = { navController.popBackStack() }
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -129,7 +134,8 @@ fun NavGraph(
                     },
                     onMarkPaid = {
                         scope.launch { rentalRepo.markRentalAsPaid(r.id, rentalSheetsRepo) }
-                    }
+                    },
+                    onBack = { navController.popBackStack() }
                 )
             } ?: run {
                 // Show loading while rental is fetched
@@ -156,7 +162,7 @@ fun NavGraph(
                     rental = r,
                     sheetsRepo = rentalSheetsRepo,
                     onRentalUpdated = { navController.popBackStack() },
-                    onCancel = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() }
                 )
             } ?: run {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -169,7 +175,8 @@ fun NavGraph(
             ConstructionListScreen(
                 sheetsRepo = constructionSheetsRepo,
                 onAddClicked = { navController.navigate(Routes.AddConstructionScreen) },
-                navController = navController
+                navController = navController,
+                onBack = {navController.popBackStack()}
             )
         }
 

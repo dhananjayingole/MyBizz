@@ -6,6 +6,6 @@ data class MenuItem(
     val id: String,
     val title: String,
     val route: String,
-    val icon: ImageVector,
+    val icon: Int,
     val adminOnly: Boolean = false
 )
