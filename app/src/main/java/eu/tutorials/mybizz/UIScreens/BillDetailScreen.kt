@@ -128,7 +128,7 @@ fun BillDetailsScreen(
                     }
                 },
                 actions = {
-                    if (isAdmin && bill != null) {
+                    if (bill != null) {
                         IconButton(onClick = {
                             navController.navigate("edit_bill/${billId}")
                         }) {
@@ -142,7 +142,7 @@ fun BillDetailsScreen(
             )
         },
         floatingActionButton = {
-            if (isAdmin && bill?.status == Bill.STATUS_UNPAID) {
+            if (bill?.status == Bill.STATUS_UNPAID) {
                 ExtendedFloatingActionButton(
                     onClick = { showMarkPaidDialog = true },
                     icon = { Icon(Icons.Default.Check, contentDescription = "Mark Paid") },
