@@ -134,14 +134,12 @@ fun BillsListScreen(
             )
         },
         floatingActionButton = {
-            if (isAdmin) {
                 FloatingActionButton(
                     onClick = { navController.navigate("add_bill") },
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Bill")
                 }
-            }
         }
     ) { innerPadding ->
         Column(
@@ -413,7 +411,7 @@ fun BillItem(
                 }
             }
 
-            if (isAdmin && bill.status == Bill.STATUS_UNPAID) {
+            if (bill.status == Bill.STATUS_UNPAID) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
                     onClick = { onMarkAsPaid(bill.id) },
