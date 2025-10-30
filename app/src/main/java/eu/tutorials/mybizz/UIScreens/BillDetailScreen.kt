@@ -41,7 +41,7 @@ fun BillDetailsScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showMarkPaidDialog by remember { mutableStateOf(false) }
 
-    val isAdmin = authRepo.getCurrentUserRole() == "admin"
+    // val isAdmin = authRepo.getCurrentUserRole() == "admin"
     val currentUserEmail = authRepo.currentUser.value?.email ?: ""
 
     // Load bill details
