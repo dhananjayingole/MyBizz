@@ -10,8 +10,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,8 +27,10 @@ import eu.tutorials.mybizz.Logic.Task.TaskSheetsRepository
 import eu.tutorials.mybizz.Model.Task
 import eu.tutorials.mybizz.Navigation.Routes
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.text.SimpleDateFormat
+import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListScreen(
     navController: NavHostController,
@@ -36,6 +41,7 @@ fun TaskListScreen(
 
     var tasks by remember { mutableStateOf<List<Task>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var searchQuery by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         scope.launch {
@@ -44,52 +50,83 @@ fun TaskListScreen(
         }
     }
 
+    val filteredTasks = tasks.filter { task ->
+        task.title.contains(searchQuery, ignoreCase = true) ||
+                task.description.contains(searchQuery, ignoreCase = true) ||
+                task.assignedTo.contains(searchQuery, ignoreCase = true) ||
+                task.status.contains(searchQuery, ignoreCase = true)
+    }
+
     Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Tasks") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
                     navController.navigate(Routes.AddTaskScreen)
-                }
+                },
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Task")
+                Icon(Icons.Default.Add, contentDescription = "Add Task", tint = MaterialTheme.colorScheme.onPrimary)
             }
         }
     ) { padding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(padding)
+                .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text("Tasks", style = MaterialTheme.typography.titleLarge)
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Search Tasks") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             if (isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
-            } else if (tasks.isEmpty()) {
+            } else if (filteredTasks.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No tasks found", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        if (searchQuery.isNotEmpty()) "No tasks found for '$searchQuery'"
+                        else "No tasks found",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             } else {
-                LazyColumn {
-                    items(tasks) { task ->
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(filteredTasks) { task ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp)
                                 .clickable {
-                                    // CORRECTED: Use proper route format
                                     navController.navigate("task_detail/${task.id}")
-                                }
+                                },
+                            elevation = CardDefaults.cardElevation(6.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                            shape = MaterialTheme.shapes.medium
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(task.title, style = MaterialTheme.typography.titleMedium)
-                                Text("Assigned to: ${task.assignedTo}", style = MaterialTheme.typography.bodySmall)
-                                Text("Due: ${task.dueDate}", style = MaterialTheme.typography.bodySmall)
-                                Text("Status: ${task.status}", style = MaterialTheme.typography.bodySmall)
+                                Text("👤 ${task.assignedTo}")
+                                Text("📅 Due: ${task.dueDate}")
+                                Text("🔄 Status: ${task.status}", style = MaterialTheme.typography.bodyMedium)
                             }
                         }
                     }
@@ -99,6 +136,7 @@ fun TaskListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskScreen(
     navController: NavHostController,
@@ -115,112 +153,129 @@ fun AddTaskScreen(
     var notes by remember { mutableStateOf("") }
 
     val statusOptions = listOf("Pending", "In Progress", "Completed")
+    var expanded by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        Text("Add New Task", style = MaterialTheme.typography.titleLarge)
+    // For Date Picker
+    val datePickerState = rememberDatePickerState()
+    var showDatePicker by remember { mutableStateOf(false) }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
-            label = { Text("Task Title *") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Description") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp),
-            singleLine = false
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = assignedTo,
-            onValueChange = { assignedTo = it },
-            label = { Text("Assigned To *") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Status Dropdown - FIXED
-        var statusExpanded by remember { mutableStateOf(false) }
-        Box(modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(
-                value = status,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Status") },
-                trailingIcon = {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = "Status")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { statusExpanded = true }
-            )
-            DropdownMenu(
-                expanded = statusExpanded,
-                onDismissRequest = { statusExpanded = false }
-            ) {
-                statusOptions.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option) },
-                        onClick = {
-                            status = option
-                            statusExpanded = false
-                        }
-                    )
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Add New Task") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
                 }
+            )
+        }
+    ) { padding ->
+
+        if (showDatePicker) {
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val millis = datePickerState.selectedDateMillis
+                        millis?.let {
+                            val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it))
+                            dueDate = date
+                        }
+                        showDatePicker = false
+                    }) { Text("OK") }
+                }
+            ) {
+                DatePicker(state = datePickerState)
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = dueDate,
-            onValueChange = { dueDate = it },
-            label = { Text("Due Date (YYYY-MM-DD)") },
-            placeholder = { Text("2024-12-31") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = notes,
-            onValueChange = { notes = it },
-            label = { Text("Notes") },
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp),
-            singleLine = false
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(padding)
+                .padding(16.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Button(
-                onClick = { navController.popBackStack() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Task Title *") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text("Description") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+                singleLine = false
+            )
+
+            OutlinedTextField(
+                value = assignedTo,
+                onValueChange = { assignedTo = it },
+                label = { Text("Assigned To *") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Status Dropdown
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
             ) {
-                Text("Cancel")
+                OutlinedTextField(
+                    value = status,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Status") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    statusOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                status = option
+                                expanded = false
+                            }
+                        )
+                    }
+                }
             }
+
+            // Due Date with Date Picker
+            OutlinedTextField(
+                value = dueDate,
+                onValueChange = {},
+                label = { Text("Due Date") },
+                readOnly = true,
+                placeholder = { Text("YYYY-MM-DD") },
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(Icons.Default.DateRange, contentDescription = "Pick Due Date")
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = notes,
+                onValueChange = { notes = it },
+                label = { Text("Notes") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp),
+                singleLine = false
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
@@ -240,6 +295,7 @@ fun AddTaskScreen(
                         }
                     }
                 },
+                modifier = Modifier.fillMaxWidth(),
                 enabled = title.isNotEmpty() && assignedTo.isNotEmpty()
             ) {
                 Text("Save Task")
@@ -248,6 +304,7 @@ fun AddTaskScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskDetailScreen(
     navController: NavHostController,
@@ -268,29 +325,50 @@ fun TaskDetailScreen(
         }
     }
 
-    if (isLoading) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-    } else if (task == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Task not found")
-        }
-    } else {
-        TaskDetailContent(
-            task = task!!,
-            onEdit = {
-                // CORRECTED: Use proper route format
-                navController.navigate("edit_task/${task!!.id}")
-            },
-            onDelete = {
-                scope.launch {
-                    repository.deleteTask(task!!.id, sheetsRepo)
-                    navController.popBackStack()
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(task?.title ?: "Task Details") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
                 }
-            },
-            onBack = { navController.popBackStack() }
-        )
+            )
+        }
+    ) { padding ->
+        if (isLoading) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (task == null) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Task not found")
+            }
+        } else {
+            TaskDetailContent(
+                task = task!!,
+                onEdit = {
+                    navController.navigate("edit_task/${task!!.id}")
+                },
+                onDelete = {
+                    scope.launch {
+                        repository.deleteTask(task!!.id, sheetsRepo)
+                        navController.popBackStack()
+                    }
+                },
+                onBack = { navController.popBackStack() },
+                modifier = Modifier.padding(padding)
+            )
+        }
     }
 }
 
@@ -299,18 +377,15 @@ fun TaskDetailContent(
     task: Task,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Text(task.title, style = MaterialTheme.typography.titleLarge)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         // Status Badge
         Box(
             modifier = Modifier
@@ -331,40 +406,25 @@ fun TaskDetailContent(
             })
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
         // Task Details
         DetailItem(label = "Description", value = task.description)
         DetailItem(label = "Assigned To", value = task.assignedTo)
         DetailItem(label = "Due Date", value = task.dueDate)
         DetailItem(label = "Notes", value = task.notes)
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // Action Buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = onEdit,
-                modifier = Modifier.weight(1f)
-            ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = onEdit, modifier = Modifier.weight(1f)) {
                 Text("Edit")
             }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Button(
-                onClick = onDelete,
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-            ) {
+            OutlinedButton(onClick = onDelete, modifier = Modifier.weight(1f)) {
                 Text("Delete")
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = onBack,
@@ -376,6 +436,7 @@ fun TaskDetailContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTaskScreen(
     navController: NavHostController,
@@ -396,6 +457,11 @@ fun EditTaskScreen(
     var notes by remember { mutableStateOf("") }
 
     val statusOptions = listOf("Pending", "In Progress", "Completed")
+    var expanded by remember { mutableStateOf(false) }
+
+    // For Date Picker
+    val datePickerState = rememberDatePickerState()
+    var showDatePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(taskId) {
         scope.launch {
@@ -413,120 +479,140 @@ fun EditTaskScreen(
         }
     }
 
-    if (isLoading) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-    } else if (task == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Task not found")
-        }
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Text("Edit Task", style = MaterialTheme.typography.titleLarge)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text("Task Title *") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text("Description") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                singleLine = false
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = assignedTo,
-                onValueChange = { assignedTo = it },
-                label = { Text("Assigned To *") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Status Dropdown - FIXED
-            var statusExpanded by remember { mutableStateOf(false) }
-            Box(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = status,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Status") },
-                    trailingIcon = {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = "Status")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { statusExpanded = true }
-                )
-                DropdownMenu(
-                    expanded = statusExpanded,
-                    onDismissRequest = { statusExpanded = false }
-                ) {
-                    statusOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option) },
-                            onClick = {
-                                status = option
-                                statusExpanded = false
-                            }
-                        )
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Edit Task") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = dueDate,
-                onValueChange = { dueDate = it },
-                label = { Text("Due Date (YYYY-MM-DD)") },
-                placeholder = { Text("2024-12-31") },
-                modifier = Modifier.fillMaxWidth()
             )
+        }
+    ) { padding ->
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = notes,
-                onValueChange = { notes = it },
-                label = { Text("Notes") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp),
-                singleLine = false
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(
-                    onClick = { navController.popBackStack() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-                ) {
-                    Text("Cancel")
+        if (showDatePicker) {
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val millis = datePickerState.selectedDateMillis
+                        millis?.let {
+                            val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it))
+                            dueDate = date
+                        }
+                        showDatePicker = false
+                    }) { Text("OK") }
                 }
+            ) {
+                DatePicker(state = datePickerState)
+            }
+        }
+
+        if (isLoading) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (task == null) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Task not found")
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .padding(16.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Task Title *") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp),
+                    singleLine = false
+                )
+
+                OutlinedTextField(
+                    value = assignedTo,
+                    onValueChange = { assignedTo = it },
+                    label = { Text("Assigned To *") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Status Dropdown
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = status,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Status") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        statusOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option) },
+                                onClick = {
+                                    status = option
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                // Due Date with Date Picker
+                OutlinedTextField(
+                    value = dueDate,
+                    onValueChange = {},
+                    label = { Text("Due Date") },
+                    readOnly = true,
+                    placeholder = { Text("YYYY-MM-DD") },
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(Icons.Default.DateRange, contentDescription = "Pick Due Date")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = notes,
+                    onValueChange = { notes = it },
+                    label = { Text("Notes") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp),
+                    singleLine = false
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
                     onClick = {
@@ -546,6 +632,7 @@ fun EditTaskScreen(
                             }
                         }
                     },
+                    modifier = Modifier.fillMaxWidth(),
                     enabled = title.isNotEmpty() && assignedTo.isNotEmpty()
                 ) {
                     Text("Update Task")
@@ -558,7 +645,7 @@ fun EditTaskScreen(
 @Composable
 fun DetailItem(label: String, value: String) {
     if (value.isNotEmpty()) {
-        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Column(modifier = Modifier.padding(vertical = 4.dp)) {
             Text(label, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
             Text(value, style = MaterialTheme.typography.bodyMedium)
         }

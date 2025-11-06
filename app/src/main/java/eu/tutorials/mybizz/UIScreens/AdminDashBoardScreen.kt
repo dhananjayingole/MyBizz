@@ -30,7 +30,7 @@ fun AdminDashboardScreen(
 
     val menuItems = listOf(
         MenuItem("bills", "Bills Management", Routes.BillsListScreen, R.drawable.img_13), // Replace with your drawable
-        MenuItem("users", "User Management", "users", R.drawable.img_14), // Replace with your drawable
+        MenuItem("users", "User Management", Routes.UserManagementScreen, R.drawable.img_14), // Replace with your drawable
         MenuItem("RentalManagement", "RentalManagement", Routes.RentalListScreen, R.drawable.img_12), // Replace with your drawable
         MenuItem("Task", "Task", Routes.TaskListScreen, R.drawable.img_15), // Replace with your drawable
         MenuItem("Construction", "Construction", Routes.ConstructionListScreen, R.drawable.img_10), // Replace with your drawable
@@ -40,17 +40,7 @@ fun AdminDashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Admin Dashboard") },
-                actions = {
-                    IconButton(onClick = {
-                        authRepo.logout()
-                        navController.navigate(Routes.LoginScreen) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }) {
-                        Icon(Icons.Default.Close, contentDescription = "Logout")
-                    }
-                }
+                title = { Text("Admin Dashboard") }
             )
         }
     ) { innerPadding ->

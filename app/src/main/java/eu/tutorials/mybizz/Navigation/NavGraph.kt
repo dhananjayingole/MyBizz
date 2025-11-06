@@ -28,7 +28,10 @@ import eu.tutorials.mybizz.Logic.Rental.RentalRepository
 import eu.tutorials.mybizz.Logic.Rental.RentalSheetsRepository
 import eu.tutorials.mybizz.Logic.Task.TaskRepository
 import eu.tutorials.mybizz.Logic.Task.TaskSheetsRepository
+import eu.tutorials.mybizz.Logic.plot.PlotRepository
+import eu.tutorials.mybizz.Logic.plot.PlotSheetsRepository
 import eu.tutorials.mybizz.Model.Construction
+import eu.tutorials.mybizz.Model.Plot
 import eu.tutorials.mybizz.Model.Rental
 import eu.tutorials.mybizz.Model.Task
 import eu.tutorials.mybizz.Navigation.Routes.EditTaskScreen
@@ -48,6 +51,9 @@ fun NavGraph(
     val constructionSheetsRepo = remember { ConstructionSheetsRepository(context) }
     val constructionRepository = remember { ConstructionRepository() }
     val taskSheetsRepo = remember { TaskSheetsRepository(context) } // Add remember
+    // Add Plot repositories
+    val plotSheetsRepo = remember { PlotSheetsRepository(context) }
+    val plotRepository = remember { PlotRepository() }
     val taskRepo = remember { TaskRepository() } // Add remember
 
     NavHost(
@@ -286,6 +292,88 @@ fun NavGraph(
                 taskId = taskId,
                 sheetsRepo = taskSheetsRepo
             )
+        }
+        composable(Routes.UserManagementScreen){
+            UserManagementScreen(
+                navController = navController,
+                authRepository
+            )
+        }
+
+        // Plot List Screen
+        composable(Routes.PlotListScreen) {
+            PlotListScreen(
+                navController = navController,
+                sheetsRepo = plotSheetsRepo,
+                onAddClicked = { navController.navigate(Routes.AddPlotScreen) },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // Add Plot Screen
+        composable(Routes.AddPlotScreen) {
+            AddPlotScreen(
+                sheetsRepo = plotSheetsRepo,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        // Plot Detail Screen
+        composable(
+            route = Routes.PlotDetailScreen,
+            arguments = listOf(navArgument("plotId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val plotId = backStackEntry.arguments?.getString("plotId") ?: ""
+            var plot by remember { mutableStateOf<Plot?>(null) }
+
+            LaunchedEffect(plotId) {
+                val allPlots = plotSheetsRepo.getAllPlots()
+                plot = allPlots.find { it.id == plotId }
+            }
+
+            plot?.let { plotItem ->
+                PlotDetailScreen(
+                    plot = plotItem,
+                    onEdit = { plot ->
+                        navController.navigate("editplotscreen/${plot.id}")
+                    },
+                    onDelete = { plot ->
+                        scope.launch {
+                            plotRepository.deletePlot(plot.id, plotSheetsRepo)
+                            navController.popBackStack()
+                        }
+                    },
+                    onBack = { navController.popBackStack() }
+                )
+            } ?: run {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+        // Edit Plot Screen
+        composable(
+            route = Routes.EditPlotScreen,
+            arguments = listOf(navArgument("plotId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val plotId = backStackEntry.arguments?.getString("plotId") ?: ""
+            var plot by remember { mutableStateOf<Plot?>(null) }
+
+            LaunchedEffect(plotId) {
+                val allPlots = plotSheetsRepo.getAllPlots()
+                plot = allPlots.find { it.id == plotId }
+            }
+
+            plot?.let { plotItem ->
+                EditPlotScreen(
+                    sheetsRepo = plotSheetsRepo,
+                    existing = plotItem,
+                    onBack = { navController.popBackStack() }
+                )
+            } ?: run {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }

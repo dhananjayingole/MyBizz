@@ -1,4 +1,4 @@
-// BillsListScreen.kt - WITH SEARCH FUNCTIONALITY
+// BillsListScreen.kt
 package eu.tutorials.mybizz.UIScreens
 
 import androidx.compose.foundation.layout.*
@@ -13,16 +13,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Logic.Bill.BillRepository
-import eu.tutorials.mybizz.Logic.Bill.BillSheetsRepository
 import eu.tutorials.mybizz.Model.Bill
+import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,14 +40,14 @@ fun BillsListScreen(
     var refreshing by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
 
-    val isAdmin = authRepo.getCurrentUserRole() == "admin"
     val currentUserEmail = authRepo.currentUser.value?.email ?: ""
 
     // Filter bills based on search query
     val filteredBills = bills.filter { bill ->
         searchQuery.isEmpty() || bill.title.contains(searchQuery, ignoreCase = true) ||
                 bill.category.contains(searchQuery, ignoreCase = true) ||
-                bill.description.contains(searchQuery, ignoreCase = true)
+                bill.description.contains(searchQuery, ignoreCase = true) ||
+                bill.billNumber.contains(searchQuery, ignoreCase = true) // NEW: Search by bill number
     }
 
     // Load bills when screen is created
@@ -134,13 +132,12 @@ fun BillsListScreen(
             )
         },
         floatingActionButton = {
-            if (isAdmin) {
-                FloatingActionButton(
-                    onClick = { navController.navigate("add_bill") },
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Bill")
-                }
+            // Both users and admins can add bills
+            FloatingActionButton(
+                onClick = { navController.navigate("add_bill") },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Bill")
             }
         }
     ) { innerPadding ->
@@ -172,7 +169,7 @@ fun BillsListScreen(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier.weight(1f),
-                        placeholder = { Text("Search bills by title, category...") },
+                        placeholder = { Text("Search bills by title, category, bill number...") },
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                             focusedContainerColor = MaterialTheme.colorScheme.surface
@@ -239,9 +236,7 @@ fun BillsListScreen(
                                 Text("Try a different search term", style = MaterialTheme.typography.bodySmall)
                             } else {
                                 Text("No bills found.")
-                                if (isAdmin) {
-                                    Text("Add your first bill using the + button!")
-                                }
+                                Text("Add your first bill using the + button!")
                             }
                         }
                     }
@@ -318,7 +313,6 @@ fun BillsListScreen(
                             items(filteredBills) { bill ->
                                 BillItem(
                                     bill = bill,
-                                    isAdmin = isAdmin,
                                     onMarkAsPaid = { markBillAsPaid(it) },
                                     onClick = {
                                         navController.navigate("bill_details/${bill.id}")
@@ -333,11 +327,9 @@ fun BillsListScreen(
     }
 }
 
-// In BillsListScreen.kt - Update the BillItem composable
 @Composable
 fun BillItem(
     bill: Bill,
-    isAdmin: Boolean,
     onMarkAsPaid: (String) -> Unit,
     onClick: () -> Unit
 ) {
@@ -353,6 +345,14 @@ fun BillItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
+                    // NEW: Bill Number display
+                    Text(
+                        text = "Bill #${bill.billNumber}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+
                     Text(
                         text = bill.title,
                         style = MaterialTheme.typography.bodyLarge,
@@ -366,6 +366,13 @@ fun BillItem(
                     Text(
                         text = "Due: ${bill.dueDate}",
                         style = MaterialTheme.typography.bodySmall
+                    )
+
+                    // NEW: Version info
+                    Text(
+                        text = "Version: ${bill.version}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
 
                     if (bill.status == Bill.STATUS_PAID) {
@@ -413,7 +420,8 @@ fun BillItem(
                 }
             }
 
-            if (isAdmin && bill.status == Bill.STATUS_UNPAID) {
+            // Both users and admins can mark bills as paid, but only unpaid bills
+            if (bill.status == Bill.STATUS_UNPAID) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
                     onClick = { onMarkAsPaid(bill.id) },
@@ -429,8 +437,6 @@ fun BillItem(
     }
 }
 
-// Remove the extractEmailFromUserId function as it's no longer needed
-// Keep the existing StatCard and loadBills functions unchanged
 private suspend fun loadBills(
     sheetsRepository: BillSheetsRepository,
     currentBills: List<Bill>,

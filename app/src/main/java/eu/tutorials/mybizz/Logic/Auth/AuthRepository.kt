@@ -171,6 +171,35 @@ class AuthRepository(private val context: Context? = null) {
             }
     }
 
+    // Fetch all users (for admin)
+    fun getAllUsers(onResult: (List<User>) -> Unit) {
+        firestore.collection("users")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.e(TAG, "Error fetching users: ${e.message}")
+                    onResult(emptyList())
+                    return@addSnapshotListener
+                }
+
+                val users = snapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject(User::class.java)
+                } ?: emptyList()
+
+                onResult(users)
+            }
+    }
+
+    // Block / Unblock user
+    fun updateUserBlockStatus(uid: String, block: Boolean, onResult: (Boolean) -> Unit) {
+        firestore.collection("users").document(uid)
+            .update("isBlocked", block)
+            .addOnSuccessListener { onResult(true) }
+            .addOnFailureListener {
+                Log.e(TAG, "Failed to update block status: ${it.message}")
+                onResult(false)
+            }
+    }
+
     private fun fetchUserRole(uid: String, onComplete: (User) -> Unit) {
         firestore.collection("users").document(uid).get()
             .addOnSuccessListener { doc ->

@@ -21,12 +21,20 @@ object Routes {
     const val AddConstructionScreen = "add_construction"
     const val ConstructionDetailScreen = "construction_detail/{constructionId}"
     const val EditConstructionScreen = "edit_construction/{constructionId}"
+    const val PlotListScreen = "plotlistscreen"
+    const val AddPlotScreen = "addplotscreen"
+    const val PlotDetailScreen = "plotdetailscreen/{plotId}" // No underscore
+    const val EditPlotScreen = "editplotscreen/{plotId}"
 
-    // Task Routes - CORRECTED
+    // Helper functions for navigation
+    fun plotDetail(plotId: String): String = "plotdetailscreen/$plotId"
+    fun editPlot(plotId: String): String = "editplotscreen/$plotId"
+
     const val TaskListScreen = "task_list"
     const val AddTaskScreen = "add_task"
     const val TaskDetailScreen = "task_detail/{taskId}"
     const val EditTaskScreen = "edit_task/{taskId}"
+    const val UserManagementScreen = "usermanagementscreen"
 
     // Helper functions to build routes with parameters
     fun constructionDetail(constructionId: String): String = "construction_detail/$constructionId"
