@@ -69,24 +69,16 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Account Statistics
-            AccountStatisticsCard()
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Quick Actions
+            // Quick Actions - Only Settings remains
             QuickActionsSection(
-                onEditProfile = {
-                    // Navigate to edit profile - you can add this route later
-                    // navController.navigate(Routes.EditProfileScreen)
-                },
-                onChangePassword = {
-                    // Navigate to change password - you can add this route later
-                    // navController.navigate(Routes.ChangePasswordScreen)
-                },
                 onSettings = {
-                    // Navigate to settings - you can add this route later
-                    // navController.navigate(Routes.SettingsScreen)
+                    navController.navigate(Routes.SettingScreen)
+                },
+                onLogout = {
+                    authRepo.logout()
+                    navController.navigate(Routes.LoginScreen) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 },
                 navController = navController
             )
@@ -95,31 +87,6 @@ fun ProfileScreen(
 
             // App Information
             AppInfoCard()
-
-            // Logout Button
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    authRepo.logout()
-                    navController.navigate(Routes.LoginScreen) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                )
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.img_9), // Replace with your actual drawable resource
-                    contentDescription = "Logout"
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Logout")
-            }
         }
     }
 }
@@ -196,10 +163,10 @@ private fun AnimatedProfileHeader(userName: String, userRole: String) {
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
-                            painter = painterResource(R.drawable.img_11),
+                            painter = painterResource(R.drawable.img_5),
                             contentDescription = "Profile",
                             modifier = Modifier.size(48.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = Color.Black
                         )
                     }
                 }
@@ -327,89 +294,9 @@ private fun InfoRow(icon: ImageVector, label: String, value: String) {
 }
 
 @Composable
-private fun AccountStatisticsCard() {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Text(
-                text = "Quick Stats",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                StatItem(
-                    count = "12",
-                    label = "Bills Managed",
-                    icon = Icons.Default.DateRange
-                )
-                StatItem(
-                    count = "8",
-                    label = "Active Rentals",
-                    icon = Icons.Default.Star
-                )
-                StatItem(
-                    count = "15",
-                    label = "Tasks",
-                    icon = Icons.Default.CheckCircle
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatItem(count: String, label: String, icon: ImageVector) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-            contentColor = MaterialTheme.colorScheme.primary
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .padding(12.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = count,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
 private fun QuickActionsSection(
-    onEditProfile: () -> Unit,
-    onChangePassword: () -> Unit,
     onSettings: () -> Unit,
+    onLogout: () -> Unit,
     navController: NavController
 ) {
     Card(
@@ -427,24 +314,17 @@ private fun QuickActionsSection(
             )
 
             ActionButton(
-                icon = Icons.Default.Edit,
-                text = "Edit Profile",
-                description = "Update your personal information",
-                onClick = onEditProfile
-            )
-
-            ActionButton(
-                icon = Icons.Default.Lock,
-                text = "Change Password",
-                description = "Update your account password",
-                onClick = onChangePassword
-            )
-
-            ActionButton(
                 icon = Icons.Default.Settings,
                 text = "App Settings",
                 description = "Configure application preferences",
-                onClick = {navController.navigate(Routes.SettingScreen)}
+                onClick = onSettings
+            )
+
+            ActionButton(
+                icon = Icons.Default.Clear,
+                text = "Logout",
+                description = "Sign out from your account",
+                onClick = onLogout
             )
         }
     }
