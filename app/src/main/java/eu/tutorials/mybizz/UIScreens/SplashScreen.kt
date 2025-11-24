@@ -2,6 +2,7 @@
 package eu.tutorials.mybizz.UIScreens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -12,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
@@ -24,15 +26,15 @@ fun SplashScreen(navController: NavController) {
     val context = LocalContext.current
     val authRepo = remember { AuthRepository(context) }
 
-    // Observe authentication state
-    val isAuthenticated by authRepo.isAuthenticated
-    val currentUser by authRepo.currentUser
-    val isLoading by authRepo.isLoading
+    // Properly collect StateFlow as State
+    val isAuthenticated by authRepo.isAuthenticated.collectAsState()
+    val currentUser by authRepo.currentUser.collectAsState()
+    val isLoading by authRepo.isLoading.collectAsState()
 
     LaunchedEffect(isLoading, isAuthenticated, currentUser) {
         if (!isLoading) {
             // Small delay for better UX (optional)
-            delay(500)
+            delay(1000)
 
             if (isAuthenticated && currentUser != null) {
                 val role = currentUser!!.role
@@ -56,11 +58,14 @@ fun SplashScreen(navController: NavController) {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(32.dp)
         ) {
             // App Icon with Rounded Corners
@@ -78,7 +83,8 @@ fun SplashScreen(navController: NavController) {
             Text(
                 text = "MyBizz",
                 style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
             )
 
             Text(
@@ -92,7 +98,8 @@ fun SplashScreen(navController: NavController) {
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(32.dp),
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 3.dp
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

@@ -33,8 +33,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
                     val navController = rememberNavController()
                     val context = LocalContext.current
-                    val authRepository = remember { AuthRepository(context) }
-                    NavGraph(navController, authRepository, context)
+                    NavGraph(navController, context)
                 }
             }
         }

@@ -42,9 +42,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    authRepository: AuthRepository,
     context: Context
 ) {
+    val authRepository = remember { AuthRepository.getInstance(context) }
+
     val rentalSheetsRepo = remember { RentalSheetsRepository(context) }
     val rentalRepo = remember { RentalRepository() }
     val scope = rememberCoroutineScope()
@@ -139,7 +140,9 @@ fun NavGraph(
                         }
                     },
                     onMarkPaid = {
-                        scope.launch { rentalRepo.markRentalAsPaid(r.id, rentalSheetsRepo) }
+                        scope.launch { rentalRepo.markRentalAsPaid(r.id, rentalSheetsRepo)
+                        navController.navigate(Routes.RentalListScreen)
+                        }
                     },
                     onBack = { navController.popBackStack() }
                 )
@@ -186,6 +189,14 @@ fun NavGraph(
             )
         }
 
+        composable(Routes.PlotAndConstructionEntry) {
+            PlotAndConstructionEntry(
+                navController = navController,
+                sheetsRepo = plotSheetsRepo,     // for plot
+                constructionSheetsRepo = constructionSheetsRepo // for construction
+            )
+        }
+
 // Add Construction
         composable(Routes.AddConstructionScreen) {
             AddConstructionScreen(
@@ -193,6 +204,8 @@ fun NavGraph(
                 onBack = { navController.popBackStack() }
             )
         }
+
+
 
 // Construction Detail - FIXED ROUTE
         composable(

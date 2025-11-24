@@ -544,14 +544,14 @@ fun PlotDetailScreen(
 
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(
-                        onClick = { onEdit(plot) },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Edit")
-                    }
+//                    Button(
+//                        onClick = { onEdit(plot) },
+//                        modifier = Modifier.weight(1f)
+//                    ) {
+//                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+//                        Spacer(modifier = Modifier.width(8.dp))
+//                        Text("Edit")
+//                    }
                     OutlinedButton(
                         onClick = { onDelete(plot) },
                         modifier = Modifier.weight(1f)

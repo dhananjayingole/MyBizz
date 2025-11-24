@@ -33,7 +33,7 @@ fun AdminDashboardScreen(
         MenuItem("users", "User Management", Routes.UserManagementScreen, R.drawable.img_14), // Replace with your drawable
         MenuItem("RentalManagement", "RentalManagement", Routes.RentalListScreen, R.drawable.img_12), // Replace with your drawable
         MenuItem("Task", "Task", Routes.TaskListScreen, R.drawable.img_15), // Replace with your drawable
-        MenuItem("Construction", "Construction", Routes.ConstructionListScreen, R.drawable.img_10), // Replace with your drawable
+        MenuItem("Construction", "plots & Construction", Routes.PlotAndConstructionEntry, R.drawable.img_10), // Replace with your drawable
         MenuItem("Profile", "Profile", Routes.ProfileScreen, R.drawable.img_11), // Replace with your drawable
     )
 

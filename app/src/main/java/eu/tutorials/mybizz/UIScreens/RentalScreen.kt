@@ -35,8 +35,8 @@ fun RentalListScreen(
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var isLoading by remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
-        scope.launch {
+    LaunchedEffect(rentals) {
+    scope.launch {
             rentals = sheetsRepo.getAllRentals()
             isLoading = false
         }
@@ -300,11 +300,22 @@ fun RentalDetailScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Show Edit only when UNPAID
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { onEdit(rental) }, modifier = Modifier.weight(1f)) {
-                    Text("Edit")
+
+                if (rental.status == Rental.STATUS_UNPAID) {
+                    Button(
+                        onClick = { onEdit(rental) },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Edit")
+                    }
                 }
-                OutlinedButton(onClick = { onDelete(rental) }, modifier = Modifier.weight(1f)) {
+
+                OutlinedButton(
+                    onClick = { onDelete(rental) },
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text("Delete")
                 }
             }
@@ -312,7 +323,9 @@ fun RentalDetailScreen(
             if (rental.status == Rental.STATUS_UNPAID) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = { onMarkPaid(rental) },
+                    onClick = {
+                        onMarkPaid(rental)
+                        onBack() },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Mark as Paid 💸")

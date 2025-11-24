@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,24 +31,14 @@ fun UserDashboardScreen(
         MenuItem("settings", "Settings", Routes.SettingScreen, R.drawable.img_16), // Replace with your drawable
         MenuItem("RentalManagement", "Rental Management", Routes.RentalListScreen, R.drawable.img_12), // Replace with your drawable
         MenuItem("Task", "Task", Routes.TaskListScreen, R.drawable.img_15), // Replace with your drawable
-        MenuItem("Construction", "Plot", Routes.PlotListScreen, R.drawable.img_10), // Replace with your drawable
+        MenuItem("Construction", "Plot & Constructions", Routes.PlotAndConstructionEntry, R.drawable.img_10), // Replace with your drawable
         MenuItem("Profile", "Profile", Routes.ProfileScreen, R.drawable.img_11), // Replace with your drawable
     )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("User Dashboard") },
-                actions = {
-                    IconButton(onClick = {
-                        authRepo.logout()
-                        navController.navigate(Routes.LoginScreen) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }) {
-                        Icon(Icons.Default.Close, contentDescription = "Logout")
-                    }
-                }
+                title = { Text("User Dashboard") }
             )
         }
     ) { innerPadding ->
