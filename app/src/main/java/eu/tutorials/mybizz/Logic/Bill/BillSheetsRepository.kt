@@ -226,7 +226,7 @@ class BillSheetsRepository(private val context: Context) {
 
                 val history = mutableListOf<BillHistoryEntry>()
 
-                // Get all versions for this bill and sort by version
+                // Get all versions for this bill
                 val billEntries = mutableListOf<BillHistoryEntry>()
                 for (i in 1 until values.size) {
                     try {
@@ -238,7 +238,7 @@ class BillSheetsRepository(private val context: Context) {
                                 modifiedBy = row.getOrNull(2)?.toString() ?: "",
                                 modifiedDate = row.getOrNull(3)?.toString() ?: "",
                                 amount = row.getOrNull(4)?.toString()?.toDoubleOrNull() ?: 0.0,
-                                cumulativeAmount = 0.0, // We'll calculate this later
+                                cumulativeAmount = 0.0,
                                 changeType = row.getOrNull(5)?.toString() ?: "MODIFIED"
                             )
                             billEntries.add(entry)
@@ -248,13 +248,12 @@ class BillSheetsRepository(private val context: Context) {
                     }
                 }
 
-                // Sort by version and calculate cumulative amounts
+                // Sort by version in ascending order (V1, V2, V3...)
                 val sortedEntries = billEntries.sortedBy { it.version }
-                var runningTotal = 0.0
 
+                // Calculate cumulative amounts if needed
                 for (entry in sortedEntries) {
-                    runningTotal = entry.amount // Each entry shows the current total amount at that version
-                    history.add(entry.copy(cumulativeAmount = runningTotal))
+                    history.add(entry.copy(cumulativeAmount = entry.amount))
                 }
 
                 Log.d(TAG, "Found ${history.size} history entries for bill $billNumber")
@@ -265,8 +264,7 @@ class BillSheetsRepository(private val context: Context) {
             emptyList()
         }
     }
-
-    // Ensure history sheet exists
+    // Ensure history sheet exists.
     private suspend fun ensureHistorySheetExists(service: Sheets) {
         try {
             val spreadsheet = service.spreadsheets().get(SPREADSHEET_ID).execute()
@@ -493,6 +491,11 @@ class BillSheetsRepository(private val context: Context) {
             withTimeout(TimeUnit.SECONDS.toMillis(API_TIMEOUT_SECONDS)) {
                 val service = getSheetsService() ?: return@withTimeout false
 
+                // First get the bill to retrieve bill number for history cleanup
+                val bill = getBillById(billId)
+                val billNumber = bill?.billNumber
+
+                // Delete from main bills sheet
                 val response = service.spreadsheets().values()
                     .get(SPREADSHEET_ID, "$BILLS_SHEET_NAME!A:A")
                     .execute()
@@ -519,7 +522,12 @@ class BillSheetsRepository(private val context: Context) {
                     .clear(SPREADSHEET_ID, range, clearRequest)
                     .execute()
 
-                Log.d(TAG, "Bill deleted successfully from row $rowIndex")
+                // Delete corresponding history entries if bill number exists
+                if (!billNumber.isNullOrEmpty()) {
+                    deleteBillHistory(billNumber)
+                }
+
+                Log.d(TAG, "Bill and its history deleted successfully")
                 true
             }
         } catch (e: Exception) {
@@ -528,6 +536,75 @@ class BillSheetsRepository(private val context: Context) {
         }
     }
 
+    // NEW: Function to delete bill history entries
+    private suspend fun deleteBillHistory(billNumber: String): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val service = getSheetsService() ?: return@withContext false
+
+            // Get all history entries to find which rows to delete
+            val response = service.spreadsheets().values()
+                .get(SPREADSHEET_ID, "$HISTORY_SHEET_NAME!A:F")
+                .execute()
+
+            val values = response.getValues()
+            if (values.isNullOrEmpty() || values.size <= 1) {
+                return@withContext true // No history exists
+            }
+
+            // Find rows that belong to this bill number (skip header row)
+            val rowsToDelete = mutableListOf<Int>()
+            for (i in 1 until values.size) {
+                val row = values[i]
+                if (row.isNotEmpty() && row[0].toString() == billNumber) {
+                    rowsToDelete.add(i + 1) // +1 because Sheets API is 1-indexed
+                }
+            }
+
+            if (rowsToDelete.isEmpty()) {
+                return@withContext true // No history entries found for this bill
+            }
+
+            // Delete rows from bottom to top to maintain correct indices
+            val sortedRowsToDelete = rowsToDelete.sortedDescending()
+
+            for (rowIndex in sortedRowsToDelete) {
+                val deleteRequest = Request().setDeleteDimension(
+                    DeleteDimensionRequest().setRange(
+                        DimensionRange()
+                            .setSheetId(getSheetId(service, HISTORY_SHEET_NAME))
+                            .setDimension("ROWS")
+                            .setStartIndex(rowIndex - 1) // Convert to 0-indexed
+                            .setEndIndex(rowIndex)
+                    )
+                )
+
+                val batchUpdateRequest = BatchUpdateSpreadsheetRequest()
+                    .setRequests(listOf(deleteRequest))
+
+                service.spreadsheets().batchUpdate(SPREADSHEET_ID, batchUpdateRequest).execute()
+
+                Log.d(TAG, "Deleted history row $rowIndex for bill $billNumber")
+            }
+
+            Log.d(TAG, "Deleted ${rowsToDelete.size} history entries for bill $billNumber")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleting bill history: ${e.message}", e)
+            false
+        }
+    }
+
+    // Helper function to get sheet ID by name
+    private fun getSheetId(service: Sheets, sheetName: String): Int {
+        return try {
+            val spreadsheet = service.spreadsheets().get(SPREADSHEET_ID).execute()
+            val sheet = spreadsheet.sheets.find { it.properties.title == sheetName }
+            sheet?.properties?.sheetId ?: -1
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting sheet ID for $sheetName: ${e.message}", e)
+            -1
+        }
+    }
     suspend fun markBillAsPaid(billId: String, paidByEmail: String): Boolean {
         val bill = getBillById(billId) ?: return false
 

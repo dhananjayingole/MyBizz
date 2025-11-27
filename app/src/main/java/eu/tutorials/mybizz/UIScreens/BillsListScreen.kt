@@ -310,7 +310,7 @@ fun BillsListScreen(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(filteredBills) { bill ->
+                            items(filteredBills.reversed()) { bill ->
                                 BillItem(
                                     bill = bill,
                                     onMarkAsPaid = { markBillAsPaid(it) },

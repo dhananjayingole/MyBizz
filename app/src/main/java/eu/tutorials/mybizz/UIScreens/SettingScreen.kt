@@ -176,10 +176,10 @@ fun SettingItem(
     }
 }
 
-
 fun sendSupportEmail(context: android.content.Context) {
     val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:support@mybiz.com")
+        data = Uri.parse("mailto:navtejsinghr8913@gmail.com") // Add "mailto:" prefix
+        putExtra(Intent.EXTRA_EMAIL, arrayOf("navtejsinghr8913@gmail.com")) // Explicitly set recipient
         putExtra(Intent.EXTRA_SUBJECT, "MyBiz App Support Request")
         putExtra(
             Intent.EXTRA_TEXT,
@@ -192,15 +192,12 @@ fun sendSupportEmail(context: android.content.Context) {
     } catch (e: Exception) {
         Toast.makeText(
             context,
-            "No email app found. Please contact support@mybiz.com",
+            "No email app found. Please contact navtejsinghr8913@gmail.com",
             Toast.LENGTH_LONG
         ).show()
     }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                             SHARE APP FUNCTION                             */
-/* -------------------------------------------------------------------------- */
 fun shareApp(context: android.content.Context) {
     val shareIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
@@ -220,7 +217,6 @@ fun shareApp(context: android.content.Context) {
         Toast.makeText(context, "Unable to share app", Toast.LENGTH_SHORT).show()
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
