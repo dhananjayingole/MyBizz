@@ -30,7 +30,6 @@ MyBizz is a comprehensive billing management application developed as my first f
 - 📊 **Real-time Data Sync** - Automatic synchronization with Google Sheets
 
 ## 🛠️ Technology Stack
-
 - **Language**: Kotlin
 - **UI Framework**: Jetpack Compose
 - **Authentication**: Firebase Authentication
