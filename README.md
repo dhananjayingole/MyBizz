@@ -10,6 +10,7 @@ MyBizz is a comprehensive billing management application developed as my first f
 
 ### Core Functionality
 - **Multi-Category Billing**: Create and manage bills for:
+  - 💰 General Billing Service - Custom invoices, expense tracking, client billing
   - 🏠 Rental Services
   - ✅ Task-based Projects
   - 🏗️ Construction Projects
