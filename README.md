@@ -228,7 +228,7 @@ Each category has dedicated Sheets repositories:
 - [ ] Payment reminder notifications
 - [ ] Offline mode support
 - [ ] Multi-language localization
-- [ ] Dark/Light theme toggle
+- [ ] Dark/Light theme toggle.
 
 ## 🤝 Contributing
 
