@@ -1,4 +1,3 @@
-// MyBizApp.kt - Application Class
 package eu.tutorials.mybizz
 
 import android.app.Application
