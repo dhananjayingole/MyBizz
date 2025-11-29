@@ -4,10 +4,10 @@ package eu.tutorials.mybizz.Navigation
 object Routes {
     const val SplashScreen = "splash_screens"
     const val LoginScreen = "login_screens"
-    const val SignUpScreen = "signup_screen"
+    const val SignUpScreen = "signup_screens"
     const val AdminDashboardScreen = "admin_dashboard"
     const val UserDashboardScreen = "user_dashboard"
-    const val SettingScreen = "settingscreen"
+    const val SettingScreen = "settingscreens"
     const val BillsListScreen = "bills_list"
     const val AddBillScreen = "add_bill"
     const val EditBillScreen = "edit_bill/{billId}"
@@ -21,8 +21,8 @@ object Routes {
     const val AddConstructionScreen = "add_construction"
     const val ConstructionDetailScreen = "construction_detail/{constructionId}"
     const val EditConstructionScreen = "edit_construction/{constructionId}"
-    const val PlotListScreen = "plotlistscreen"
-    const val AddPlotScreen = "addplotscreen"
+    const val PlotListScreen = "plotlistscreens"
+    const val AddPlotScreen = "addplotscreens"
     const val PlotDetailScreen = "plotdetailscreen/{plotId}" // No underscore
     const val EditPlotScreen = "editplotscreen/{plotId}"
 
