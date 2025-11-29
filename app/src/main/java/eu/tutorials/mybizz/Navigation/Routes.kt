@@ -2,8 +2,8 @@
 package eu.tutorials.mybizz.Navigation
 
 object Routes {
-    const val SplashScreen = "splash_screen"
-    const val LoginScreen = "login_screen"
+    const val SplashScreen = "splash_screens"
+    const val LoginScreen = "login_screens"
     const val SignUpScreen = "signup_screen"
     const val AdminDashboardScreen = "admin_dashboard"
     const val UserDashboardScreen = "user_dashboard"
