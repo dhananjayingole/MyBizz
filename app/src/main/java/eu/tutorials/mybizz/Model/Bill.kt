@@ -1,7 +1,7 @@
 package eu.tutorials.mybizz.Model
 
 import java.util.*
-
+// this is Schema of Bill
 data class Bill(
     val id: String = "",
     val billNumber: String = "", // NEW: Formatted bill number like "2025001"

@@ -1,4 +1,3 @@
-// Logic/Auth/AuthRepository.kt - OPTIMIZED VERSION
 package eu.tutorials.mybizz.Logic.Auth
 
 import android.annotation.SuppressLint
@@ -105,7 +104,6 @@ class AuthRepository(private val context: Context? = null) {
             }
     }
 
-    // ✅ OPTIMIZED SIGNUP - Navigate immediately after Firebase Auth
     fun signUp(
         email: String,
         password: String,
