@@ -1,6 +1,8 @@
 // Navigation/NavGraph.kt
 package eu.tutorials.mybizz.Navigation
 
+import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -16,12 +18,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
+import eu.tutorials.mybizz.Logic.Bill.BillRepository
 import eu.tutorials.mybizz.Logic.Construction.ConstructionRepository
 import eu.tutorials.mybizz.Logic.Construction.ConstructionSheetsRepository
 import eu.tutorials.mybizz.Logic.Rental.RentalRepository
@@ -35,9 +41,17 @@ import eu.tutorials.mybizz.Model.Plot
 import eu.tutorials.mybizz.Model.Rental
 import eu.tutorials.mybizz.Model.Task
 import eu.tutorials.mybizz.Navigation.Routes.EditTaskScreen
+import eu.tutorials.mybizz.Navigation.Routes.MonthlyReportScreen
+import eu.tutorials.mybizz.Report.BillsMonthlyReportRepository
+import eu.tutorials.mybizz.Report.BillsMonthlyReportScreen
+import eu.tutorials.mybizz.Report.BillsMonthlyReportViewModel
+import eu.tutorials.mybizz.Reporting.MonthlyReportScreen
+import eu.tutorials.mybizz.Reporting.MonthlyReportViewModel
+import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import eu.tutorials.mybizz.UIScreens.*
 import kotlinx.coroutines.launch
 
+@SuppressLint("ViewModelConstructorInComposable")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavGraph(
@@ -387,6 +401,23 @@ fun NavGraph(
                     CircularProgressIndicator()
                 }
             }
+        }
+        // In NavGraph.kt - add this composable inside the NavHost
+        composable(Routes.MonthlyReportScreen) {
+            // Create the ViewModel with Application context
+            val viewModel: MonthlyReportViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        val application = context.applicationContext as Application
+                        return MonthlyReportViewModel(application) as T
+                    }
+                }
+            )
+
+            MonthlyReportScreen(
+                viewModel = viewModel,
+                navController = navController
+            )
         }
     }
 }

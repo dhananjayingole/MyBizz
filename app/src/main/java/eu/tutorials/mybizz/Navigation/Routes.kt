@@ -38,6 +38,10 @@ object Routes {
 
     const val PlotAndConstructionEntry = "plotandconstructionentry"
 
+    const val BillsMonthlyReportScreen = "billsmonthlyreportscreen"
+
+    const val MonthlyReportScreen = "monthlyreportscreen"
+
     // Helper functions to build routes with parameters
     fun constructionDetail(constructionId: String): String = "construction_detail/$constructionId"
     fun editConstruction(constructionId: String): String = "edit_construction/$constructionId"

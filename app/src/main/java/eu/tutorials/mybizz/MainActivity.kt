@@ -12,12 +12,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
+import eu.tutorials.mybizz.Logic.Bill.BillRepository
 import eu.tutorials.mybizz.Navigation.NavGraph
+import eu.tutorials.mybizz.Report.BillsMonthlyReportRepository
+import eu.tutorials.mybizz.Report.BillsMonthlyReportScreen
+import eu.tutorials.mybizz.Report.BillsMonthlyReportViewModel
+import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import eu.tutorials.mybizz.ui.theme.MyBizzTheme
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

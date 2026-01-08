@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +21,7 @@ import androidx.navigation.NavController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Logic.Bill.BillRepository
 import eu.tutorials.mybizz.Model.Bill
+import eu.tutorials.mybizz.Navigation.Routes
 import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import kotlinx.coroutines.launch
 
@@ -129,6 +131,30 @@ fun BillsListScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Bills Management") },
+                actions = {
+                    // Monthly Summary Button
+                    TextButton(
+                        onClick = {
+                            // Navigate to monthly summary screen
+                            navController.navigate(Routes.MonthlyReportScreen)
+                        },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Create,
+                                contentDescription = "Monthly Summary",
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Monthly Summary")
+                        }
+                    }
+                }
             )
         },
         floatingActionButton = {

@@ -34,7 +34,8 @@ fun AdminDashboardScreen(
         MenuItem("RentalManagement", "RentalManagement", Routes.RentalListScreen, R.drawable.img_12), // Replace with your drawable
         MenuItem("Task", "Task", Routes.TaskListScreen, R.drawable.img_15), // Replace with your drawable
         MenuItem("Construction", "plots & Construction", Routes.PlotAndConstructionEntry, R.drawable.img_10), // Replace with your drawable
-        MenuItem("Profile", "Profile", Routes.ProfileScreen, R.drawable.img_11), // Replace with your drawable
+        MenuItem("Profile", "Profile", Routes.ProfileScreen, R.drawable.img_11),
+        MenuItem("Setting", "Setting", Routes.SettingScreen, R.drawable.img_16)// Replace with your drawable
     )
 
     Scaffold(

@@ -2,33 +2,45 @@ package eu.tutorials.mybizz.UIScreens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Navigation.Routes
-import androidx.compose.runtime.collectAsState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupScreen(
     navController: NavController,
-    authRepo: AuthRepository = AuthRepository.getInstance(LocalContext.current) // Use singleton
+    authRepo: AuthRepository = AuthRepository.getInstance(LocalContext.current)
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -41,237 +53,251 @@ fun SignupScreen(
 
     val context = LocalContext.current
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
+    Box(modifier = Modifier.fillMaxSize()) {
+        // 1. ANIMATED BACKGROUND
+        AnimatedBackgroundGradient()
+
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(24.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                .fillMaxSize()
+                .padding(24.dp)
+                .systemBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Column(
+            // Header with entry animation
+            Text(
+                text = "Join MyBizz",
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 2.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                text = "Let's get your account set up",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
+
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                    .animateContentSize(), // Smoothes transitions when errors appear
+                shape = RoundedCornerShape(32.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
-                Text(
-                    text = "Create Account",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Fields
+                    CustomTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = "Email",
+                        icon = Icons.Default.Email,
+                        keyboardType = KeyboardType.Email
+                    )
 
-                // Email
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
-                    placeholder = { Text("Enter your email") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                )
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // Password
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
-                    placeholder = { Text("Enter your password") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 12.dp),
-                    singleLine = true,
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(
-                                imageVector = if (passwordVisible) Icons.Filled.Face else Icons.Filled.Lock,
-                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                            )
-                        }
-                    }
-                )
+                    CustomTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = "Password",
+                        icon = Icons.Default.Lock,
+                        isPassword = true,
+                        passwordVisible = passwordVisible,
+                        onVisibilityChange = { passwordVisible = !passwordVisible }
+                    )
 
-                // Confirm Password
-                OutlinedTextField(
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
-                    label = { Text("Confirm Password") },
-                    placeholder = { Text("Confirm your password") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    trailingIcon = {
-                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                            Icon(
-                                imageVector = if (confirmPasswordVisible) Icons.Filled.Face else Icons.Filled.Lock,
-                                contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password"
-                            )
-                        }
-                    }
-                )
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // Role selection
-                Text(
-                    text = "Select Role:",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 8.dp)
-                )
+                    CustomTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = "Confirm Password",
+                        icon = Icons.Default.Lock,
+                        isPassword = true,
+                        passwordVisible = confirmPasswordVisible,
+                        onVisibilityChange = { confirmPasswordVisible = !confirmPasswordVisible }
+                    )
 
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .selectable(
-                                selected = role == "admin",
-                                onClick = { role = "admin" }
-                            )
-                            .padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = role == "admin",
-                            onClick = { role = "admin" }
-                        )
-                        Text("Admin", modifier = Modifier.padding(start = 4.dp))
-                    }
+                    // Role Selection
+                    RoleSelector(role) { role = it }
 
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .selectable(
-                                selected = role == "user",
-                                onClick = { role = "user" }
-                            )
-                            .padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = role == "user",
-                            onClick = { role = "user" }
-                        )
-                        Text("User", modifier = Modifier.padding(start = 4.dp))
-                    }
-                }
-
-                // Sign Up Button - SIMPLIFIED NAVIGATION
-                Button(
-                    onClick = {
-                        // Validation
-                        when {
-                            email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
-                                error = "Please fill all fields"
-                                return@Button
-                            }
-                            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
-                                error = "Please enter a valid email"
-                                return@Button
-                            }
-                            password != confirmPassword -> {
-                                error = "Passwords do not match"
-                                return@Button
-                            }
-                            password.length < 6 -> {
-                                error = "Password must be at least 6 characters"
-                                return@Button
-                            }
-                            else -> {
+                    // 2. ANIMATED SIGN UP BUTTON
+                    AnimatedSignupButton(
+                        isLoading = isLoading,
+                        onClick = {
+                            if (validate(email, password, confirmPassword) { error = it }) {
                                 isLoading = true
-                                error = null
-
-                                // Store the role for navigation
-                                val selectedRole = role
-
-                                authRepo.signUp(email, password, role) { success, err, user ->
+                                authRepo.signUp(email, password, role) { success, err, _ ->
                                     isLoading = false
-
                                     if (success) {
-                                        Toast.makeText(context, "Account Created Successfully!", Toast.LENGTH_SHORT).show()
-
-                                        // NAVIGATE IMMEDIATELY using the selected role
-                                        // Don't rely on state updates, navigate directly
-                                        when (selectedRole) {
-                                            "admin" -> {
-                                                Log.d("SIGNUP", "🔄 Navigating to Admin Dashboard")
-                                                navController.navigate(Routes.AdminDashboardScreen) {
-                                                    popUpTo(Routes.SplashScreen) { inclusive = true }
-                                                }
-                                            }
-                                            else -> {
-                                                Log.d("SIGNUP", "🔄 Navigating to User Dashboard")
-                                                navController.navigate(Routes.UserDashboardScreen) {
-                                                    popUpTo(Routes.SplashScreen) { inclusive = true }
-                                                }
-                                            }
-                                        }
+                                        navController.navigate(Routes.UserDashboardScreen) // Logic here
                                     } else {
-                                        error = err ?: "Signup failed. Please try again."
-                                        Log.e("SIGNUP", "❌ Signup failed: $error")
+                                        error = err ?: "Signup failed"
                                     }
                                 }
                             }
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .padding(top = 24.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = !isLoading
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            strokeWidth = 2.dp
+                    )
+
+                    // Error display with Animation
+                    AnimatedVisibility(
+                        visible = error != null,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Text(
+                            text = error ?: "",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 16.dp)
                         )
-                    } else {
-                        Text("SIGN UP", style = MaterialTheme.typography.labelLarge)
                     }
                 }
+            }
 
-                // Login text
-                TextButton(
-                    onClick = {
-                        navController.navigate(Routes.LoginScreen) {
-                            popUpTo(Routes.SignUpScreen) { inclusive = true }
-                        }
-                    },
-                    modifier = Modifier.padding(top = 16.dp)
-                ) {
-                    Text("Already have an account? Login")
-                }
+            TextButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.padding(top = 16.dp)
+            ) {
+                Text("Already have an account? Login", color = MaterialTheme.colorScheme.onBackground)
+            }
+        }
+    }
+}
 
-                // Error message
-                error?.let {
-                    Text(
-                        text = it,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(12.dp)
+@Composable
+fun AnimatedBackgroundGradient() {
+    val infiniteTransition = rememberInfiniteTransition(label = "background")
+    val angle by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(10000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ), label = "angle"
+    )
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        drawRect(
+            brush = Brush.linearGradient(
+                colors = listOf(Color(0xFFE3F2FD), Color(0xFFF3E5F5), Color(0xFFE8EAF6)),
+                start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                end = androidx.compose.ui.geometry.Offset(size.width, size.height)
+            )
+        )
+    }
+}
+
+@Composable
+fun AnimatedSignupButton(isLoading: Boolean, onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Scale down effect on press
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.92f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "scale"
+    )
+
+    Button(
+        onClick = onClick,
+        interactionSource = interactionSource,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .padding(top = 8.dp)
+            .graphicsLayer(scaleX = scale, scaleY = scale),
+        shape = RoundedCornerShape(16.dp),
+        enabled = !isLoading,
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+        } else {
+            Text("SIGN UP", fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun CustomTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    isPassword: Boolean = false,
+    passwordVisible: Boolean = false,
+    onVisibilityChange: () -> Unit = {},
+    keyboardType: KeyboardType = KeyboardType.Text
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        leadingIcon = { Icon(icon, contentDescription = null) },
+        trailingIcon = {
+            if (isPassword) {
+                IconButton(onClick = onVisibilityChange) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Default.Face else Icons.Default.Lock,
+                        contentDescription = null
                     )
                 }
             }
+        },
+        visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp)
+    )
+}
+
+@Composable
+fun RoleSelector(selectedRole: String, onRoleSelected: (String) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        listOf("admin", "user").forEach { role ->
+            val isSelected = selectedRole == role
+            val backgroundColor by animateColorAsState(
+                if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                label = "color"
+            )
+
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(backgroundColor)
+                    .clickable { onRoleSelected(role) }
+                    .padding(horizontal = 24.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = role.replaceFirstChar { it.uppercase() },
+                    color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
+    }
+}
+
+private fun validate(e: String, p: String, cp: String, onError: (String) -> Unit): Boolean {
+    return when {
+        e.isEmpty() || p.isEmpty() -> { onError("Fields cannot be empty"); false }
+        p != cp -> { onError("Passwords do not match"); false }
+        else -> true
     }
 }

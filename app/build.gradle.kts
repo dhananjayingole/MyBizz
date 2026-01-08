@@ -82,5 +82,12 @@ dependencies {
 // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
+// lottie
+    implementation("com.airbnb.android:lottie-compose:6.0.0")
 
+    implementation("com.google.accompanist:accompanist-pager:0.31.5-beta")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.31.5-beta")
+// Charts
+    implementation("com.patrykandpatrick.vico:compose-m3:1.12.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
 }
