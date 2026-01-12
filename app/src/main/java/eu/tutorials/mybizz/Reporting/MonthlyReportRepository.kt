@@ -1,13 +1,11 @@
 package eu.tutorials.mybizz.Reporting
 
 import android.util.Log
-import com.google.api.services.sheets.v4.model.*
 import eu.tutorials.mybizz.Logic.Rental.RentalSheetsRepository
 import eu.tutorials.mybizz.Logic.Task.TaskSheetsRepository
 import eu.tutorials.mybizz.Model.Bill
 import eu.tutorials.mybizz.Model.Rental
 import eu.tutorials.mybizz.Repository.BillSheetsRepository
-import java.util.*
 
 class MonthlyReportRepository {
     companion object {
