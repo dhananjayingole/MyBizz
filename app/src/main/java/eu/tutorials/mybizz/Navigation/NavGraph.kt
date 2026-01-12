@@ -402,7 +402,8 @@ fun NavGraph(
                 }
             }
         }
-        // In NavGraph.kt - add this composable inside the NavHost
+
+        // In NavGraph.kt -
         composable(Routes.MonthlyReportScreen) {
             // Create the ViewModel with Application context
             val viewModel: MonthlyReportViewModel = viewModel(
@@ -413,7 +414,6 @@ fun NavGraph(
                     }
                 }
             )
-
             MonthlyReportScreen(
                 viewModel = viewModel,
                 navController = navController
