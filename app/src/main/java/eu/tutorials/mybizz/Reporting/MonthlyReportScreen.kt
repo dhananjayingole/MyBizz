@@ -35,6 +35,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -264,7 +266,6 @@ fun MonthSelector(
     }
 }
 
-
 @Composable
 fun BillsReportPage(summary: MonthlyReportSummary) {
     LazyColumn(
@@ -357,7 +358,6 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
         }
     }
 }
-
 @Composable
 fun RentalsReportPage(summary: MonthlyReportSummary) {
     LazyColumn(
@@ -448,7 +448,6 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
         }
     }
 }
-
 @Composable
 fun TasksReportPage(summary: MonthlyReportSummary) {
     LazyColumn(
@@ -759,35 +758,89 @@ fun BillReportItemCard(item: BillReportItem) {
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
+        // Table Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Bill #${item.billNumber}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-                Text(
-                    text = item.category,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "₹${item.amount}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = if (item.status == Bill.STATUS_PAID) Color.Red else Color(0xFFFF9800)
-                )
+            Text(
+                text = "Bill #",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = "Title",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(2f)
+            )
+            Text(
+                text = "Category",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1.5f)
+            )
+            Text(
+                text = "Amount",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.End
+            )
+            Text(
+                text = "Status",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Divider(thickness = 1.dp)
+
+        // Table Row
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = item.billNumber,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(2f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = item.category,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1.5f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "₹${item.amount}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = if (item.status == Bill.STATUS_PAID) Color.Red else Color(0xFFFF9800),
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.End
+            )
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
                 StatusChip(item.status)
             }
         }
@@ -800,31 +853,79 @@ fun RentalReportItemCard(item: RentalReportItem) {
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
+        // Table Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.tenantName,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = item.property,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "₹${item.amount}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = if (item.status == Rental.STATUS_PAID) Color.Green else Color(0xFFFF9800)
-                )
+            Text(
+                text = "Tenant Name",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(2f)
+            )
+            Text(
+                text = "Property",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(2f)
+            )
+            Text(
+                text = "Amount",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.End
+            )
+            Text(
+                text = "Status",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Divider(thickness = 1.dp)
+
+        // Table Row
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = item.tenantName,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(2f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = item.property,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                modifier = Modifier.weight(2f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "₹${item.amount}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = if (item.status == Rental.STATUS_PAID) Color.Green else Color(0xFFFF9800),
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.End
+            )
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
                 StatusChip(item.status)
             }
         }
@@ -837,29 +938,77 @@ fun TaskReportItemCard(item: TaskReportItem) {
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
+        // Table Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Assigned to: ${item.assignedTo}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-                Text(
-                    text = "Due: ${item.dueDate}",
-                    style = MaterialTheme.typography.bodySmall
-                )
+            Text(
+                text = "Task Title",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(2.5f)
+            )
+            Text(
+                text = "Assigned To",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1.5f)
+            )
+            Text(
+                text = "Due Date",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1.5f)
+            )
+            Text(
+                text = "Status",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Divider(thickness = 1.dp)
+
+        // Table Row
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(2.5f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = item.assignedTo,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                modifier = Modifier.weight(1.5f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = item.dueDate,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1.5f)
+            )
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                StatusChip(item.status)
             }
-            StatusChip(item.status)
         }
     }
 }
