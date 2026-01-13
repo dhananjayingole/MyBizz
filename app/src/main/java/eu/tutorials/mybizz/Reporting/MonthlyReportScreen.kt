@@ -11,13 +11,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
@@ -56,7 +57,13 @@ fun MonthlyReportScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Monthly Reports") },
+                title = {
+                    Text(
+                        "Monthly Reports",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, "Back")
@@ -64,67 +71,113 @@ fun MonthlyReportScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
                 )
             )
-        }
+        },
+        containerColor = Color(0xFFF5F5F5)
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            MonthSelector(
-                selectedMonth = selectedMonth,
-                onPreviousMonth = { viewModel.loadPreviousMonth() },
-                onNextMonth = { viewModel.loadNextMonth() }
-            )
-
             when {
                 isLoading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(48.dp),
+                            strokeWidth = 4.dp
+                        )
                     }
                 }
                 errorMessage != null -> {
                     ErrorView(errorMessage = errorMessage)
                 }
                 monthlyReport != null -> {
-                    // Overall Financial Summary Card
-                    FinancialOverviewCard(monthlyReport)
-
-                    ScrollableTabRow(
-                        selectedTabIndex = pagerState.currentPage,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Tab(
-                            selected = pagerState.currentPage == 0,
-                            onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
-                            text = { Text("Bills") }
-                        )
-                        Tab(
-                            selected = pagerState.currentPage == 1,
-                            onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
-                            text = { Text("Rentals") }
-                        )
-                        Tab(
-                            selected = pagerState.currentPage == 2,
-                            onClick = { scope.launch { pagerState.animateScrollToPage(2) } },
-                            text = { Text("Tasks") }
-                        )
-                    }
-
-                    HorizontalPager(
-                        state = pagerState,
+                    Column(
                         modifier = Modifier.fillMaxSize()
-                    ) { page ->
-                        when (page) {
-                            0 -> BillsReportPage(monthlyReport.billsSummary)
-                            1 -> RentalsReportPage(monthlyReport.rentalsSummary)
-                            2 -> TasksReportPage(monthlyReport.tasksSummary)
+                    ) {
+                        // Month Selector with elevated card
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Color.White,
+                            shadowElevation = 2.dp
+                        ) {
+                            MonthSelector(
+                                selectedMonth = selectedMonth,
+                                onPreviousMonth = { viewModel.loadPreviousMonth() },
+                                onNextMonth = { viewModel.loadNextMonth() }
+                            )
+                        }
+
+                        // Financial Overview Card
+                        FinancialOverviewCard(monthlyReport)
+
+                        // Tab Row
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Color.White,
+                            shadowElevation = 4.dp
+                        ) {
+                            TabRow(
+                                selectedTabIndex = pagerState.currentPage,
+                                modifier = Modifier.fillMaxWidth(),
+                                containerColor = Color.White,
+                                indicator = { tabPositions ->
+                                    TabRowDefaults.SecondaryIndicator(
+                                        Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                                        height = 3.dp,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            ) {
+                                Tab(
+                                    selected = pagerState.currentPage == 0,
+                                    onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
+                                    text = {
+                                        Text(
+                                            "Bills",
+                                            fontWeight = if (pagerState.currentPage == 0) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    }
+                                )
+                                Tab(
+                                    selected = pagerState.currentPage == 1,
+                                    onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
+                                    text = {
+                                        Text(
+                                            "Rentals",
+                                            fontWeight = if (pagerState.currentPage == 1) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    }
+                                )
+                                Tab(
+                                    selected = pagerState.currentPage == 2,
+                                    onClick = { scope.launch { pagerState.animateScrollToPage(2) } },
+                                    text = {
+                                        Text(
+                                            "Tasks",
+                                            fontWeight = if (pagerState.currentPage == 2) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    }
+                                )
+                            }
+                        }
+
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxSize()
+                        ) { page ->
+                            when (page) {
+                                0 -> BillsReportPage(monthlyReport.billsSummary)
+                                1 -> RentalsReportPage(monthlyReport.rentalsSummary)
+                                2 -> TasksReportPage(monthlyReport.tasksSummary)
+                            }
                         }
                     }
                 }
@@ -141,33 +194,40 @@ fun FinancialOverviewCard(report: MonthlyReport) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        elevation = CardDefaults.cardElevation(6.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isProfit) Color(0xFFE8F5E9) else Color(0xFFFFEBEE)
+            containerColor = Color.White
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(20.dp)
         ) {
             Text(
                 text = "Financial Overview",
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1A1A1A)
             )
-            Spacer(modifier = Modifier.height(12.dp))
 
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Income and Expenses Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                FinancialMetric(
+                FinancialMetricCard(
                     label = "Income",
                     amount = report.getTotalIncome(),
                     color = Color(0xFF4CAF50),
                     icon = Icons.Default.KeyboardArrowUp
                 )
-                FinancialMetric(
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                FinancialMetricCard(
                     label = "Expenses",
                     amount = report.getTotalExpenses(),
                     color = Color(0xFFF44336),
@@ -175,12 +235,21 @@ fun FinancialOverviewCard(report: MonthlyReport) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-            Divider()
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
+            Divider(color = Color(0xFFE0E0E0), thickness = 1.dp)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Net Profit/Loss Section
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        if (isProfit) Color(0xFFE8F5E9) else Color(0xFFFFEBEE)
+                    )
+                    .padding(16.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -188,17 +257,18 @@ fun FinancialOverviewCard(report: MonthlyReport) {
                     imageVector = if (isProfit) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
                     tint = if (isProfit) Color(0xFF4CAF50) else Color(0xFFF44336),
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(28.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(horizontalAlignment = Alignment.Start) {
                     Text(
                         text = if (isProfit) "Net Profit" else "Net Loss",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
+                        color = Color(0xFF666666),
+                        fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "₹${String.format("%.2f", kotlin.math.abs(netAmount))}",
+                        text = "₹${String.format("%,.2f", kotlin.math.abs(netAmount))}",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = if (isProfit) Color(0xFF4CAF50) else Color(0xFFF44336)
@@ -210,31 +280,48 @@ fun FinancialOverviewCard(report: MonthlyReport) {
 }
 
 @Composable
-fun FinancialMetric(
+fun RowScope.FinancialMetricCard(
     label: String,
     amount: Double,
     color: Color,
     icon: androidx.compose.ui.graphics.vector.ImageVector
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = color,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
-        )
-        Text(
-            text = "₹${String.format("%.2f", amount)}",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
+    Surface(
+        modifier = Modifier
+            .weight(1f)
+            .height(100.dp),
+        shape = RoundedCornerShape(12.dp),
+        color = color.copy(alpha = 0.1f)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = color,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF666666),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+            Text(
+                text = "₹${String.format("%,.2f", amount)}",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
+        }
     }
 }
 
@@ -251,29 +338,52 @@ fun MonthSelector(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onPreviousMonth) {
-            Icon(Icons.Default.KeyboardArrowLeft, "Previous Month")
+        IconButton(
+            onClick = onPreviousMonth,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+        ) {
+            Icon(
+                Icons.Default.KeyboardArrowLeft,
+                "Previous Month",
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
 
         Text(
             text = formatMonthDisplay(selectedMonth),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1A1A1A)
         )
 
-        IconButton(onClick = onNextMonth) {
-            Icon(Icons.Default.KeyboardArrowRight, "Next Month")
+        IconButton(
+            onClick = onNextMonth,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+        ) {
+            Icon(
+                Icons.Default.KeyboardArrowRight,
+                "Next Month",
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
+
 @Composable
 fun BillsReportPage(summary: MonthlyReportSummary) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(Color(0xFFF5F5F5)),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Summary Card
         item {
             SummaryCard(
                 title = "Bills Summary",
@@ -285,26 +395,27 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
                 unpaidCount = summary.unpaidCount,
                 isExpense = true
             )
-            Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Pie Chart for Paid vs Unpaid
         item {
             if (summary.totalAmount > 0) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(4.dp)
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "Payment Status Distribution",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1A1A1A)
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         PieChart(
                             data = listOf(
@@ -314,11 +425,9 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 
-        // Category Breakdown Bar Chart
         item {
             val billItems = summary.items.filterIsInstance<BillReportItem>()
             if (billItems.isNotEmpty()) {
@@ -329,15 +438,18 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
                 if (categoryTotals.isNotEmpty()) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        elevation = CardDefaults.cardElevation(4.dp)
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column(modifier = Modifier.padding(20.dp)) {
                             Text(
                                 text = "Expenses by Category",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF1A1A1A)
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
 
                             SimpleBarChart(
                                 data = categoryTotals,
@@ -345,12 +457,10 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
 
-        // Bills Table
         item {
             if (summary.items.isNotEmpty()) {
                 BillsTable(summary.items.filterIsInstance<BillReportItem>())
@@ -364,7 +474,9 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(Color(0xFFF5F5F5)),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
             SummaryCard(
@@ -377,26 +489,27 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
                 unpaidCount = summary.unpaidCount,
                 isExpense = false
             )
-            Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Pie Chart for Collection Status
         item {
             if (summary.totalAmount > 0) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(4.dp)
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "Collection Status",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1A1A1A)
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         PieChart(
                             data = listOf(
@@ -406,11 +519,9 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 
-        // Property-wise breakdown
         item {
             val rentalItems = summary.items.filterIsInstance<RentalReportItem>()
             if (rentalItems.isNotEmpty()) {
@@ -421,15 +532,18 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
                 if (propertyTotals.isNotEmpty()) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        elevation = CardDefaults.cardElevation(4.dp)
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column(modifier = Modifier.padding(20.dp)) {
                             Text(
                                 text = "Income by Property",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF1A1A1A)
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
 
                             SimpleBarChart(
                                 data = propertyTotals,
@@ -437,12 +551,10 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
 
-        // Rentals Table
         item {
             if (summary.items.isNotEmpty()) {
                 RentalsTable(summary.items.filterIsInstance<RentalReportItem>())
@@ -456,30 +568,33 @@ fun TasksReportPage(summary: MonthlyReportSummary) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(Color(0xFFF5F5F5)),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
             TaskSummaryCard(summary)
-            Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Task Completion Donut Chart
         item {
             if (summary.totalCount > 0) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(4.dp)
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "Task Completion Rate",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1A1A1A)
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         val completionRate = (summary.paidCount.toFloat() / summary.totalCount.toFloat()) * 100
 
@@ -490,11 +605,9 @@ fun TasksReportPage(summary: MonthlyReportSummary) {
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 
-        // Tasks Table
         item {
             if (summary.items.isNotEmpty()) {
                 TasksTable(summary.items.filterIsInstance<TaskReportItem>())
@@ -503,101 +616,52 @@ fun TasksReportPage(summary: MonthlyReportSummary) {
     }
 }
 
-// New Table Composables
-
 @Composable
 fun BillsTable(items: List<BillReportItem>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
             // Table Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                    .background(Color(0xFFF5F5F5))
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Bill #",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(0.8f)
-                )
-                Text(
-                    text = "Title",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1.8f)
-                )
-                Text(
-                    text = "Category",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1.3f)
-                )
-                Text(
-                    text = "Amount",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.End
-                )
-                Text(
-                    text = "Status",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(0.9f),
-                    textAlign = TextAlign.Center
-                )
+                TableHeaderText("Bill #", Modifier.weight(0.8f))
+                TableHeaderText("Title", Modifier.weight(1.8f))
+                TableHeaderText("Category", Modifier.weight(1.3f))
+                TableHeaderText("Amount", Modifier.weight(1f), TextAlign.End)
+                TableHeaderText("Status", Modifier.weight(0.9f), TextAlign.Center)
             }
 
-            Divider(thickness = 1.dp, color = Color.Gray)
+            Divider(thickness = 1.dp, color = Color(0xFFE0E0E0))
 
             // Table Rows
             items.forEachIndexed { index, item ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            if (index % 2 == 0) Color.Transparent
-                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
+                        .background(Color.White)
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = item.billNumber,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(0.8f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1.8f),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = item.category,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1.3f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = "₹${String.format("%.2f", item.amount)}",
-                        style = MaterialTheme.typography.bodySmall,
+                    TableCellText(item.billNumber, Modifier.weight(0.8f))
+                    TableCellText(item.title, Modifier.weight(1.8f), maxLines = 2)
+                    TableCellText(item.category, Modifier.weight(1.3f))
+                    TableCellText(
+                        "₹${String.format("%,.2f", item.amount)}",
+                        Modifier.weight(1f),
+                        textAlign = TextAlign.End,
                         fontWeight = FontWeight.Bold,
-                        color = if (item.status == Bill.STATUS_PAID) Color(0xFFF44336) else Color(0xFFFF9800),
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.End
+                        color = if (item.status == Bill.STATUS_PAID) Color(0xFFF44336) else Color(0xFFFF9800)
                     )
                     Box(
                         modifier = Modifier.weight(0.9f),
@@ -607,7 +671,7 @@ fun BillsTable(items: List<BillReportItem>) {
                     }
                 }
                 if (index < items.size - 1) {
-                    Divider(thickness = 0.5.dp, color = Color.LightGray)
+                    Divider(thickness = 0.5.dp, color = Color(0xFFE0E0E0))
                 }
             }
         }
@@ -618,83 +682,44 @@ fun BillsTable(items: List<BillReportItem>) {
 fun RentalsTable(items: List<RentalReportItem>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
-            // Table Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                    .background(Color(0xFFF5F5F5))
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Tenant Name",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(2f)
-                )
-                Text(
-                    text = "Property",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1.8f)
-                )
-                Text(
-                    text = "Amount",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1.2f),
-                    textAlign = TextAlign.End
-                )
-                Text(
-                    text = "Status",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(0.9f),
-                    textAlign = TextAlign.Center
-                )
+                TableHeaderText("Tenant Name", Modifier.weight(2f))
+                TableHeaderText("Property", Modifier.weight(1.8f))
+                TableHeaderText("Amount", Modifier.weight(1.2f), TextAlign.End)
+                TableHeaderText("Status", Modifier.weight(0.9f), TextAlign.Center)
             }
 
-            Divider(thickness = 1.dp, color = Color.Gray)
+            Divider(thickness = 1.dp, color = Color(0xFFE0E0E0))
 
-            // Table Rows
             items.forEachIndexed { index, item ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            if (index % 2 == 0) Color.Transparent
-                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
+                        .background(Color.White)
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = item.tenantName,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(2f),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = item.property,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray,
-                        modifier = Modifier.weight(1.8f),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = "₹${String.format("%.2f", item.amount)}",
-                        style = MaterialTheme.typography.bodySmall,
+                    TableCellText(item.tenantName, Modifier.weight(2f), maxLines = 2)
+                    TableCellText(item.property, Modifier.weight(1.8f), color = Color(0xFF666666), maxLines = 2)
+                    TableCellText(
+                        "₹${String.format("%,.2f", item.amount)}",
+                        Modifier.weight(1.2f),
+                        textAlign = TextAlign.End,
                         fontWeight = FontWeight.Bold,
-                        color = if (item.status == Rental.STATUS_PAID) Color(0xFF4CAF50) else Color(0xFFFF9800),
-                        modifier = Modifier.weight(1.2f),
-                        textAlign = TextAlign.End
+                        color = if (item.status == Rental.STATUS_PAID) Color(0xFF4CAF50) else Color(0xFFFF9800)
                     )
                     Box(
                         modifier = Modifier.weight(0.9f),
@@ -704,7 +729,7 @@ fun RentalsTable(items: List<RentalReportItem>) {
                     }
                 }
                 if (index < items.size - 1) {
-                    Divider(thickness = 0.5.dp, color = Color.LightGray)
+                    Divider(thickness = 0.5.dp, color = Color(0xFFE0E0E0))
                 }
             }
         }
@@ -715,82 +740,39 @@ fun RentalsTable(items: List<RentalReportItem>) {
 fun TasksTable(items: List<TaskReportItem>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
-            // Table Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                    .background(Color(0xFFF5F5F5))
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Title",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(2.5f)
-                )
-                Text(
-                    text = "Assigned To",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1.5f)
-                )
-                Text(
-                    text = "Due Date",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1.3f)
-                )
-                Text(
-                    text = "Status",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
+                TableHeaderText("Title", Modifier.weight(2.5f))
+                TableHeaderText("Assigned To", Modifier.weight(1.5f))
+                TableHeaderText("Due Date", Modifier.weight(1.3f))
+                TableHeaderText("Status", Modifier.weight(1f), TextAlign.Center)
             }
 
-            Divider(thickness = 1.dp, color = Color.Gray)
+            Divider(thickness = 1.dp, color = Color(0xFFE0E0E0))
 
-            // Table Rows
             items.forEachIndexed { index, item ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            if (index % 2 == 0) Color.Transparent
-                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
+                        .background(Color.White)
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(2.5f),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = item.assignedTo,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray,
-                        modifier = Modifier.weight(1.5f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = item.dueDate,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1.3f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    TableCellText(item.title, Modifier.weight(2.5f), maxLines = 2)
+                    TableCellText(item.assignedTo, Modifier.weight(1.5f), color = Color(0xFF666666))
+                    TableCellText(item.dueDate, Modifier.weight(1.3f))
                     Box(
                         modifier = Modifier.weight(1f),
                         contentAlignment = Alignment.Center
@@ -799,13 +781,45 @@ fun TasksTable(items: List<TaskReportItem>) {
                     }
                 }
                 if (index < items.size - 1) {
-                    Divider(thickness = 0.5.dp, color = Color.LightGray)
+                    Divider(thickness = 0.5.dp, color = Color(0xFFE0E0E0))
                 }
             }
         }
     }
 }
 
+@Composable
+fun TableHeaderText(text: String, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.Bold,
+        color = Color(0xFF1A1A1A),
+        modifier = modifier,
+        textAlign = textAlign
+    )
+}
+
+@Composable
+fun TableCellText(
+    text: String,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Start,
+    maxLines: Int = 1,
+    fontWeight: FontWeight = FontWeight.Normal,
+    color: Color = Color(0xFF1A1A1A)
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = modifier,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = textAlign,
+        fontWeight = fontWeight,
+        color = color
+    )
+}
 @Composable
 fun CompactStatusChip(status: String) {
     val backgroundColor = when (status.lowercase()) {
@@ -1116,29 +1130,6 @@ fun CountColumn(label: String, count: Int) {
 }
 
 @Composable
-fun StatusChip(status: String) {
-    val backgroundColor = when (status.lowercase()) {
-        "paid", "completed" -> Color(0xFF4CAF50)
-        "unpaid", "pending" -> Color(0xFFFF9800)
-        else -> Color.Gray
-    }
-
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = backgroundColor.copy(alpha = 0.2f),
-        modifier = Modifier.padding(top = 4.dp)
-    ) {
-        Text(
-            text = status.capitalize(Locale.ROOT),
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.bodySmall,
-            color = backgroundColor,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
 fun ErrorView(errorMessage: String) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -1157,7 +1148,6 @@ fun ErrorView(errorMessage: String) {
     }
 }
 
-// Helper function to format month display
 fun formatMonthDisplay(month: String): String {
     return try {
         val sdf = SimpleDateFormat("yyyy-MM", Locale.getDefault())
