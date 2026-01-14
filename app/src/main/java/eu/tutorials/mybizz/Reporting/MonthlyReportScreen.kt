@@ -625,7 +625,7 @@ fun BillsTable(items: List<BillReportItem>) {
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
-            // Table Header
+            
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
