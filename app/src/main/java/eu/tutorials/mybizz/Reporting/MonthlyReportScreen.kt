@@ -643,7 +643,7 @@ fun BillsTable(items: List<BillReportItem>) {
 
             Divider(thickness = 1.dp, color = Color(0xFFE0E0E0))
 
-            // Table Rows
+            
             items.forEachIndexed { index, item ->
                 Row(
                     modifier = Modifier
