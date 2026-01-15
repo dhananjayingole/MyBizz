@@ -661,7 +661,7 @@ fun BillsTable(items: List<BillReportItem>) {
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
-            // Table Header
+            
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -679,7 +679,7 @@ fun BillsTable(items: List<BillReportItem>) {
 
             Divider(thickness = 2.dp, color = Color(0xFFE0E0E0))
 
-            // Table Rows
+            
             items.forEachIndexed { index, item ->
                 Row(
                     modifier = Modifier
