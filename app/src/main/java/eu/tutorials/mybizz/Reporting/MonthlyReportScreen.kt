@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
@@ -61,7 +60,8 @@ fun MonthlyReportScreen(
                     Text(
                         "Monthly Reports",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.5.sp
                     )
                 },
                 navigationIcon = {
@@ -70,13 +70,13 @@ fun MonthlyReportScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color(0xFF1976D2),
                     titleContentColor = Color.White,
                     navigationIconContentColor = Color.White
                 )
             )
         },
-        containerColor = Color(0xFFF5F5F5)
+        containerColor = Color(0xFFF8F9FA)
     ) { padding ->
         Column(
             modifier = Modifier
@@ -90,8 +90,9 @@ fun MonthlyReportScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(48.dp),
-                            strokeWidth = 4.dp
+                            modifier = Modifier.size(56.dp),
+                            strokeWidth = 5.dp,
+                            color = Color(0xFF1976D2)
                         )
                     }
                 }
@@ -102,11 +103,11 @@ fun MonthlyReportScreen(
                     Column(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        // Month Selector with elevated card
+                        // Month Selector with gradient background
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             color = Color.White,
-                            shadowElevation = 2.dp
+                            shadowElevation = 4.dp
                         ) {
                             MonthSelector(
                                 selectedMonth = selectedMonth,
@@ -118,11 +119,11 @@ fun MonthlyReportScreen(
                         // Financial Overview Card
                         FinancialOverviewCard(monthlyReport)
 
-                        // Tab Row
+                        // Modern Tab Row
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             color = Color.White,
-                            shadowElevation = 4.dp
+                            shadowElevation = 2.dp
                         ) {
                             TabRow(
                                 selectedTabIndex = pagerState.currentPage,
@@ -131,8 +132,8 @@ fun MonthlyReportScreen(
                                 indicator = { tabPositions ->
                                     TabRowDefaults.SecondaryIndicator(
                                         Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-                                        height = 3.dp,
-                                        color = MaterialTheme.colorScheme.primary
+                                        height = 4.dp,
+                                        color = Color(0xFF1976D2)
                                     )
                                 }
                             ) {
@@ -142,7 +143,8 @@ fun MonthlyReportScreen(
                                     text = {
                                         Text(
                                             "Bills",
-                                            fontWeight = if (pagerState.currentPage == 0) FontWeight.Bold else FontWeight.Normal
+                                            fontWeight = if (pagerState.currentPage == 0) FontWeight.Bold else FontWeight.Medium,
+                                            fontSize = 15.sp
                                         )
                                     }
                                 )
@@ -152,7 +154,8 @@ fun MonthlyReportScreen(
                                     text = {
                                         Text(
                                             "Rentals",
-                                            fontWeight = if (pagerState.currentPage == 1) FontWeight.Bold else FontWeight.Normal
+                                            fontWeight = if (pagerState.currentPage == 1) FontWeight.Bold else FontWeight.Medium,
+                                            fontSize = 15.sp
                                         )
                                     }
                                 )
@@ -162,7 +165,8 @@ fun MonthlyReportScreen(
                                     text = {
                                         Text(
                                             "Tasks",
-                                            fontWeight = if (pagerState.currentPage == 2) FontWeight.Bold else FontWeight.Normal
+                                            fontWeight = if (pagerState.currentPage == 2) FontWeight.Bold else FontWeight.Medium,
+                                            fontSize = 15.sp
                                         )
                                     }
                                 )
@@ -194,29 +198,41 @@ fun FinancialOverviewCard(report: MonthlyReport) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        shape = RoundedCornerShape(16.dp),
+            .padding(16.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         )
     ) {
         Column(
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(24.dp)
         ) {
-            Text(
-                text = "Financial Overview",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1A1A1A)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AccountBox,
+                    contentDescription = null,
+                    tint = Color(0xFF1976D2),
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Financial Overview",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF212121)
+                )
+            }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Income and Expenses Row
+            // Income and Expenses Row with improved spacing
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 FinancialMetricCard(
                     label = "Income",
@@ -224,8 +240,6 @@ fun FinancialOverviewCard(report: MonthlyReport) {
                     color = Color(0xFF4CAF50),
                     icon = Icons.Default.KeyboardArrowUp
                 )
-
-                Spacer(modifier = Modifier.width(12.dp))
 
                 FinancialMetricCard(
                     label = "Expenses",
@@ -235,44 +249,55 @@ fun FinancialOverviewCard(report: MonthlyReport) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Divider(color = Color(0xFFE0E0E0), thickness = 1.dp)
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Net Profit/Loss Section
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(
-                        if (isProfit) Color(0xFFE8F5E9) else Color(0xFFFFEBEE)
-                    )
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+            // Enhanced Net Profit/Loss Section
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = if (isProfit) Color(0xFFE8F5E9) else Color(0xFFFFEBEE)
             ) {
-                Icon(
-                    imageVector = if (isProfit) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = if (isProfit) Color(0xFF4CAF50) else Color(0xFFF44336),
-                    modifier = Modifier.size(28.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(horizontalAlignment = Alignment.Start) {
-                    Text(
-                        text = if (isProfit) "Net Profit" else "Net Loss",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF666666),
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = "₹${String.format("%,.2f", kotlin.math.abs(netAmount))}",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isProfit) Color(0xFF4CAF50) else Color(0xFFF44336)
-                    )
+                Row(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            shape = CircleShape,
+                            color = if (isProfit) Color(0xFF4CAF50) else Color(0xFFF44336),
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = if (isProfit) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                text = if (isProfit) "Net Profit" else "Net Loss",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color(0xFF757575),
+                                fontWeight = FontWeight.Medium
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "₹${String.format("%,.2f", kotlin.math.abs(netAmount))}",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isProfit) Color(0xFF4CAF50) else Color(0xFFF44336)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -289,38 +314,44 @@ fun RowScope.FinancialMetricCard(
     Surface(
         modifier = Modifier
             .weight(1f)
-            .height(100.dp),
-        shape = RoundedCornerShape(12.dp),
-        color = color.copy(alpha = 0.1f)
+            .height(130.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = color.copy(alpha = 0.08f)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            Surface(
+                shape = CircleShape,
+                color = color.copy(alpha = 0.15f),
+                modifier = Modifier.size(40.dp)
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = label,
+                        tint = color,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
+            Column {
                 Text(
                     text = label,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF666666),
+                    color = Color(0xFF757575),
                     fontWeight = FontWeight.Medium
                 )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "₹${String.format("%,.2f", amount)}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = color
+                )
             }
-            Text(
-                text = "₹${String.format("%,.2f", amount)}",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = color
-            )
         }
     }
 }
@@ -334,43 +365,48 @@ fun MonthSelector(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
+        Surface(
             onClick = onPreviousMonth,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+            modifier = Modifier.size(44.dp),
+            shape = CircleShape,
+            color = Color(0xFF1976D2).copy(alpha = 0.1f)
         ) {
-            Icon(
-                Icons.Default.KeyboardArrowLeft,
-                "Previous Month",
-                tint = MaterialTheme.colorScheme.primary
-            )
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    Icons.Default.KeyboardArrowLeft,
+                    "Previous Month",
+                    tint = Color(0xFF1976D2),
+                    modifier = Modifier.size(28.dp)
+                )
+            }
         }
 
         Text(
             text = formatMonthDisplay(selectedMonth),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A1A1A)
+            color = Color(0xFF212121),
+            letterSpacing = 0.5.sp
         )
 
-        IconButton(
+        Surface(
             onClick = onNextMonth,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+            modifier = Modifier.size(44.dp),
+            shape = CircleShape,
+            color = Color(0xFF1976D2).copy(alpha = 0.1f)
         ) {
-            Icon(
-                Icons.Default.KeyboardArrowRight,
-                "Next Month",
-                tint = MaterialTheme.colorScheme.primary
-            )
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    Icons.Default.KeyboardArrowRight,
+                    "Next Month",
+                    tint = Color(0xFF1976D2),
+                    modifier = Modifier.size(28.dp)
+                )
+            }
         }
     }
 }
@@ -380,7 +416,7 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5)),
+            .background(Color(0xFFF8F9FA)),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -401,21 +437,21 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
             if (summary.totalAmount > 0) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(4.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(6.dp),
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "Payment Status Distribution",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1A1A1A)
+                            color = Color(0xFF212121)
                         )
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
 
                         PieChart(
                             data = listOf(
@@ -438,18 +474,18 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
                 if (categoryTotals.isNotEmpty()) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        elevation = CardDefaults.cardElevation(4.dp),
-                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(6.dp),
+                        shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
-                        Column(modifier = Modifier.padding(20.dp)) {
+                        Column(modifier = Modifier.padding(24.dp)) {
                             Text(
                                 text = "Expenses by Category",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1A1A1A)
+                                color = Color(0xFF212121)
                             )
-                            Spacer(modifier = Modifier.height(20.dp))
+                            Spacer(modifier = Modifier.height(24.dp))
 
                             SimpleBarChart(
                                 data = categoryTotals,
@@ -474,7 +510,7 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5)),
+            .background(Color(0xFFF8F9FA)),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -495,21 +531,21 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
             if (summary.totalAmount > 0) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(4.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(6.dp),
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "Collection Status",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1A1A1A)
+                            color = Color(0xFF212121)
                         )
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
 
                         PieChart(
                             data = listOf(
@@ -532,18 +568,18 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
                 if (propertyTotals.isNotEmpty()) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        elevation = CardDefaults.cardElevation(4.dp),
-                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(6.dp),
+                        shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
-                        Column(modifier = Modifier.padding(20.dp)) {
+                        Column(modifier = Modifier.padding(24.dp)) {
                             Text(
                                 text = "Income by Property",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1A1A1A)
+                                color = Color(0xFF212121)
                             )
-                            Spacer(modifier = Modifier.height(20.dp))
+                            Spacer(modifier = Modifier.height(24.dp))
 
                             SimpleBarChart(
                                 data = propertyTotals,
@@ -568,7 +604,7 @@ fun TasksReportPage(summary: MonthlyReportSummary) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5)),
+            .background(Color(0xFFF8F9FA)),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -580,21 +616,21 @@ fun TasksReportPage(summary: MonthlyReportSummary) {
             if (summary.totalCount > 0) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(4.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(6.dp),
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "Task Completion Rate",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1A1A1A)
+                            color = Color(0xFF212121)
                         )
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
 
                         val completionRate = (summary.paidCount.toFloat() / summary.totalCount.toFloat()) * 100
 
@@ -620,8 +656,8 @@ fun TasksReportPage(summary: MonthlyReportSummary) {
 fun BillsTable(items: List<BillReportItem>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp),
-        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
@@ -629,8 +665,8 @@ fun BillsTable(items: List<BillReportItem>) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF5F5F5))
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                    .background(Color(0xFFF5F7FA))
+                    .padding(horizontal = 20.dp, vertical = 18.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -641,7 +677,7 @@ fun BillsTable(items: List<BillReportItem>) {
                 TableHeaderText("Status", Modifier.weight(0.9f), TextAlign.Center)
             }
 
-            Divider(thickness = 1.dp, color = Color(0xFFE0E0E0))
+            Divider(thickness = 2.dp, color = Color(0xFFE0E0E0))
 
             // Table Rows
             items.forEachIndexed { index, item ->
@@ -649,7 +685,7 @@ fun BillsTable(items: List<BillReportItem>) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color.White)
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -671,7 +707,7 @@ fun BillsTable(items: List<BillReportItem>) {
                     }
                 }
                 if (index < items.size - 1) {
-                    Divider(thickness = 0.5.dp, color = Color(0xFFE0E0E0))
+                    Divider(thickness = 1.dp, color = Color(0xFFF0F0F0))
                 }
             }
         }
@@ -682,16 +718,16 @@ fun BillsTable(items: List<BillReportItem>) {
 fun RentalsTable(items: List<RentalReportItem>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp),
-        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF5F5F5))
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                    .background(Color(0xFFF5F7FA))
+                    .padding(horizontal = 20.dp, vertical = 18.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -701,19 +737,19 @@ fun RentalsTable(items: List<RentalReportItem>) {
                 TableHeaderText("Status", Modifier.weight(0.9f), TextAlign.Center)
             }
 
-            Divider(thickness = 1.dp, color = Color(0xFFE0E0E0))
+            Divider(thickness = 2.dp, color = Color(0xFFE0E0E0))
 
             items.forEachIndexed { index, item ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color.White)
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TableCellText(item.tenantName, Modifier.weight(2f), maxLines = 2)
-                    TableCellText(item.property, Modifier.weight(1.8f), color = Color(0xFF666666), maxLines = 2)
+                    TableCellText(item.property, Modifier.weight(1.8f), color = Color(0xFF757575), maxLines = 2)
                     TableCellText(
                         "₹${String.format("%,.2f", item.amount)}",
                         Modifier.weight(1.2f),
@@ -729,7 +765,7 @@ fun RentalsTable(items: List<RentalReportItem>) {
                     }
                 }
                 if (index < items.size - 1) {
-                    Divider(thickness = 0.5.dp, color = Color(0xFFE0E0E0))
+                    Divider(thickness = 1.dp, color = Color(0xFFF0F0F0))
                 }
             }
         }
@@ -740,16 +776,16 @@ fun RentalsTable(items: List<RentalReportItem>) {
 fun TasksTable(items: List<TaskReportItem>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp),
-        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF5F5F5))
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                    .background(Color(0xFFF5F7FA))
+                    .padding(horizontal = 20.dp, vertical = 18.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -759,19 +795,19 @@ fun TasksTable(items: List<TaskReportItem>) {
                 TableHeaderText("Status", Modifier.weight(1f), TextAlign.Center)
             }
 
-            Divider(thickness = 1.dp, color = Color(0xFFE0E0E0))
+            Divider(thickness = 2.dp, color = Color(0xFFE0E0E0))
 
             items.forEachIndexed { index, item ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color.White)
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TableCellText(item.title, Modifier.weight(2.5f), maxLines = 2)
-                    TableCellText(item.assignedTo, Modifier.weight(1.5f), color = Color(0xFF666666))
+                    TableCellText(item.assignedTo, Modifier.weight(1.5f), color = Color(0xFF757575))
                     TableCellText(item.dueDate, Modifier.weight(1.3f))
                     Box(
                         modifier = Modifier.weight(1f),
@@ -781,7 +817,7 @@ fun TasksTable(items: List<TaskReportItem>) {
                     }
                 }
                 if (index < items.size - 1) {
-                    Divider(thickness = 0.5.dp, color = Color(0xFFE0E0E0))
+                    Divider(thickness = 1.dp, color = Color(0xFFF0F0F0))
                 }
             }
         }
@@ -794,7 +830,7 @@ fun TableHeaderText(text: String, modifier: Modifier = Modifier, textAlign: Text
         text = text,
         style = MaterialTheme.typography.labelLarge,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF1A1A1A),
+        color = Color(0xFF212121),
         modifier = modifier,
         textAlign = textAlign
     )
@@ -807,7 +843,7 @@ fun TableCellText(
     textAlign: TextAlign = TextAlign.Start,
     maxLines: Int = 1,
     fontWeight: FontWeight = FontWeight.Normal,
-    color: Color = Color(0xFF1A1A1A)
+    color: Color = Color(0xFF212121)
 ) {
     Text(
         text = text,
@@ -820,6 +856,7 @@ fun TableCellText(
         color = color
     )
 }
+
 @Composable
 fun CompactStatusChip(status: String) {
     val backgroundColor = when (status.lowercase()) {
@@ -829,20 +866,21 @@ fun CompactStatusChip(status: String) {
     }
 
     Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = backgroundColor.copy(alpha = 0.2f),
+        shape = RoundedCornerShape(12.dp),
+        color = backgroundColor.copy(alpha = 0.15f),
         modifier = Modifier.padding(2.dp)
     ) {
         Text(
             text = status.capitalize(Locale.ROOT),
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             style = MaterialTheme.typography.labelSmall,
             color = backgroundColor,
             fontWeight = FontWeight.Bold,
-            fontSize = 10.sp
+            fontSize = 11.sp
         )
     }
 }
+
 data class PieChartData(
     val label: String,
     val value: Double,
@@ -864,7 +902,7 @@ fun PieChart(
         // Pie Chart Canvas
         Canvas(
             modifier = Modifier
-                .size(200.dp)
+                .size(220.dp)
                 .padding(16.dp)
         ) {
             val radius = size.minDimension / 2
@@ -889,26 +927,35 @@ fun PieChart(
         }
 
         // Legend
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         data.forEach { slice ->
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.Center,
+                    .fillMaxWidth(0.9f)
+                    .padding(vertical = 6.dp),
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(16.dp)
-                        .clip(CircleShape)
+                        .size(20.dp)
+                        .clip(RoundedCornerShape(4.dp))
                         .background(slice.color)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "${slice.label}: ₹${String.format("%.2f", slice.value)} (${String.format("%.1f", (slice.value / total) * 100)}%)",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = slice.label,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF212121)
+                    )
+                    Text(
+                        text = "₹${String.format("%,.2f", slice.value)} (${String.format("%.1f", (slice.value / total) * 100)}%)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF757575)
+                    )
+                }
             }
         }
     }
@@ -927,35 +974,45 @@ fun SimpleBarChart(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = category,
-                    modifier = Modifier.width(100.dp),
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1
+                    modifier = Modifier.width(110.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 2,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF212121)
                 )
+
+                Spacer(modifier = Modifier.width(12.dp))
 
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(24.dp)
-                        .background(Color.LightGray.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+                        .height(32.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.LightGray.copy(alpha = 0.2f))
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
                             .fillMaxWidth((amount / maxValue).toFloat())
-                            .background(color, RoundedCornerShape(4.dp))
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(color)
                     )
                 }
 
+                Spacer(modifier = Modifier.width(12.dp))
+
                 Text(
-                    text = "₹${String.format("%.0f", amount)}",
-                    modifier = Modifier.padding(start = 8.dp),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold
+                    text = "₹${String.format("%,.0f", amount)}",
+                    modifier = Modifier.width(80.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = color,
+                    textAlign = TextAlign.End
                 )
             }
         }
@@ -970,16 +1027,16 @@ fun DonutChart(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.size(200.dp),
+        modifier = modifier.size(220.dp),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val strokeWidth = 40f
+            val strokeWidth = 45f
             val radius = (size.minDimension - strokeWidth) / 2
 
             // Background circle
             drawArc(
-                color = Color.LightGray.copy(alpha = 0.3f),
+                color = Color.LightGray.copy(alpha = 0.2f),
                 startAngle = -90f,
                 sweepAngle = 360f,
                 useCenter = false,
@@ -1003,14 +1060,16 @@ fun DonutChart(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "${String.format("%.1f", percentage)}%",
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF4CAF50)
             )
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "$completed/$total",
+                text = "$completed of $total",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
+                color = Color(0xFF757575),
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -1029,36 +1088,39 @@ fun SummaryCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(24.dp)
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF212121)
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                AmountColumn("Total", totalAmount, Color.Gray)
+                AmountColumn("Total", totalAmount, Color(0xFF757575))
                 AmountColumn(
                     "Paid",
                     paidAmount,
-                    if (isExpense) Color.Red else Color.Green
+                    if (isExpense) Color(0xFFF44336) else Color(0xFF4CAF50)
                 )
                 AmountColumn("Unpaid", unpaidAmount, Color(0xFFFF9800))
             }
 
-            Divider(modifier = Modifier.padding(vertical = 12.dp))
+            Divider(modifier = Modifier.padding(vertical = 16.dp), color = Color(0xFFE0E0E0))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 CountColumn("Total", totalCount)
                 CountColumn("Paid", paidCount)
@@ -1072,17 +1134,20 @@ fun SummaryCard(
 fun TaskSummaryCard(summary: MonthlyReportSummary) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(24.dp)
         ) {
             Text(
                 text = "Tasks Summary",
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF212121)
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -1098,15 +1163,20 @@ fun TaskSummaryCard(summary: MonthlyReportSummary) {
 
 @Composable
 fun AmountColumn(label: String, amount: Double, color: Color) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(8.dp)
+    ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color(0xFF757575),
+            fontWeight = FontWeight.Medium
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "₹${String.format("%.2f", amount)}",
-            style = MaterialTheme.typography.bodyLarge,
+            text = "₹${String.format("%,.2f", amount)}",
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = color
         )
@@ -1115,16 +1185,22 @@ fun AmountColumn(label: String, amount: Double, color: Color) {
 
 @Composable
 fun CountColumn(label: String, count: Int) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(8.dp)
+    ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color(0xFF757575),
+            fontWeight = FontWeight.Medium
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = count.toString(),
             style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF212121)
         )
     }
 }
@@ -1135,15 +1211,38 @@ fun ErrorView(errorMessage: String) {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                Icons.Default.Warning,
-                contentDescription = "Error",
-                tint = Color.Red,
-                modifier = Modifier.size(48.dp)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(24.dp)
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = Color(0xFFF44336).copy(alpha = 0.1f),
+                modifier = Modifier.size(80.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = "Error",
+                        tint = Color(0xFFF44336),
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Something went wrong",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF212121)
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = errorMessage, color = Color.Red)
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF757575),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
