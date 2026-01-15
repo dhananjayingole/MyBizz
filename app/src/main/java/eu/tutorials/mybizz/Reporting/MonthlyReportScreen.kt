@@ -314,7 +314,7 @@ fun RowScope.FinancialMetricCard(
     Surface(
         modifier = Modifier
             .weight(1f)
-            .height(130.dp),
+            .height(120.dp),
         shape = RoundedCornerShape(16.dp),
         color = color.copy(alpha = 0.08f)
     ) {
