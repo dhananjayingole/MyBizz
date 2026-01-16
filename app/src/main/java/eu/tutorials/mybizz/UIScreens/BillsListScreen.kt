@@ -131,30 +131,6 @@ fun BillsListScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Bills Management") },
-                actions = {
-                    // Monthly Summary Button
-                    TextButton(
-                        onClick = {
-                            // Navigate to monthly summary screen
-                            navController.navigate(Routes.MonthlyReportScreen)
-                        },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.primary
-                        )
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Create,
-                                contentDescription = "Monthly Summary",
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Monthly Summary")
-                        }
-                    }
-                }
             )
         },
         floatingActionButton = {

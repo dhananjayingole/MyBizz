@@ -14,10 +14,6 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import eu.tutorials.mybizz.Logic.Bill.BillRepository
 import eu.tutorials.mybizz.Navigation.NavGraph
-import eu.tutorials.mybizz.Report.BillsMonthlyReportRepository
-import eu.tutorials.mybizz.Report.BillsMonthlyReportScreen
-import eu.tutorials.mybizz.Report.BillsMonthlyReportViewModel
-import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import eu.tutorials.mybizz.ui.theme.MyBizzTheme
 
 class MainActivity : ComponentActivity() {

@@ -39,15 +39,8 @@ import eu.tutorials.mybizz.Logic.plot.PlotSheetsRepository
 import eu.tutorials.mybizz.Model.Construction
 import eu.tutorials.mybizz.Model.Plot
 import eu.tutorials.mybizz.Model.Rental
-import eu.tutorials.mybizz.Model.Task
-import eu.tutorials.mybizz.Navigation.Routes.EditTaskScreen
-import eu.tutorials.mybizz.Navigation.Routes.MonthlyReportScreen
-import eu.tutorials.mybizz.Report.BillsMonthlyReportRepository
-import eu.tutorials.mybizz.Report.BillsMonthlyReportScreen
-import eu.tutorials.mybizz.Report.BillsMonthlyReportViewModel
 import eu.tutorials.mybizz.Reporting.MonthlyReportScreen
 import eu.tutorials.mybizz.Reporting.MonthlyReportViewModel
-import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import eu.tutorials.mybizz.UIScreens.*
 import kotlinx.coroutines.launch
 

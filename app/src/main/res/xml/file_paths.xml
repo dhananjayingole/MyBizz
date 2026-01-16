@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- For Downloads directory (Android 9 and below) -->
+    <external-path
+        name="downloads"
+        path="Download/" />
+
+    <!-- For app-specific files -->
+    <external-files-path
+        name="pdf_reports"
+        path="Documents/Reports/"/>
+
+    <!-- For cache -->
+    <cache-path
+        name="cache"
+        path="."/>
+
+    <!-- For external storage root -->
+    <external-path
+        name="external"
+        path="."/>
+</paths>
