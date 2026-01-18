@@ -148,7 +148,7 @@ fun BillsListScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            // Search Bar
+            // Search Bar code
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
