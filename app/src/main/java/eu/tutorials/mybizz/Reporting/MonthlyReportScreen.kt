@@ -78,32 +78,31 @@ fun MonthlyReportScreen(
         },
         containerColor = Color(0xFFF8F9FA)
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(56.dp),
-                            strokeWidth = 5.dp,
-                            color = Color(0xFF1976D2)
-                        )
-                    }
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(56.dp),
+                        strokeWidth = 5.dp,
+                        color = Color(0xFF1976D2)
+                    )
                 }
-                errorMessage != null -> {
-                    ErrorView(errorMessage = errorMessage)
-                }
-                monthlyReport != null -> {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        // Month Selector with gradient background
+            }
+            errorMessage != null -> {
+                ErrorView(errorMessage = errorMessage)
+            }
+            monthlyReport != null -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
+                    // Month Selector
+                    item {
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             color = Color.White,
@@ -115,11 +114,15 @@ fun MonthlyReportScreen(
                                 onNextMonth = { viewModel.loadNextMonth() }
                             )
                         }
+                    }
 
-                        // Financial Overview Card
+                    // Financial Overview Card
+                    item {
                         FinancialOverviewCard(monthlyReport)
+                    }
 
-                        // Modern Tab Row
+                    // Modern Tab Row
+                    item {
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             color = Color.White,
@@ -172,10 +175,13 @@ fun MonthlyReportScreen(
                                 )
                             }
                         }
+                    }
 
+                    // Horizontal Pager content - This is the key change
+                    item {
                         HorizontalPager(
                             state = pagerState,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.height(600.dp) // Fixed height or adjust as needed
                         ) { page ->
                             when (page) {
                                 0 -> BillsReportPage(monthlyReport.billsSummary)
