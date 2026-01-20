@@ -1,10 +1,14 @@
 package eu.tutorials.mybizz.pdfgen
 
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.*
 import android.graphics.pdf.PdfDocument
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import eu.tutorials.mybizz.Model.Bill
 import eu.tutorials.mybizz.Model.Rental
 import eu.tutorials.mybizz.Reporting.BillReportItem
@@ -31,6 +35,7 @@ class PdfGenerator(private val context: Context) {
         private const val SMALL_SIZE = 8f
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     fun generateMonthlyReport(monthlyReport: MonthlyReport, selectedMonth: String): File? {
         val pdfDocument = PdfDocument()
         var currentPage = 1
@@ -86,6 +91,32 @@ class PdfGenerator(private val context: Context) {
 
             // Save the document
             val fileName = "MonthlyReport_${selectedMonth.replace("-", "_")}_${System.currentTimeMillis()}.pdf"
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            }
+
+            val resolver = context.contentResolver
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+
+            if (uri != null) {
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    pdfDocument.writeTo(outputStream)
+                }
+
+                Toast.makeText(
+                    context,
+                    "PDF saved in Downloads folder",
+                    Toast.LENGTH_LONG
+                ).show()
+            } else {
+                Toast.makeText(context, "Failed to save PDF", Toast.LENGTH_LONG).show()
+            }
+
+            pdfDocument.close()
+
             val directory = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Reports")
             if (!directory.exists()) {
                 directory.mkdirs()
