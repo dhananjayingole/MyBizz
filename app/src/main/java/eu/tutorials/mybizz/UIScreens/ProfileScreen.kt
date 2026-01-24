@@ -26,6 +26,7 @@ import androidx.navigation.NavHostController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Navigation.Routes
 import eu.tutorials.mybizz.R
+import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +34,7 @@ fun ProfileScreen(
     navController: NavHostController,
     authRepo: AuthRepository
 ) {
-    val currentUser = authRepo.currentUser.value
+    val currentUser = authRepo.currentUser.collectAsState().value
     val userRole = authRepo.getCurrentUserRole()
     val userName = currentUser?.email?.substringBefore("@") ?: "User"
 
