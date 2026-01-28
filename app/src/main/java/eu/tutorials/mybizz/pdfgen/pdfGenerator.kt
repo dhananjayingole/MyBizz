@@ -25,8 +25,8 @@ import java.util.*
 class PdfGenerator(private val context: Context) {
 
     companion object {
-        private const val PAGE_WIDTH = 595 // A4 width in points (8.27 inches)
-        private const val PAGE_HEIGHT = 842 // A4 height in points (11.69 inches)
+        private const val PAGE_WIDTH = 595 
+        private const val PAGE_HEIGHT = 842 
         private const val MARGIN = 40f
         private const val TITLE_SIZE = 24f
         private const val HEADING_SIZE = 18f
@@ -89,7 +89,7 @@ class PdfGenerator(private val context: Context) {
             yPos = drawTasksTable(canvas, monthlyReport.tasksSummary.items.filterIsInstance<TaskReportItem>(), yPos)
             pdfDocument.finishPage(page)
 
-            // Save the document
+            // Saving the document
             val fileName = "MonthlyReport_${selectedMonth.replace("-", "_")}_${System.currentTimeMillis()}.pdf"
 
             val contentValues = ContentValues().apply {
@@ -150,7 +150,7 @@ class PdfGenerator(private val context: Context) {
         canvas.drawText("Monthly Business Report", PAGE_WIDTH / 2f, yPos, titlePaint)
         yPos += 40
 
-        // Month
+        // Months
         val monthPaint = Paint().apply {
             color = Color.DKGRAY
             textSize = HEADING_SIZE
