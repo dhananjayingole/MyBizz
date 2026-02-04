@@ -1,4 +1,3 @@
-// BillRepository.kt - UPDATED VERSION
 package eu.tutorials.mybizz.Logic.Bill
 
 import android.util.Log
