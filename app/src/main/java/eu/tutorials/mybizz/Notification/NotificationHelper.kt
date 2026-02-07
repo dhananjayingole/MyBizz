@@ -1,106 +1,73 @@
 package eu.tutorials.mybizz.Notification
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import eu.tutorials.mybizz.MainActivity
 import eu.tutorials.mybizz.R
 
-class NotificationHelper(private val context: Context) {
-    companion object {
-        const val CHANNEL_ID = "bills_reminders_channel"
-        const val CHANNEL_NAME = "Bill & Rental Reminders"
-        const val CHANNEL_DESCRIPTION = "Notifications for upcoming bills and rental payments"
-        private var notificationId = 1000 // Start from 1000
-    }
+object NotificationHelper {
+    private const val CHANNEL_ID = "payment_reminders"
+    private const val CHANNEL_NAME = "Payment Reminders"
+    private const val CHANNEL_DESCRIPTION = "Notifications for unpaid bills and rentals"
 
-    private val notificationManager: NotificationManager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-    init {
-        createNotificationChannel()
-    }
-
-    private fun createNotificationChannel() {
+    fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
                 description = CHANNEL_DESCRIPTION
                 enableVibration(true)
-                vibrationPattern = longArrayOf(0, 500, 200, 500)
-                setShowBadge(true)
+                enableLights(true)
             }
+
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
 
-    fun showBillReminder(
-        billTitle: String,
-        billAmount: Double,
-        dueDate: String,
-        daysUntilDue: Long,
-        billId: String? = null
-    ) {
-        val title = when (daysUntilDue) {
-            0L -> "💰 Bill Due TODAY!"
-            1L -> "📅 Bill Due Tomorrow"
-            else -> "⏰ Bill Due in $daysUntilDue days"
-        }
-
-        val message = "$billTitle - $${"%.2f".format(billAmount)} due on $dueDate"
-
-        showNotification(title, message, billId ?: billTitle)
-    }
-
-    fun showRentalReminder(
-        tenantName: String,
-        property: String,
-        rentAmount: Double,
-        month: String,
-        daysUntilDue: Long,
-        rentalId: String? = null
-    ) {
-        val title = when (daysUntilDue) {
-            0L -> "🏠 Rent Due TODAY!"
-            1L -> "📅 Rent Due Tomorrow"
-            else -> "⏰ Rent Due in $daysUntilDue days"
-        }
-
-        val message = "$tenantName - $property - $${"%.2f".format(rentAmount)} for $month"
-
-        showNotification(title, message, rentalId ?: tenantName)
-    }
-
-    fun showOverdueReminder(
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    fun sendPaymentReminder(
+        context: Context,
+        notificationId: Int,
         title: String,
         message: String,
-        itemId: String
+        type: String // "bill" or "rental"
     ) {
-        showNotification("🚨 OVERDUE: $title", message, itemId + "_overdue")
-    }
+        createNotificationChannel(context)
 
-    private fun showNotification(title: String, message: String, tag: String) {
-        val notificationId = notificationId++
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("notification_type", type)
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.img_16) // Add this icon to your drawable
+            .setSmallIcon(R.drawable.img_16) // You'll need to add this icon
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setAutoCancel(true)
-            .setVibrate(longArrayOf(0, 500, 200, 500))
+            .setContentIntent(pendingIntent)
             .build()
 
-        notificationManager.notify(tag, notificationId, notification)
+        NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 
-    fun cancelNotification(tag: String) {
-        notificationManager.cancel(tag, 0)
+    fun cancelNotification(context: Context, notificationId: Int) {
+        NotificationManagerCompat.from(context).cancel(notificationId)
     }
 }
