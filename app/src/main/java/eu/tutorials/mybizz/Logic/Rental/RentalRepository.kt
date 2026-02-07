@@ -47,4 +47,15 @@ class RentalRepository {
             false
         }
     }
+
+    // ADD THIS METHOD - It's missing
+    suspend fun getAllRentals(sheetsRepo: RentalSheetsRepository): List<Rental> {
+        return try {
+            Log.d(TAG, "Fetching all rentals")
+            sheetsRepo.getAllRentals()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching all rentals", e)
+            emptyList()
+        }
+    }
 }

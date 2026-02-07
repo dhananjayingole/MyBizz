@@ -90,10 +90,9 @@ class RentalSheetsRepository(private val context: Context) {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching rentals: ${e.message}", e)
-            throw e
+            emptyList() // Return empty list instead of throwing
         }
     }
-
     suspend fun addRental(rental: Rental): Boolean = withContext(Dispatchers.IO) {
         try {
             withTimeout(TimeUnit.SECONDS.toMillis(API_TIMEOUT_SECONDS)) {
