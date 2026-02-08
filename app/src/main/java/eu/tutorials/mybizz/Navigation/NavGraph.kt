@@ -92,8 +92,6 @@ fun NavGraph(
             BillDetailsScreen(navController, billId, authRepository)
         }
 
-        // ------------------ Rental Screens ------------------
-
         // Rental List
         composable(Routes.RentalListScreen) {
             var rentals by remember { mutableStateOf<List<Rental>>(emptyList()) }
