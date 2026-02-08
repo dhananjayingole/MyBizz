@@ -1,4 +1,3 @@
-// Navigation/NavGraph.kt
 package eu.tutorials.mybizz.Navigation
 
 import android.annotation.SuppressLint
