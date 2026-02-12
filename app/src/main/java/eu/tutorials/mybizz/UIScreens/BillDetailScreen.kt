@@ -108,7 +108,7 @@ fun BillDetailsScreen(
                         )
                     }
                     showMarkPaidDialog = false
-                    reloadBillDetails() // Reload to get updated history
+                    reloadBillDetails()
                 } else {
                     error = "Failed to mark bill as paid"
                     isLoading = false
@@ -164,16 +164,7 @@ fun BillDetailsScreen(
                 }
             )
         },
-        floatingActionButton = {
-            if (bill?.status == Bill.STATUS_UNPAID) {
-                ExtendedFloatingActionButton(
-                    onClick = { showMarkPaidDialog = true },
-                    icon = { Icon(Icons.Default.Check, contentDescription = "Mark Paid") },
-                    text = { Text("Mark as Paid") },
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
+        // REMOVED: Mark as Paid FAB - replaced with Pay Now button
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -214,6 +205,95 @@ fun BillDetailsScreen(
             } else {
                 BillDetailsContent(bill = bill!!)
 
+                // NEW: Payment Action Section
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    if (bill!!.status == Bill.STATUS_UNPAID) {
+                        // Pay Now Button
+                        Button(
+                            onClick = {
+                                navController.navigate("payment_bill/${bill!!.id}")
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4CAF50) // Green
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.Clear,
+                                contentDescription = "Pay",
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Pay Now - ₹${String.format("%.2f", bill!!.amount)}",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Alternative: Manual Mark as Paid
+                        OutlinedButton(
+                            onClick = { showMarkPaidDialog = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.Check, "Mark Paid")
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Mark as Paid (Manual)")
+                        }
+                    } else {
+                        // Show Paid Status Card
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFE8F5E9) // Light green
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    Icons.Default.CheckCircle,
+                                    contentDescription = null,
+                                    tint = Color(0xFF4CAF50),
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Column {
+                                    Text(
+                                        "Payment Completed",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp,
+                                        color = Color(0xFF2E7D32)
+                                    )
+                                    if (bill!!.paidDate.isNotEmpty()) {
+                                        Text(
+                                            "Paid on: ${bill!!.paidDate}",
+                                            fontSize = 14.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                    if (bill!!.paidBy.isNotEmpty()) {
+                                        Text(
+                                            "Paid by: ${bill!!.paidBy}",
+                                            fontSize = 14.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // History Section
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -231,7 +311,7 @@ fun BillDetailsScreen(
         AlertDialog(
             onDismissRequest = { showMarkPaidDialog = false },
             title = { Text("Mark as Paid") },
-            text = { Text("Are you sure you want to mark this bill as paid?") },
+            text = { Text("Are you sure you want to manually mark this bill as paid? Use 'Pay Now' for payment processing.") },
             confirmButton = {
                 TextButton(onClick = { markBillAsPaid() }) {
                     Text("Mark Paid")
@@ -269,6 +349,7 @@ fun BillDetailsScreen(
     }
 }
 
+// Keep all other composables the same (BillDetailsContent, BillHistorySection, etc.)
 @Composable
 fun BillDetailsContent(bill: Bill) {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -304,7 +385,6 @@ fun BillDetailsContent(bill: Bill) {
                             style = MaterialTheme.typography.bodyMedium
                         )
 
-                        // Bill Number and Version
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Bill: ${bill.billNumber} | Version: ${bill.version}",
@@ -319,7 +399,6 @@ fun BillDetailsContent(bill: Bill) {
                     )
                 }
 
-                // Show paid by information if bill is paid
                 if (bill.status == Bill.STATUS_PAID && bill.paidBy.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -333,7 +412,6 @@ fun BillDetailsContent(bill: Bill) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Bill Information
         Text(
             text = "Bill Information",
             style = MaterialTheme.typography.titleMedium,
@@ -357,7 +435,6 @@ fun BillDetailsContent(bill: Bill) {
             }
         }
 
-        // Edit restriction notice for paid bills
         if (bill.status == Bill.STATUS_PAID) {
             Spacer(modifier = Modifier.height(16.dp))
             Card(
@@ -385,7 +462,6 @@ fun BillDetailsContent(bill: Bill) {
     }
 }
 
-// NEW: Bill History Section Component - UPDATED VERSION
 @Composable
 fun BillHistorySection(
     billHistory: List<BillHistoryEntry>,
@@ -451,13 +527,11 @@ fun BillHistorySection(
                 }
             }
         } else {
-            // History Table
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column {
-                    // Table Header
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -515,7 +589,6 @@ fun BillHistorySection(
                         )
                     }
 
-                    // Table Rows - Show in chronological order (oldest first)
                     LazyColumn(
                         modifier = Modifier.heightIn(max = 400.dp)
                     ) {
@@ -526,14 +599,12 @@ fun BillHistorySection(
                 }
             }
 
-            // History Summary
             Spacer(modifier = Modifier.height(16.dp))
             HistorySummarySection(billHistory = billHistory)
         }
     }
 }
 
-// NEW: History Table Row Component - UPDATED VERSION
 @Composable
 fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistoryEntry>) {
     val isCreated = historyEntry.changeType == "CREATED"
@@ -541,7 +612,7 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
     val amountChange = if (previousVersion != null) {
         historyEntry.amount - previousVersion.amount
     } else {
-        0.0 // First version has no change
+        0.0
     }
 
     Row(
@@ -561,7 +632,6 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Bill ID Column
         Text(
             text = historyEntry.billNumber,
             style = MaterialTheme.typography.bodySmall,
@@ -570,7 +640,6 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
             textAlign = TextAlign.Center
         )
 
-        // Version Column
         Column(
             modifier = Modifier.weight(0.8f),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -596,7 +665,6 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
             }
         }
 
-        // Modified By Column
         Text(
             text = historyEntry.modifiedBy.split("@").firstOrNull() ?: historyEntry.modifiedBy,
             style = MaterialTheme.typography.bodySmall,
@@ -605,7 +673,6 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
             maxLines = 1
         )
 
-        // Date Column
         Text(
             text = historyEntry.modifiedDate.split(" ").getOrNull(0) ?: historyEntry.modifiedDate,
             style = MaterialTheme.typography.bodySmall,
@@ -613,7 +680,6 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
             textAlign = TextAlign.Center
         )
 
-        // Amount Column
         Column(
             modifier = Modifier.weight(1.2f),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -630,7 +696,6 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
             )
         }
 
-        // Change Column
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -666,7 +731,6 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
     }
 }
 
-// NEW: History Summary Component
 @Composable
 fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
     Card(
@@ -685,7 +749,6 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
             val createdEntry = billHistory.find { it.changeType == "CREATED" }
             val modifications = billHistory.count { it.changeType == "MODIFIED" }
 
-            // Calculate amount changes
             val initialAmount = billHistory.firstOrNull()?.amount ?: 0.0
             val currentAmount = latestVersion?.amount ?: 0.0
             val totalChange = currentAmount - initialAmount
@@ -739,7 +802,6 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Timeline info
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -787,6 +849,7 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
         }
     }
 }
+
 @Composable
 fun InfoRow(label: String, value: String) {
     Column(modifier = Modifier.padding(vertical = 8.dp)) {

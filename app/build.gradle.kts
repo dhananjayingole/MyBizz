@@ -93,4 +93,6 @@ dependencies {
 // Charts
     implementation("com.patrykandpatrick.vico:compose-m3:1.12.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+//    Payment
+    implementation("com.razorpay:checkout:1.6.33")
 }

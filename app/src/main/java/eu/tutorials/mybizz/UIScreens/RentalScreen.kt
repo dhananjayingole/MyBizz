@@ -13,9 +13,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import eu.tutorials.mybizz.Model.Rental
 import eu.tutorials.mybizz.Logic.Rental.RentalRepository
 import eu.tutorials.mybizz.Logic.Rental.RentalSheetsRepository
@@ -35,8 +39,8 @@ fun RentalListScreen(
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var isLoading by remember { mutableStateOf(true) }
 
-    LaunchedEffect(rentals) {
-    scope.launch {
+    LaunchedEffect(Unit) {
+        scope.launch {
             rentals = sheetsRepo.getAllRentals()
             isLoading = false
         }
@@ -127,7 +131,6 @@ fun RentalListScreen(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddRentalScreen(
@@ -144,7 +147,6 @@ fun AddRentalScreen(
     var month by remember { mutableStateOf("") }
     var contactNo by remember { mutableStateOf("") }
 
-    // 📅 Function to open month-year picker
     val openMonthYearPicker = {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -153,7 +155,6 @@ fun AddRentalScreen(
         val dialog = DatePickerDialog(
             context,
             { _: DatePicker, selectedYear: Int, selectedMonth: Int, _: Int ->
-                // Format: YYYY-MM
                 val formattedMonth = String.format("%04d-%02d", selectedYear, selectedMonth + 1)
                 month = formattedMonth
             },
@@ -162,7 +163,6 @@ fun AddRentalScreen(
             calendar.get(Calendar.DAY_OF_MONTH)
         )
 
-        // 👇 Hide the day picker (only show month & year)
         try {
             val dayPickerId = context.resources.getIdentifier("day", "id", "android")
             val dayPicker = dialog.datePicker.findViewById<DatePicker>(dayPickerId)
@@ -211,7 +211,6 @@ fun AddRentalScreen(
                 label = { Text("Rent Amount") }
             )
 
-            // 📅 Month-Year Picker Field
             OutlinedTextField(
                 value = month,
                 onValueChange = { },
@@ -262,16 +261,19 @@ fun AddRentalScreen(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RentalDetailScreen(
     rental: Rental,
-    onEdit: (Rental) -> Unit,
-    onDelete: (Rental) -> Unit,
-    onMarkPaid: (Rental) -> Unit,
-    onBack: () -> Unit
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onMarkPaid: () -> Unit,
+    onBack: () -> Unit,
+    navController: NavController // NEW: Add navController parameter
 ) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showMarkPaidDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -287,51 +289,211 @@ fun RentalDetailScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text("👤 Tenant: ${rental.tenantName}", style = MaterialTheme.typography.titleMedium)
-            Text("🏠 Property: ${rental.property}")
-            Text("💰 Rent: ₹${rental.rentAmount}")
-            Text("📅 Month: ${rental.month}")
-            Text("📞 Contact: ${rental.contactNo}")
-            Text("Status: ${rental.status}")
-            Text("Payment Date: ${rental.paymentDate ?: "Not Paid"}")
+            // Rental Info Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        "👤 Tenant: ${rental.tenantName}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text("🏠 Property: ${rental.property}")
+                    Text(
+                        "💰 Rent: ₹${rental.rentAmount}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text("📅 Month: ${rental.month}")
+                    Text("📞 Contact: ${rental.contactNo}")
+                    Text(
+                        "Status: ${rental.status.uppercase()}",
+                        fontWeight = FontWeight.Bold,
+                        color = if (rental.status == Rental.STATUS_PAID)
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.error
+                    )
+                    if (rental.paymentDate.isNotEmpty()) {
+                        Text("Payment Date: ${rental.paymentDate}")
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Show Edit only when UNPAID
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Payment Action Section
+            if (rental.status == Rental.STATUS_UNPAID) {
+                // NEW: Pay Now Button
+                Button(
+                    onClick = {
+                        navController.navigate("payment_rental/${rental.id}")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2196F3) // Blue
+                    )
+                ) {
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = "Pay",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Pay Now - ₹${String.format("%.2f", rental.rentAmount)}",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Alternative: Manual Mark as Paid
+                OutlinedButton(
+                    onClick = { showMarkPaidDialog = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Check, "Mark Paid")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Mark as Paid (Manual)")
+                }
+            } else {
+                // Show Paid Status Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFE3F2FD) // Light blue
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = Color(0xFF2196F3),
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                "Rent Paid ✓",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = Color(0xFF1565C0)
+                            )
+                            if (rental.paymentDate.isNotEmpty()) {
+                                Text(
+                                    "Paid on: ${rental.paymentDate}",
+                                    fontSize = 14.sp,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Action Buttons
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (rental.status == Rental.STATUS_UNPAID) {
-                    Button(
-                        onClick = { onEdit(rental) },
+                    OutlinedButton(
+                        onClick = onEdit,
                         modifier = Modifier.weight(1f)
                     ) {
+                        Icon(Icons.Default.Edit, "Edit")
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text("Edit")
                     }
                 }
 
                 OutlinedButton(
-                    onClick = { onDelete(rental) },
-                    modifier = Modifier.weight(1f)
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.Red
+                    )
                 ) {
+                    Icon(Icons.Default.Delete, "Delete")
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text("Delete")
                 }
             }
+        }
+    }
 
-            if (rental.status == Rental.STATUS_UNPAID) {
-                Spacer(modifier = Modifier.height(8.dp))
+    // Delete Confirmation Dialog
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            icon = {
+                Icon(
+                    Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = Color.Red,
+                    modifier = Modifier.size(48.dp)
+                )
+            },
+            title = { Text("Delete Rental?") },
+            text = { Text("Are you sure you want to delete this rental record? This action cannot be undone.") },
+            confirmButton = {
                 Button(
                     onClick = {
-                        onMarkPaid(rental)
-                        onBack() },
-                    modifier = Modifier.fillMaxWidth()
+                        showDeleteDialog = false
+                        onDelete()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red
+                    )
                 ) {
-                    Text("Mark as Paid 💸")
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
                 }
             }
-        }
+        )
+    }
+
+    // Manual Mark as Paid Dialog
+    if (showMarkPaidDialog) {
+        AlertDialog(
+            onDismissRequest = { showMarkPaidDialog = false },
+            title = { Text("Mark as Paid") },
+            text = { Text("Are you sure you want to manually mark this rental as paid? Use 'Pay Now' for payment processing.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showMarkPaidDialog = false
+                    onMarkPaid()
+                }) {
+                    Text("Mark Paid")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showMarkPaidDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 

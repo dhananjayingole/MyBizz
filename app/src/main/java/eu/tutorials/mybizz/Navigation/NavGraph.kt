@@ -1,4 +1,3 @@
-// Navigation/NavGraph.kt
 package eu.tutorials.mybizz.Navigation
 
 import android.annotation.SuppressLint
@@ -39,8 +38,13 @@ import eu.tutorials.mybizz.Logic.plot.PlotSheetsRepository
 import eu.tutorials.mybizz.Model.Construction
 import eu.tutorials.mybizz.Model.Plot
 import eu.tutorials.mybizz.Model.Rental
+import eu.tutorials.mybizz.Model.Bill
+import eu.tutorials.mybizz.Navigation.Routes.PaymentScreen
+import eu.tutorials.mybizz.Payments.PaymentScreen
+import eu.tutorials.mybizz.Payments.PaymentSheetsRepository
 import eu.tutorials.mybizz.Reporting.MonthlyReportScreen
 import eu.tutorials.mybizz.Reporting.MonthlyReportViewModel
+import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import eu.tutorials.mybizz.UIScreens.*
 import kotlinx.coroutines.launch
 
@@ -58,11 +62,15 @@ fun NavGraph(
     val scope = rememberCoroutineScope()
     val constructionSheetsRepo = remember { ConstructionSheetsRepository(context) }
     val constructionRepository = remember { ConstructionRepository() }
-    val taskSheetsRepo = remember { TaskSheetsRepository(context) } // Add remember
-    // Add Plot repositories
+    val taskSheetsRepo = remember { TaskSheetsRepository(context) }
     val plotSheetsRepo = remember { PlotSheetsRepository(context) }
     val plotRepository = remember { PlotRepository() }
-    val taskRepo = remember { TaskRepository() } // Add remember
+    val taskRepo = remember { TaskRepository() }
+
+    // NEW: Add Bill and Payment repositories
+    val billSheetsRepo = remember { BillSheetsRepository(context) }
+    val billRepo = remember { BillRepository() }
+    val paymentSheetsRepo = remember { PaymentSheetsRepository(context) }
 
     NavHost(
         navController = navController,
@@ -85,12 +93,50 @@ fun NavGraph(
             val billId = backStackEntry.arguments?.getString("billId") ?: ""
             EditBillScreen(navController, billId, authRepository)
         }
+
         composable(
             route = Routes.BillDetailsScreen,
             arguments = listOf(navArgument("billId") { type = NavType.StringType })
         ) { backStackEntry ->
             val billId = backStackEntry.arguments?.getString("billId") ?: ""
             BillDetailsScreen(navController, billId, authRepository)
+        }
+
+        // NEW: Payment Screen for Bills
+        composable(
+            route = "payment_bill/{billId}",
+            arguments = listOf(navArgument("billId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val billId = backStackEntry.arguments?.getString("billId") ?: ""
+            var bill by remember { mutableStateOf<Bill?>(null) }
+            var isLoading by remember { mutableStateOf(true) }
+
+            LaunchedEffect(billId) {
+                bill = billSheetsRepo.getBillById(billId)
+                isLoading = false
+            }
+
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                bill?.let { b ->
+                    PaymentScreen(
+                        bill = b,
+                        rental = null,
+                        onPaymentSuccess = {
+                            // Navigate back to bill details with refresh flag
+                            navController.navigate(Routes.BillsListScreen) {
+                                popUpTo(Routes.BillsListScreen) { inclusive = true }
+                            }
+                        },
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            }
         }
 
         // ------------------ Rental Screens ------------------
@@ -147,14 +193,17 @@ fun NavGraph(
                         }
                     },
                     onMarkPaid = {
-                        scope.launch { rentalRepo.markRentalAsPaid(r.id, rentalSheetsRepo)
-                        navController.navigate(Routes.RentalListScreen)
+                        scope.launch {
+                            rentalRepo.markRentalAsPaid(r.id, rentalSheetsRepo)
+                            navController.navigate(Routes.RentalListScreen) {
+                                popUpTo(Routes.RentalListScreen) { inclusive = true }
+                            }
                         }
                     },
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    navController = navController // NEW: Pass navController
                 )
             } ?: run {
-                // Show loading while rental is fetched
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -186,6 +235,44 @@ fun NavGraph(
                 }
             }
         }
+
+        // NEW: Payment Screen for Rentals
+        composable(
+            route = "payment_rental/{rentalId}",
+            arguments = listOf(navArgument("rentalId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val rentalId = backStackEntry.arguments?.getString("rentalId") ?: ""
+            var rental by remember { mutableStateOf<Rental?>(null) }
+            var isLoading by remember { mutableStateOf(true) }
+
+            LaunchedEffect(rentalId) {
+                rental = rentalSheetsRepo.getAllRentals().find { it.id == rentalId }
+                isLoading = false
+            }
+
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                rental?.let { r ->
+                    PaymentScreen(
+                        bill = null,
+                        rental = r,
+                        onPaymentSuccess = {
+                            // Navigate back to rental list with refresh
+                            navController.navigate(Routes.RentalListScreen) {
+                                popUpTo(Routes.RentalListScreen) { inclusive = true }
+                            }
+                        },
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            }
+        }
+
         // Construction List
         composable(Routes.ConstructionListScreen) {
             ConstructionListScreen(
@@ -199,12 +286,12 @@ fun NavGraph(
         composable(Routes.PlotAndConstructionEntry) {
             PlotAndConstructionEntry(
                 navController = navController,
-                sheetsRepo = plotSheetsRepo,     // for plot
-                constructionSheetsRepo = constructionSheetsRepo // for construction
+                sheetsRepo = plotSheetsRepo,
+                constructionSheetsRepo = constructionSheetsRepo
             )
         }
 
-// Add Construction
+        // Add Construction
         composable(Routes.AddConstructionScreen) {
             AddConstructionScreen(
                 sheetsRepo = constructionSheetsRepo,
@@ -212,9 +299,7 @@ fun NavGraph(
             )
         }
 
-
-
-// Construction Detail - FIXED ROUTE
+        // Construction Detail
         composable(
             route = "construction_detail/{constructionId}",
             arguments = listOf(navArgument("constructionId") { type = NavType.StringType })
@@ -223,7 +308,6 @@ fun NavGraph(
             var construction by remember { mutableStateOf<Construction?>(null) }
 
             LaunchedEffect(constructionId) {
-                // You need to implement this method in your repository
                 val allConstructions = constructionSheetsRepo.getAllConstructions()
                 construction = allConstructions.find { it.id == constructionId }
             }
@@ -249,7 +333,7 @@ fun NavGraph(
             }
         }
 
-// Edit Construction - FIXED ROUTE
+        // Edit Construction
         composable(
             route = "edit_construction/{constructionId}",
             arguments = listOf(navArgument("constructionId") { type = NavType.StringType })
@@ -275,7 +359,7 @@ fun NavGraph(
             }
         }
 
-        // Navigation/NavGraph.kt - Update the task section
+        // Task screens
         composable(Routes.TaskListScreen) {
             TaskListScreen(
                 navController = navController,
@@ -313,6 +397,7 @@ fun NavGraph(
                 sheetsRepo = taskSheetsRepo
             )
         }
+
         composable(Routes.UserManagementScreen){
             UserManagementScreen(
                 navController = navController,
@@ -337,6 +422,7 @@ fun NavGraph(
                 onBack = { navController.popBackStack() }
             )
         }
+
         // Plot Detail Screen
         composable(
             route = Routes.PlotDetailScreen,
@@ -370,6 +456,7 @@ fun NavGraph(
                 }
             }
         }
+
         // Edit Plot Screen
         composable(
             route = Routes.EditPlotScreen,
@@ -396,9 +483,8 @@ fun NavGraph(
             }
         }
 
-        // In NavGraph.kt -
+        // Monthly Report Screen
         composable(Routes.MonthlyReportScreen) {
-            // Create the ViewModel with Application context
             val viewModel: MonthlyReportViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
