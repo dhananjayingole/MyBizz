@@ -57,11 +57,11 @@ fun NavGraph(
     val scope = rememberCoroutineScope()
     val constructionSheetsRepo = remember { ConstructionSheetsRepository(context) }
     val constructionRepository = remember { ConstructionRepository() }
-    val taskSheetsRepo = remember { TaskSheetsRepository(context) } // Add remember
-    // Add Plot repositories
+    val taskSheetsRepo = remember { TaskSheetsRepository(context) }
+    // plot sheet Repos.
     val plotSheetsRepo = remember { PlotSheetsRepository(context) }
     val plotRepository = remember { PlotRepository() }
-    val taskRepo = remember { TaskRepository() } // Add remember
+    val taskRepo = remember { TaskRepository() }
 
     NavHost(
         navController = navController,
