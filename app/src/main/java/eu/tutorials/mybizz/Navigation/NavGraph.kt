@@ -63,14 +63,15 @@ fun NavGraph(
     val constructionSheetsRepo = remember { ConstructionSheetsRepository(context) }
     val constructionRepository = remember { ConstructionRepository() }
     val taskSheetsRepo = remember { TaskSheetsRepository(context) }
-    val plotSheetsRepo = remember { PlotSheetsRepository(context) }
-    val plotRepository = remember { PlotRepository() }
-    val taskRepo = remember { TaskRepository() }
 
     // NEW: Add Bill and Payment repositories
     val billSheetsRepo = remember { BillSheetsRepository(context) }
     val billRepo = remember { BillRepository() }
     val paymentSheetsRepo = remember { PaymentSheetsRepository(context) }
+    // plot sheet Repos.
+    val plotSheetsRepo = remember { PlotSheetsRepository(context) }
+    val plotRepository = remember { PlotRepository() }
+    val taskRepo = remember { TaskRepository() }
 
     NavHost(
         navController = navController,

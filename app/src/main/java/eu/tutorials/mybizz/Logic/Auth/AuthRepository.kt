@@ -141,8 +141,7 @@ class AuthRepository(private val context: Context? = null) {
                         }
                         .addOnFailureListener { e ->
                             Log.e(TAG, "⚠️ Firestore error (background): ${e.message}")
-                            // User is still authenticated via Firebase Auth
-                            // We can retry later or handle this gracefully
+                            // User is still authenticated via Firebase Auth.
                         }
                 } else {
                     val errorMessage = task.exception?.message ?: "Unknown error occurred"
@@ -181,7 +180,7 @@ class AuthRepository(private val context: Context? = null) {
                     // Verify in background
                     fetchUserRoleInBackground(uid)
                 } else {
-                    // Fetch from Firestore
+
                     fetchUserRole(uid) { user ->
                         _currentUser.value = user
                         _isAuthenticated.value = true

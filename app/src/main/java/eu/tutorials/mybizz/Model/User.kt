@@ -1,4 +1,3 @@
-// User.kt - User Model
 package eu.tutorials.mybizz.Model
 
 data class User(
