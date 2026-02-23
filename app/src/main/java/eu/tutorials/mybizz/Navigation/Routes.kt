@@ -1,4 +1,3 @@
-// Navigation/Routes.kt
 package eu.tutorials.mybizz.Navigation
 
 object Routes {
