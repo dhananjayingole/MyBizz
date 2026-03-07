@@ -269,10 +269,11 @@ fun RentalDetailScreen(
     onDelete: () -> Unit,
     onMarkPaid: () -> Unit,
     onBack: () -> Unit,
-    navController: NavController // NEW: Add navController parameter
+    navController: NavController
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showMarkPaidDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -281,6 +282,19 @@ fun RentalDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    // Add call icon in top bar
+                    if (rental.contactNo.isNotBlank()) {
+                        IconButton(onClick = {
+                            val intent = android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
+                                data = android.net.Uri.parse("tel:${rental.contactNo}")
+                            }
+                            context.startActivity(intent)
+                        }) {
+                            Icon(Icons.Default.Call, contentDescription = "Call Tenant")
+                        }
                     }
                 }
             )
@@ -301,20 +315,59 @@ fun RentalDetailScreen(
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "👤 Tenant: ${rental.tenantName}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text("🏠 Property: ${rental.property}")
-                    Text(
-                        "💰 Rent: ₹${rental.rentAmount}",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text("📅 Month: ${rental.month}")
-                    Text("📞 Contact: ${rental.contactNo}")
+                    // Add call option in contact info row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "👤 Tenant: ${rental.tenantName}",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text("🏠 Property: ${rental.property}")
+                            Text(
+                                "💰 Rent: ₹${rental.rentAmount}",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text("📅 Month: ${rental.month}")
+
+                            // Contact info with call button
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("📞 Contact: ${rental.contactNo}")
+                                if (rental.contactNo.isNotBlank()) {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    IconButton(
+                                        onClick = {
+                                            val intent = android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
+                                                data = android.net.Uri.parse("tel:${rental.contactNo}")
+                                            }
+                                            context.startActivity(intent)
+                                        },
+                                        modifier = Modifier.size(32.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Call,
+                                            contentDescription = "Call Tenant",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (rental.paymentDate.isNotEmpty()) {
+                                Text("Payment Date: ${rental.paymentDate}")
+                            }
+                        }
+                    }
+
+                    // Status
                     Text(
                         "Status: ${rental.status.uppercase()}",
                         fontWeight = FontWeight.Bold,
@@ -323,9 +376,6 @@ fun RentalDetailScreen(
                         else
                             MaterialTheme.colorScheme.error
                     )
-                    if (rental.paymentDate.isNotEmpty()) {
-                        Text("Payment Date: ${rental.paymentDate}")
-                    }
                 }
             }
 
@@ -333,7 +383,6 @@ fun RentalDetailScreen(
 
             // Payment Action Section
             if (rental.status == Rental.STATUS_UNPAID) {
-                // NEW: Pay Now Button
                 Button(
                     onClick = {
                         navController.navigate("payment_rental/${rental.id}")
@@ -342,7 +391,7 @@ fun RentalDetailScreen(
                         .fillMaxWidth()
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2196F3) // Blue
+                        containerColor = Color(0xFF2196F3)
                     )
                 ) {
                     Spacer(modifier = Modifier.width(8.dp))
@@ -355,7 +404,6 @@ fun RentalDetailScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Alternative: Manual Mark as Paid
                 OutlinedButton(
                     onClick = { showMarkPaidDialog = true },
                     modifier = Modifier.fillMaxWidth()
@@ -365,11 +413,10 @@ fun RentalDetailScreen(
                     Text("Mark as Paid (Manual)")
                 }
             } else {
-                // Show Paid Status Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFE3F2FD) // Light blue
+                        containerColor = Color(0xFFE3F2FD)
                     )
                 ) {
                     Row(
