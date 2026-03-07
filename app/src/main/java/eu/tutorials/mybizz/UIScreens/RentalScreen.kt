@@ -345,11 +345,6 @@ fun RentalDetailScreen(
                         containerColor = Color(0xFF2196F3) // Blue
                     )
                 ) {
-                    Icon(
-                        Icons.Default.Clear,
-                        contentDescription = "Pay",
-                        modifier = Modifier.size(24.dp)
-                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         "Pay Now - ₹${String.format("%.2f", rental.rentAmount)}",
