@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
+import eu.tutorials.mybizz.Chatbot.ChatScreen
 import eu.tutorials.mybizz.Navigation.NavGraph
 import eu.tutorials.mybizz.Notification.NotificationHelper
 import eu.tutorials.mybizz.Notification.NotificationPermissionHelper
@@ -51,7 +52,8 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
                     val navController = rememberNavController()
                     val context = LocalContext.current
-                    NavGraph(navController, context)
+//                    NavGraph(navController, context)
+                    ChatScreen()
                 }
             }
         }
