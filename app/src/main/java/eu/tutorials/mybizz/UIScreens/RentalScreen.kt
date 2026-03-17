@@ -1,6 +1,10 @@
 package eu.tutorials.mybizz.UIScreens
 
 import android.app.DatePickerDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.widget.DatePicker
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,12 +23,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import eu.tutorials.mybizz.Model.Rental
 import eu.tutorials.mybizz.Logic.Rental.RentalRepository
 import eu.tutorials.mybizz.Logic.Rental.RentalSheetsRepository
 import kotlinx.coroutines.launch
 import java.util.*
+import android.provider.Settings
+import androidx.annotation.RequiresApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,6 +138,7 @@ fun RentalListScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.HONEYCOMB)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddRentalScreen(
@@ -165,7 +173,7 @@ fun AddRentalScreen(
 
         try {
             val dayPickerId = context.resources.getIdentifier("day", "id", "android")
-            val dayPicker = dialog.datePicker.findViewById<DatePicker>(dayPickerId)
+            val dayPicker = dialog. datePicker.findViewById<DatePicker>(dayPickerId)
             dayPicker?.visibility = android.view.View.GONE
         } catch (e: Exception) {
             e.printStackTrace()
@@ -273,7 +281,34 @@ fun RentalDetailScreen(
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showMarkPaidDialog by remember { mutableStateOf(false) }
+    var showCallDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    // Function to handle call
+    fun makePhoneCall(phoneNumber: String) {
+        try {
+            val intent = Intent(Intent.ACTION_CALL).apply {
+                data = Uri.parse("tel:$phoneNumber")
+            }
+            // Check if we have permission
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.CALL_PHONE
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                context.startActivity(intent)
+            } else {
+                // Request permission if not granted
+                showCallDialog = true
+            }
+        } catch (e: Exception) {
+            // Fallback to dial if call fails
+            val dialIntent = Intent(Intent.ACTION_DIAL).apply {
+                data = Uri.parse("tel:$phoneNumber")
+            }
+            context.startActivity(dialIntent)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -288,12 +323,13 @@ fun RentalDetailScreen(
                     // Add call icon in top bar
                     if (rental.contactNo.isNotBlank()) {
                         IconButton(onClick = {
-                            val intent = android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
-                                data = android.net.Uri.parse("tel:${rental.contactNo}")
-                            }
-                            context.startActivity(intent)
+                            makePhoneCall(rental.contactNo)
                         }) {
-                            Icon(Icons.Default.Call, contentDescription = "Call Tenant")
+                            Icon(
+                                Icons.Default.Call,
+                                contentDescription = "Call Tenant",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 }
@@ -315,57 +351,73 @@ fun RentalDetailScreen(
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    // Add call option in contact info row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "👤 Tenant: ${rental.tenantName}",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text("🏠 Property: ${rental.property}")
-                            Text(
-                                "💰 Rent: ₹${rental.rentAmount}",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text("📅 Month: ${rental.month}")
+                    Text(
+                        "👤 Tenant: ${rental.tenantName}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
 
-                            // Contact info with call button
+                    Text("🏠 Property: ${rental.property}")
+
+                    Text(
+                        "💰 Rent: ₹${rental.rentAmount}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    Text("📅 Month: ${rental.month}")
+
+                    // Contact info with clickable call button
+                    if (rental.contactNo.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            )
+                        ) {
                             Row(
-                                verticalAlignment = Alignment.CenterVertically
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { makePhoneCall(rental.contactNo) }
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("📞 Contact: ${rental.contactNo}")
-                                if (rental.contactNo.isNotBlank()) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Default.Phone,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    IconButton(
-                                        onClick = {
-                                            val intent = android.content.Intent(android.content.Intent.ACTION_DIAL).apply {
-                                                data = android.net.Uri.parse("tel:${rental.contactNo}")
-                                            }
-                                            context.startActivity(intent)
-                                        },
-                                        modifier = Modifier.size(32.dp)
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Call,
-                                            contentDescription = "Call Tenant",
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
+                                    Text(
+                                        "📞 ${rental.contactNo}",
+                                        fontSize = 16.sp
+                                    )
                                 }
-                            }
 
-                            if (rental.paymentDate.isNotEmpty()) {
-                                Text("Payment Date: ${rental.paymentDate}")
+                                // Small call button
+                                Icon(
+                                    Icons.Default.Call,
+                                    contentDescription = "Call",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
                             }
                         }
                     }
+
+                    if (rental.paymentDate.isNotEmpty()) {
+                        Text("Payment Date: ${rental.paymentDate}")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     // Status
                     Text(
@@ -394,6 +446,7 @@ fun RentalDetailScreen(
                         containerColor = Color(0xFF2196F3)
                     )
                 ) {
+                    Icon(Icons.Default.Refresh, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         "Pay Now - ₹${String.format("%.2f", rental.rentAmount)}",
@@ -454,7 +507,10 @@ fun RentalDetailScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Action Buttons
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 if (rental.status == Rental.STATUS_UNPAID) {
                     OutlinedButton(
                         onClick = onEdit,
@@ -533,6 +589,39 @@ fun RentalDetailScreen(
             dismissButton = {
                 TextButton(onClick = { showMarkPaidDialog = false }) {
                     Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Call Permission Dialog
+    if (showCallDialog) {
+        AlertDialog(
+            onDismissRequest = { showCallDialog = false },
+            title = { Text("Call Permission Required") },
+            text = { Text("Please grant call permission to directly call the tenant. You can still use the dialer without permission.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showCallDialog = false
+                    // Open app settings for permission
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:${context.packageName}")
+                    }
+                    context.startActivity(intent)
+                }) {
+                    Text("Open Settings")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showCallDialog = false
+                    // Fallback to dial
+                    val dialIntent = Intent(Intent.ACTION_DIAL).apply {
+                        data = Uri.parse("tel:${rental.contactNo}")
+                    }
+                    context.startActivity(dialIntent)
+                }) {
+                    Text("Use Dialer")
                 }
             }
         )
