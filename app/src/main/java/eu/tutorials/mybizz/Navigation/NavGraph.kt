@@ -25,6 +25,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import eu.tutorials.mybizz.Chatbot.ChatScreen
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Logic.Bill.BillRepository
 import eu.tutorials.mybizz.Logic.Construction.ConstructionRepository
@@ -498,6 +499,11 @@ fun NavGraph(
                 viewModel = viewModel,
                 navController = navController
             )
+        }
+
+//        Chatbot Screen
+        composable(Routes.ChatScreen){
+            ChatScreen(navController = navController)
         }
     }
 }

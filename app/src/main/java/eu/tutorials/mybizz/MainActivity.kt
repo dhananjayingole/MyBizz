@@ -52,8 +52,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
                     val navController = rememberNavController()
                     val context = LocalContext.current
-//                    NavGraph(navController, context)
-                    ChatScreen()
+                    NavGraph(navController, context)
                 }
             }
         }

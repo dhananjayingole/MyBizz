@@ -19,6 +19,8 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Model.MenuItem
 import eu.tutorials.mybizz.Navigation.Routes
@@ -27,6 +29,7 @@ import eu.tutorials.mybizz.pdfgen.PdfGenerator
 import eu.tutorials.mybizz.Reporting.MonthlyReportViewModel
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserDashboardScreen(
@@ -107,6 +110,23 @@ fun UserDashboardScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    // Navigate to Chatbot screen
+                    navController.navigate(Routes.ChatScreen)
+                },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.navigationBarsPadding()
+            ) {
+                Icon(
+                    Icons.Default.AccountBox,
+                    contentDescription = "Chatbot",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     ) { innerPadding ->
         Column(
