@@ -11,4 +11,9 @@
         name="cache"
         path="." />
 
+    <!-- ADD THIS: For QR image sharing via WhatsApp -->
+    <cache-path
+        name="images"
+        path="images/" />
+
 </paths>

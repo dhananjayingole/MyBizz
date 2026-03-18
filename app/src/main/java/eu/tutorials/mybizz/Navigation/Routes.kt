@@ -33,7 +33,6 @@ object Routes {
     const val AddTaskScreen = "add_task"
     const val TaskDetailScreen = "task_detail/{taskId}"
     const val EditTaskScreen = "edit_task/{taskId}"
-
     const val PaymentScreen = "paymentscreen"
     const val UserManagementScreen = "usermanagementscreen"
 

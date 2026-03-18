@@ -3,6 +3,8 @@ package eu.tutorials.mybizz.UIScreens
 import androidx.compose.runtime.livedata.observeAsState
 import eu.tutorials.mybizz.pdfgen.PdfGenerator
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -27,6 +29,7 @@ import eu.tutorials.mybizz.R
 import eu.tutorials.mybizz.Reporting.MonthlyReportViewModel
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminDashboardScreen(

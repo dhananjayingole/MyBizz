@@ -284,6 +284,8 @@ fun RentalDetailScreen(
     var showCallDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    var showPaymentOptions by remember { mutableStateOf(false) }
+
     // Function to handle call
     fun makePhoneCall(phoneNumber: String) {
         try {
@@ -436,9 +438,7 @@ fun RentalDetailScreen(
             // Payment Action Section
             if (rental.status == Rental.STATUS_UNPAID) {
                 Button(
-                    onClick = {
-                        navController.navigate("payment_rental/${rental.id}")
-                    },
+                    onClick = { showPaymentOptions = true }, // Changed this line
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -593,6 +593,17 @@ fun RentalDetailScreen(
             }
         )
     }
+// Add this dialog call at the bottom of RentalDetailScreen (alongside other dialogs):
+    if (showPaymentOptions) {
+        PaymentOptionsDialog(
+            rental = rental,
+            onDismiss = { showPaymentOptions = false },
+            onPayHere = {
+                navController.navigate("payment_rental/${rental.id}")
+            }
+        )
+    }
+
 
     // Call Permission Dialog
     if (showCallDialog) {
