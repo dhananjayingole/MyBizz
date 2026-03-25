@@ -19,6 +19,7 @@ import eu.tutorials.mybizz.Navigation.NavGraph
 import eu.tutorials.mybizz.Notification.NotificationHelper
 import eu.tutorials.mybizz.Notification.NotificationPermissionHelper
 import eu.tutorials.mybizz.Notification.ReminderScheduler
+import eu.tutorials.mybizz.bankingSms.BankSMSScreen
 import eu.tutorials.mybizz.ui.theme.MyBizzTheme
 
 class MainActivity : ComponentActivity() {
@@ -52,7 +53,8 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
                     val navController = rememberNavController()
                     val context = LocalContext.current
-                    NavGraph(navController, context)
+//                    NavGraph(navController, context)
+                    BankSMSScreen(onBack = {navController.popBackStack()})
                 }
             }
         }
