@@ -27,6 +27,7 @@ import eu.tutorials.mybizz.Model.MenuItem
 import eu.tutorials.mybizz.Navigation.Routes
 import eu.tutorials.mybizz.R
 import eu.tutorials.mybizz.Reporting.MonthlyReportViewModel
+import eu.tutorials.mybizz.ui.theme.Divider
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -104,6 +105,22 @@ fun AdminDashboardScreen(
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Info,
+                                    contentDescription = "Generate PDF"
+                                )
+                            }
+                        )
+
+                        Divider()
+//                        Moves to the BankSMS Screen
+                        DropdownMenuItem(
+                            text = { Text("BankSMSScreen") },
+                            onClick = {
+                                showMenu = false
+                                navController.navigate(Routes.BankSMSScreen)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Notifications,
                                     contentDescription = "Generate PDF"
                                 )
                             }

@@ -44,6 +44,8 @@ object Routes {
 
     const val ChatScreen = "chatscreen"
 
+    const val BankSMSScreen = "banksmsscreen"
+
     // Helper functions to build routes with parameters
     fun constructionDetail(constructionId: String): String = "construction_detail/$constructionId"
     fun editConstruction(constructionId: String): String = "edit_construction/$constructionId"

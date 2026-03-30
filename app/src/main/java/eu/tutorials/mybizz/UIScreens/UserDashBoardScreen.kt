@@ -107,6 +107,21 @@ fun UserDashboardScreen(
                                 )
                             }
                         )
+
+                        Divider()
+                        DropdownMenuItem(
+                            text = { Text("Banking SMS") },
+                            onClick = {
+                                showMenu = false
+                                navController.navigate(Routes.BankSMSScreen)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Notifications,
+                                    contentDescription = "Generate PDF"
+                                )
+                            }
+                        )
                     }
                 }
             )

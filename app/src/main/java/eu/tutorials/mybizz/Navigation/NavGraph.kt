@@ -47,6 +47,7 @@ import eu.tutorials.mybizz.Reporting.MonthlyReportScreen
 import eu.tutorials.mybizz.Reporting.MonthlyReportViewModel
 import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import eu.tutorials.mybizz.UIScreens.*
+import eu.tutorials.mybizz.bankingSms.BankSMSScreen
 import kotlinx.coroutines.launch
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -504,6 +505,10 @@ fun NavGraph(
 //        Chatbot Screen
         composable(Routes.ChatScreen){
             ChatScreen(navController = navController)
+        }
+
+        composable(Routes.BankSMSScreen){
+            BankSMSScreen({navController.popBackStack()})
         }
     }
 }
