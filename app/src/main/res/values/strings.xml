@@ -358,6 +358,7 @@
     <string name="tech_firebase">Firebase Authentication</string>
     <string name="tech_sheets">Google Sheets Integration</string>
     <string name="tech_material">Material Design 3</string>
+    <string name="search_clear">clear search</string>
 
     <!-- About Us (Settings) -->
     <string name="about_us_title">MyBiz - Personal Business Management System</string>

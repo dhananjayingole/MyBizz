@@ -25,7 +25,6 @@ import eu.tutorials.mybizz.language.LocaleManager
 import eu.tutorials.mybizz.ui.theme.MyBizzTheme
 
 class MainActivity : ComponentActivity() {
-
     // ── 1. Apply saved locale BEFORE the activity inflates any view ────────
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleManager.applyLocale(newBase))

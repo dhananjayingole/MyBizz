@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -22,6 +23,7 @@ import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Logic.Bill.BillRepository
 import eu.tutorials.mybizz.Model.Bill
 import eu.tutorials.mybizz.Navigation.Routes
+import eu.tutorials.mybizz.R
 import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import kotlinx.coroutines.launch
 
@@ -96,7 +98,7 @@ fun BillsListScreen(
                     // Then sync with server
                     reloadBills()
                 } else {
-                    error = "Failed to mark bill as paid"
+                    error = context.getString(R.string.failed_mark_paid)
                 }
             } catch (e: Exception) {
                 error = "Error: ${e.message}"
@@ -117,7 +119,7 @@ fun BillsListScreen(
                     bills = bills.filter { it.id != billId }
                     // Show success message or handle accordingly
                 } else {
-                    error = "Failed to delete bill"
+                    error = context.getString(R.string.failed_delete_bill)
                 }
             } catch (e: Exception) {
                 error = "Error: ${e.message}"
@@ -130,7 +132,7 @@ fun BillsListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Bills Management") },
+                title = { Text(stringResource(R.string.bills_management)) },
             )
         },
         floatingActionButton = {
@@ -139,7 +141,7 @@ fun BillsListScreen(
                 onClick = { navController.navigate("add_bill") },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Bill")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_bill))
             }
         }
     ) { innerPadding ->
@@ -163,7 +165,7 @@ fun BillsListScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
+                        contentDescription = stringResource(R.string.search),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -171,7 +173,7 @@ fun BillsListScreen(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier.weight(1f),
-                        placeholder = { Text("Search bills by title, category, bill number...") },
+                        placeholder = { Text(stringResource(R.string.search_bills)) },
                         colors = TextFieldDefaults.colors(
                             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                             focusedContainerColor = MaterialTheme.colorScheme.surface
@@ -184,7 +186,7 @@ fun BillsListScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Clear search",
+                                contentDescription = stringResource(R.string.search_clear),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -222,7 +224,7 @@ fun BillsListScreen(
                             modifier = Modifier.padding(16.dp)
                         )
                         Button(onClick = { reloadBills() }) {
-                            Text("Retry")
+                            Text(stringResource(R.string.retry))
                         }
                     }
                 }
@@ -235,10 +237,10 @@ fun BillsListScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             if (searchQuery.isNotEmpty()) {
                                 Text("No bills found matching \"$searchQuery\"")
-                                Text("Try a different search term", style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(R.string.try_different_search), style = MaterialTheme.typography.bodySmall)
                             } else {
-                                Text("No bills found.")
-                                Text("Add your first bill using the + button!")
+                                Text(stringResource(R.string.no_bills_found))
+                                Text(stringResource(R.string.add_first_bill))
                             }
                         }
                     }
@@ -256,9 +258,9 @@ fun BillsListScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            StatCard(title = "Total", value = totalBills.toString())
-                            StatCard(title = "Paid", value = paidBills.toString(), isPaid = true)
-                            StatCard(title = "Unpaid", value = unpaidBills.toString(), isPaid = false)
+                            StatCard(title = stringResource(R.string.total), value = totalBills.toString())
+                            StatCard(title = stringResource(R.string.paid), value = paidBills.toString(), isPaid = true)
+                            StatCard(title = stringResource(R.string.unpaid), value = unpaidBills.toString(), isPaid = false)
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -282,7 +284,7 @@ fun BillsListScreen(
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold
                                     )
-                                    Text("Total Amount", style = MaterialTheme.typography.bodySmall)
+                                    Text(stringResource(R.string.total_amount), style = MaterialTheme.typography.bodySmall)
                                 }
 
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -292,7 +294,7 @@ fun BillsListScreen(
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.error
                                     )
-                                    Text("Due Amount", style = MaterialTheme.typography.bodySmall)
+                                    Text(stringResource(R.string.due_date), style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }
@@ -383,7 +385,7 @@ fun BillItem(
                             text = if (bill.paidBy.isNotEmpty()) {
                                 "Paid by: ${bill.paidBy}"
                             } else {
-                                "Paid"
+                                stringResource(R.string.paid)
                             },
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary
@@ -432,7 +434,7 @@ fun BillItem(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("Mark as Paid")
+                    Text(stringResource(R.string.mark_as_paid))
                 }
             }
         }
