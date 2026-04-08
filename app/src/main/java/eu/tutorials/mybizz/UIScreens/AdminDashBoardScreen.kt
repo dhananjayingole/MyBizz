@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
@@ -27,7 +28,6 @@ import eu.tutorials.mybizz.Model.MenuItem
 import eu.tutorials.mybizz.Navigation.Routes
 import eu.tutorials.mybizz.R
 import eu.tutorials.mybizz.Reporting.MonthlyReportViewModel
-import eu.tutorials.mybizz.ui.theme.Divider
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -80,7 +80,7 @@ fun AdminDashboardScreen(
                     ) {
                         // Monthly Summary option
                         DropdownMenuItem(
-                            text = { Text("Monthly Summary") },
+                            text = { Text(stringResource(R.string.monthly_summary)) },
                             onClick = {
                                 showMenu = false
                                 navController.navigate(Routes.MonthlyReportScreen)
@@ -88,7 +88,7 @@ fun AdminDashboardScreen(
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.DateRange,
-                                    contentDescription = "Monthly Summary"
+                                    contentDescription = stringResource(R.string.monthly_summary)
                                 )
                             }
                         )
@@ -97,7 +97,7 @@ fun AdminDashboardScreen(
 
                         // Generate PDF option
                         DropdownMenuItem(
-                            text = { Text("Generate PDF") },
+                            text = { Text(stringResource(R.string.generate_pdf)) },
                             onClick = {
                                 showMenu = false
                                 showPdfDialog = true
@@ -113,7 +113,7 @@ fun AdminDashboardScreen(
                         Divider()
 //                        Moves to the BankSMS Screen
                         DropdownMenuItem(
-                            text = { Text("BankSMSScreen") },
+                            text = { Text(stringResource(R.string.banking_sms)) },
                             onClick = {
                                 showMenu = false
                                 navController.navigate(Routes.BankSMSScreen)
@@ -143,13 +143,13 @@ fun AdminDashboardScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Welcome, Admin!",
+                        text = stringResource(R.string.welcome_admin),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "Manage your business operations from here",
+                        text = stringResource(R.string.manage_business),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -159,7 +159,7 @@ fun AdminDashboardScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Quick Actions",
+                text = stringResource(R.string.quick_actions),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -206,7 +206,7 @@ fun AdminDashboardScreen(
             },
             title = {
                 Text(
-                    "Generate Monthly Report PDF",
+                    stringResource(R.string.generate_monthly_pdf),
                     style = MaterialTheme.typography.titleLarge
                 )
             },
@@ -223,13 +223,13 @@ fun AdminDashboardScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                "Generating PDF report...",
+                                stringResource(R.string.generating_pdf),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                "This may take a few seconds",
+                                stringResource(R.string.may_take_seconds),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -246,7 +246,7 @@ fun AdminDashboardScreen(
                                 ) {
                                     Column(modifier = Modifier.padding(12.dp)) {
                                         Text(
-                                            "Report Details",
+                                            stringResource(R.string.report_details),
                                             style = MaterialTheme.typography.titleSmall,
                                             fontWeight = FontWeight.Bold
                                         )
@@ -261,7 +261,7 @@ fun AdminDashboardScreen(
                             }
 
                             Text(
-                                "This will generate a comprehensive PDF report including:",
+                                stringResource(R.string.pdf_includes),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -275,7 +275,7 @@ fun AdminDashboardScreen(
                             if (monthlyReport == null) {
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    "Note: Loading report data...",
+                                    stringResource(R.string.loading_report_data),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -324,7 +324,7 @@ fun AdminDashboardScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Generate PDF")
+                    Text(stringResource(R.string.generate_pdf))
                 }
             },
             dismissButton = {
@@ -332,7 +332,7 @@ fun AdminDashboardScreen(
                     onClick = { showPdfDialog = false },
                     enabled = !isGeneratingPdf
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

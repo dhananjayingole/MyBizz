@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -31,7 +32,15 @@ import eu.tutorials.mybizz.R
 fun SettingsScreen(navController: NavController, authRepo: AuthRepository) {
     var showAboutUs by remember { mutableStateOf(false) }
     var showPrivacyPolicy by remember { mutableStateOf(false) }
+
+    var showLanguageDialog by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
+
+    // Show language picker dialog
+    if (showLanguageDialog) {
+        LanguageSelectorDialog(onDismiss = { showLanguageDialog = false })
+    }
 
     if (showAboutUs) {
         AboutUsScreen(onBackClick = { showAboutUs = false })
@@ -46,7 +55,7 @@ fun SettingsScreen(navController: NavController, authRepo: AuthRepository) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -67,17 +76,27 @@ fun SettingsScreen(navController: NavController, authRepo: AuthRepository) {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "App Information",
+                        text = stringResource(R.string.app_information),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // ── Language Selector ──────────────────────────────────
+                    SettingItem(
+                        icon = painterResource(R.drawable.img_16), // use any suitable icon you have
+                        title = stringResource(R.string.change_language),
+                        subtitle = stringResource(R.string.change_language_subtitle),
+                        onClick = { showLanguageDialog = true }
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
                     SettingItem(
                         icon = painterResource(R.drawable.img_21),
-                        title = "About Us",
-                        subtitle = "Learn more about MyBiz",
+                        title = stringResource(R.string.about_us),
+                        subtitle =  stringResource(R.string.about_us_subtitle),
                         onClick = { showAboutUs = true }
                     )
 
@@ -85,8 +104,8 @@ fun SettingsScreen(navController: NavController, authRepo: AuthRepository) {
 
                     SettingItem(
                         icon = painterResource(R.drawable.img_24),
-                        title = "Privacy Policy",
-                        subtitle = "How we handle your data",
+                        title =stringResource(R.string.privacy_policy),
+                        subtitle = stringResource(R.string.privacy_policy_subtitle),
                         onClick = { showPrivacyPolicy = true }
                     )
 
@@ -94,8 +113,8 @@ fun SettingsScreen(navController: NavController, authRepo: AuthRepository) {
 
                     SettingItem(
                         icon = painterResource(R.drawable.img_19),
-                        title = "Email Support",
-                        subtitle = "Contact our support team",
+                        title =  stringResource(R.string.email_support),
+                        subtitle = stringResource(R.string.email_support_subtitle),
                         onClick = {
                             sendSupportEmail(context)
                         }
@@ -105,8 +124,8 @@ fun SettingsScreen(navController: NavController, authRepo: AuthRepository) {
 
                     SettingItem(
                         icon = painterResource(R.drawable.img_23),
-                        title = "Share App",
-                        subtitle = "Share MyBiz with others",
+                        title = stringResource(R.string.share_app),
+                        subtitle = stringResource(R.string.share_app_subtitle),
                         onClick = {
                             shareApp(context)
                         }
@@ -167,7 +186,7 @@ fun SettingItem(
             if (onClick != null) {
                 Icon(
                     painter = painterResource(R.drawable.img),
-                    contentDescription = "Navigate",
+                    contentDescription = stringResource(R.string.navigate),
                     tint = androidx.compose.ui.graphics.Color.Unspecified, // show original arrow color
                     modifier = Modifier.size(16.dp)
                 )

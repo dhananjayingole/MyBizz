@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.res.stringResource
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Model.MenuItem
 import eu.tutorials.mybizz.Navigation.Routes
@@ -61,13 +62,13 @@ fun UserDashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("User Dashboard") },
+                title = { Text(stringResource(R.string.user_dashboard)) },
                 actions = {
                     // Three-dot menu button
                     IconButton(onClick = { showMenu = true }) {
                         Icon(
                             Icons.Default.MoreVert,
-                            contentDescription = "More Options"
+                            contentDescription = stringResource(R.string.more_options)
                         )
                     }
 
@@ -78,7 +79,7 @@ fun UserDashboardScreen(
                     ) {
                         // Monthly Summary option
                         DropdownMenuItem(
-                            text = { Text("Monthly Summary") },
+                            text = { Text(stringResource(R.string.monthly_summary)) },
                             onClick = {
                                 showMenu = false
                                 navController.navigate(Routes.MonthlyReportScreen)
@@ -86,7 +87,7 @@ fun UserDashboardScreen(
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.DateRange,
-                                    contentDescription = "Monthly Summary"
+                                    contentDescription = stringResource(R.string.monthly_summary)
                                 )
                             }
                         )
@@ -95,7 +96,7 @@ fun UserDashboardScreen(
 
                         // Generate PDF option
                         DropdownMenuItem(
-                            text = { Text("Generate PDF Report") },
+                            text = { Text(stringResource(R.string.generate_pdf)) },
                             onClick = {
                                 showMenu = false
                                 showPdfDialog = true
@@ -103,14 +104,14 @@ fun UserDashboardScreen(
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Build,
-                                    contentDescription = "Generate PDF"
+                                    contentDescription = stringResource(R.string.generate_pdf)
                                 )
                             }
                         )
 
                         Divider()
                         DropdownMenuItem(
-                            text = { Text("Banking SMS") },
+                            text = { Text(stringResource(R.string.banking_sms)) },
                             onClick = {
                                 showMenu = false
                                 navController.navigate(Routes.BankSMSScreen)
@@ -138,7 +139,7 @@ fun UserDashboardScreen(
             ) {
                 Icon(
                     Icons.Default.AccountBox,
-                    contentDescription = "Chatbot",
+                    contentDescription = stringResource(R.string.chatbot),
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -157,7 +158,7 @@ fun UserDashboardScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Welcome, User!",
+                        text = stringResource(R.string.welcome_user),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -167,7 +168,7 @@ fun UserDashboardScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Available Options",
+                text = stringResource(R.string.available_options),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -209,7 +210,7 @@ fun UserDashboardScreen(
             },
             title = {
                 Text(
-                    "Generate Monthly Report PDF",
+                    stringResource(R.string.generate_monthly_pdf),
                     style = MaterialTheme.typography.titleLarge
                 )
             },
@@ -226,13 +227,13 @@ fun UserDashboardScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                "Generating PDF report...",
+                                stringResource(R.string.generating_pdf),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                "This may take a few seconds",
+                                stringResource(R.string.may_take_seconds),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -249,7 +250,7 @@ fun UserDashboardScreen(
                                 ) {
                                     Column(modifier = Modifier.padding(12.dp)) {
                                         Text(
-                                            "Report Details",
+                                            stringResource(R.string.report_details),
                                             style = MaterialTheme.typography.titleSmall,
                                             fontWeight = FontWeight.Bold
                                         )
@@ -264,7 +265,7 @@ fun UserDashboardScreen(
                             }
 
                             Text(
-                                "This will generate a comprehensive PDF report including:",
+                                stringResource(R.string.pdf_includes),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -278,7 +279,7 @@ fun UserDashboardScreen(
                             if (monthlyReport == null) {
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    "Note: Loading report data...",
+                                    stringResource(R.string.loading_report_data),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -327,7 +328,7 @@ fun UserDashboardScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Generate PDF")
+                    Text(stringResource(R.string.generate_pdf))
                 }
             },
             dismissButton = {
@@ -335,7 +336,7 @@ fun UserDashboardScreen(
                     onClick = { showPdfDialog = false },
                     enabled = !isGeneratingPdf
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

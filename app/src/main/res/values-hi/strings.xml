@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">माइबिज़</string>
+    <string name="app_tagline">व्यवसाय प्रबंधन प्रणाली</string>
+    <string name="app_version">संस्करण 1.0.0</string>
+
+    <!-- Common / Shared -->
+    <string name="ok">ठीक है</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="save">सहेजें</string>
+    <string name="delete">हटाएं</string>
+    <string name="edit">संपादित करें</string>
+    <string name="back">वापस</string>
+    <string name="retry">पुनः प्रयास</string>
+    <string name="loading">लोड हो रहा है…</string>
+    <string name="search">खोजें</string>
+    <string name="add">जोड़ें</string>
+    <string name="update">अपडेट करें</string>
+    <string name="close">बंद करें</string>
+    <string name="yes">हाँ</string>
+    <string name="no">नहीं</string>
+    <string name="confirm">पुष्टि करें</string>
+    <string name="error">त्रुटि</string>
+    <string name="success">सफलता</string>
+    <string name="status">स्थिति</string>
+    <string name="date">तारीख</string>
+    <string name="amount">राशि</string>
+    <string name="description">विवरण</string>
+    <string name="notes">नोट्स</string>
+    <string name="no_data_found">कोई डेटा नहीं मिला</string>
+    <string name="please_wait">कृपया प्रतीक्षा करें…</string>
+    <string name="share">शेयर करें</string>
+    <string name="generate_pdf">PDF बनाएं</string>
+    <string name="version">संस्करण</string>
+    <string name="navigate">आगे जाएं</string>
+    <string name="active">सक्रिय</string>
+    <string name="blocked">अवरुद्ध</string>
+    <string name="paid">भुगतान हो गया</string>
+    <string name="unpaid">भुगतान बाकी</string>
+    <string name="mark_as_paid">भुगतान किया गया चिह्नित करें</string>
+    <string name="mark_paid_manual">भुगतान किया (मैन्युअल)</string>
+    <string name="pay_now">अभी भुगतान करें</string>
+    <string name="payment_completed">भुगतान पूर्ण</string>
+    <string name="paid_on">भुगतान किया: %s</string>
+    <string name="paid_by">भुगतानकर्ता: %s</string>
+    <string name="due_on">देय तिथि: %s</string>
+    <string name="title_required">शीर्षक आवश्यक है</string>
+    <string name="amount_required">राशि आवश्यक है</string>
+    <string name="due_date_required">देय तिथि आवश्यक है</string>
+    <string name="enter_valid_number">कृपया वैध संख्या दर्ज करें</string>
+    <string name="select_valid_date">कृपया वैध तिथि चुनें</string>
+    <string name="fill_required_fields">कृपया सभी आवश्यक फ़ील्ड सही से भरें</string>
+    <string name="fields_cannot_be_empty">फ़ील्ड खाली नहीं हो सकते</string>
+    <string name="passwords_do_not_match">पासवर्ड मेल नहीं खाते</string>
+    <string name="tap_to_select_date">तारीख चुनने के लिए टैप करें</string>
+    <string name="today">आज</string>
+    <string name="tomorrow">कल</string>
+    <string name="next_week">अगले हफ्ते</string>
+    <string name="category">श्रेणी</string>
+    <string name="select_category">श्रेणी चुनें</string>
+    <string name="select_due_date">देय तिथि चुनें</string>
+    <string name="due_date">देय तिथि*</string>
+    <string name="initial">प्रारंभिक</string>
+    <string name="no_change">कोई बदलाव नहीं</string>
+    <string name="increase">वृद्धि</string>
+    <string name="decrease">कमी</string>
+    <string name="total">कुल</string>
+    <string name="updated">अपडेट किया</string>
+    <string name="created">बनाया गया</string>
+    <string name="monthly_summary">मासिक सारांश</string>
+    <string name="banking_sms">बैंकिंग SMS</string>
+    <string name="choose_language">भाषा चुनें</string>
+
+    <!-- Splash Screen -->
+    <string name="splash_loading">लोड हो रहा है…</string>
+    <string name="splash_tagline">व्यवसाय प्रबंधन प्रणाली</string>
+
+    <!-- Login Screen -->
+    <string name="welcome_back">वापसी पर स्वागत है</string>
+    <string name="sign_in_to_continue">अपनी यात्रा जारी रखने के लिए साइन इन करें</string>
+    <string name="email">ईमेल</string>
+    <string name="password">पासवर्ड</string>
+    <string name="forgot_password">पासवर्ड भूल गए?</string>
+    <string name="login_as">इस रूप में लॉगिन करें</string>
+    <string name="login">लॉगिन</string>
+    <string name="no_account_sign_up">खाता नहीं है? साइन अप करें</string>
+    <string name="please_fill_all_fields">कृपया सभी फ़ील्ड भरें</string>
+    <string name="welcome_back_toast">वापसी पर स्वागत है!</string>
+    <string name="role_mismatch">भूमिका मेल नहीं खाती! आप एक %s हैं</string>
+    <string name="login_failed">लॉगिन विफल</string>
+    <string name="admin">व्यवस्थापक</string>
+    <string name="user">उपयोगकर्ता</string>
+
+    <!-- Signup Screen -->
+    <string name="join_mybiz">माइबिज़ से जुड़ें</string>
+    <string name="setup_account">आपका खाता सेट करते हैं</string>
+    <string name="confirm_password">पासवर्ड की पुष्टि करें</string>
+    <string name="sign_up">साइन अप</string>
+    <string name="already_have_account">पहले से खाता है? लॉगिन करें</string>
+    <string name="signup_failed">साइनअप विफल</string>
+
+    <!-- Admin Dashboard -->
+    <string name="admin_dashboard">व्यवस्थापक डैशबोर्ड</string>
+    <string name="welcome_admin">स्वागत है, व्यवस्थापक!</string>
+    <string name="manage_business">यहाँ से अपने व्यवसाय का प्रबंधन करें</string>
+    <string name="quick_actions">त्वरित क्रियाएं</string>
+    <string name="more_options">अधिक विकल्प</string>
+    <string name="bills_management">बिल प्रबंधन</string>
+    <string name="user_management">उपयोगकर्ता प्रबंधन</string>
+    <string name="rental_management">किराया प्रबंधन</string>
+    <string name="task">कार्य</string>
+    <string name="plots_construction">भूखंड और निर्माण</string>
+    <string name="profile">प्रोफ़ाइल</string>
+    <string name="setting">सेटिंग</string>
+
+    <!-- User Dashboard -->
+    <string name="user_dashboard">उपयोगकर्ता डैशबोर्ड</string>
+    <string name="welcome_user">स्वागत है, उपयोगकर्ता!</string>
+    <string name="available_options">उपलब्ध विकल्प</string>
+    <string name="view_bills">बिल देखें</string>
+    <string name="settings">सेटिंग्स</string>
+    <string name="plot_constructions">भूखंड और निर्माण</string>
+    <string name="generate_pdf_report">PDF रिपोर्ट बनाएं</string>
+    <string name="chatbot">चैटबॉट</string>
+
+    <!-- Bills List Screen -->
+    <string name="bills_management_title">बिल प्रबंधन</string>
+    <string name="search_bills">शीर्षक, श्रेणी, बिल नंबर से खोजें…</string>
+    <string name="found_bills">"%2$s" से मिले %1$d बिल</string>
+    <string name="add_bill">बिल जोड़ें</string>
+    <string name="total_bills">कुल</string>
+    <string name="paid_bills">भुगतान</string>
+    <string name="unpaid_bills">बकाया</string>
+    <string name="total_amount">कुल राशि</string>
+    <string name="due_amount">देय राशि</string>
+    <string name="all_bills">सभी बिल (%d)</string>
+    <string name="search_results">खोज परिणाम (%d)</string>
+    <string name="no_bills_found">कोई बिल नहीं मिला।</string>
+    <string name="add_first_bill">+ बटन से अपना पहला बिल जोड़ें!</string>
+    <string name="no_bills_matching">"%s" से कोई बिल नहीं मिला</string>
+    <string name="try_different_search">अलग शब्द से खोजें</string>
+    <string name="bill_number">बिल #%s</string>
+    <string name="bill_version">संस्करण: %d</string>
+    <string name="mark_as_paid_button">भुगतान किया गया चिह्नित करें</string>
+
+    <!-- Add Bill Screen -->
+    <string name="add_new_bill">नया बिल जोड़ें</string>
+    <string name="bill_title">बिल शीर्षक*</string>
+    <string name="bill_description">विवरण</string>
+    <string name="bill_amount">राशि*</string>
+    <string name="adding_bill">बिल जोड़ा जा रहा है…</string>
+    <string name="add_bill_button">बिल जोड़ें</string>
+    <string name="bill_added_success">बिल सफलतापूर्वक जोड़ा गया!</string>
+    <string name="failed_add_bill">बिल जोड़ने में विफल। इंटरनेट कनेक्शन जांचें।</string>
+    <string name="adding_to_sheets">Google Sheets में बिल जोड़ा जा रहा है…</string>
+    <string name="may_take_seconds">इसमें कुछ सेकंड लग सकते हैं।</string>
+    <string name="form_guidelines">फॉर्म दिशानिर्देश</string>
+    <string name="guideline_title">शीर्षक: बिल का संक्षिप्त विवरण</string>
+    <string name="guideline_amount">राशि: केवल संख्या दर्ज करें (जैसे 1500.50)</string>
+    <string name="guideline_date">देय तिथि: डेट पिकर से चुनें</string>
+    <string name="guideline_category">श्रेणी: ड्रॉपडाउन से उचित श्रेणी चुनें</string>
+    <string name="note_sheets_sync">नोट: बिल Google Sheets में सहेजे जाते हैं, 2-3 सेकंड लग सकते हैं।</string>
+
+    <!-- Bill Details Screen -->
+    <string name="bill_details">बिल विवरण</string>
+    <string name="bill_info">बिल जानकारी</string>
+    <string name="bill_number_version">बिल: %s | संस्करण: %d</string>
+    <string name="bill_paid_info">यह बिल भुगतान किया जा चुका है और संपादित नहीं किया जा सकता।</string>
+    <string name="delete_bill">बिल हटाएं</string>
+    <string name="delete_bill_confirm">क्या आप वाकई इस बिल को हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।</string>
+    <string name="mark_paid_title">भुगतान किया गया चिह्नित करें</string>
+    <string name="mark_paid_confirm">क्या आप वाकई इस बिल को मैन्युअल रूप से भुगतान किया गया चिह्नित करना चाहते हैं?</string>
+    <string name="mark_paid_button">भुगतान चिह्नित करें</string>
+    <string name="bill_not_found">बिल नहीं मिला</string>
+    <string name="failed_load_bill">बिल विवरण लोड करने में विफल</string>
+    <string name="failed_mark_paid">बिल को भुगतान किया गया चिह्नित करने में विफल</string>
+    <string name="failed_delete_bill">बिल हटाने में विफल</string>
+    <string name="bill_history">बिल इतिहास - #%s</string>
+    <string name="total_versions">कुल संस्करण: %d</string>
+    <string name="no_history">कोई इतिहास उपलब्ध नहीं</string>
+    <string name="bill_modifications_appear">बिल परिवर्तन यहाँ दिखाई देंगे</string>
+    <string name="version_history_summary">संस्करण इतिहास सारांश</string>
+    <string name="current_version">वर्तमान संस्करण</string>
+    <string name="modifications">संशोधन</string>
+    <string name="amount_change">राशि परिवर्तन</string>
+    <string name="last_updated">अंतिम अपडेट</string>
+    <string name="current_amount">वर्तमान राशि</string>
+    <string name="bill_id_col">बिल ID</string>
+    <string name="version_col">संस्करण</string>
+    <string name="modified_by_col">संशोधित किया</string>
+    <string name="date_col">तारीख</string>
+    <string name="change_col">बदलाव</string>
+
+    <!-- Edit Bill Screen -->
+    <string name="edit_bill">बिल संपादित करें</string>
+    <string name="current_version_label">वर्तमान संस्करण: %d</string>
+    <string name="editing_creates_version">संपादन से संस्करण %d बनेगा</string>
+    <string name="updating_bill">बिल अपडेट हो रहा है…</string>
+    <string name="update_bill_version">बिल अपडेट करें (संस्करण %d)</string>
+    <string name="bill_updated_success">बिल सफलतापूर्वक अपडेट हो गया! नया संस्करण बनाया गया।</string>
+    <string name="failed_update_bill">बिल अपडेट करने में विफल। इंटरनेट जांचें।</string>
+    <string name="cannot_edit_paid">भुगतान किया बिल संपादित नहीं किया जा सकता</string>
+    <string name="cannot_edit_paid_desc">यह बिल भुगतान किया जा चुका है।</string>
+    <string name="go_back">वापस जाएं</string>
+
+    <!-- Rental Screens -->
+    <string name="rental_management_title">किराया प्रबंधन</string>
+    <string name="search_tenant_property">किरायेदार या संपत्ति खोजें</string>
+    <string name="no_rentals_found">कोई किराया नहीं मिला</string>
+    <string name="add_rental">किराया जोड़ें</string>
+    <string name="tenant_name">किरायेदार का नाम</string>
+    <string name="property_shop">संपत्ति/दुकान</string>
+    <string name="rent_amount">किराया राशि</string>
+    <string name="month_yyyy_mm">महीना (YYYY-MM)</string>
+    <string name="contact_number">संपर्क नंबर</string>
+    <string name="save_rental">किराया सहेजें</string>
+    <string name="rental_details">किराया विवरण</string>
+    <string name="tenant_label">किरायेदार: %s</string>
+    <string name="property_label">संपत्ति: %s</string>
+    <string name="rent_label">किराया: ₹%s</string>
+    <string name="month_label">महीना: %s</string>
+    <string name="payment_date">भुगतान तिथि: %s</string>
+    <string name="rent_paid">किराया भुगतान हो गया ✓</string>
+    <string name="delete_rental">किराया हटाएं?</string>
+    <string name="delete_rental_confirm">क्या आप वाकई इस किराया रिकॉर्ड को हटाना चाहते हैं?</string>
+    <string name="mark_paid_rental_confirm">क्या आप वाकई इस किराये को मैन्युअल रूप से भुगतान किया गया चिह्नित करना चाहते हैं?</string>
+    <string name="edit_rental">किराया संपादित करें</string>
+    <string name="update_rental">किराया अपडेट करें</string>
+    <string name="call_permission_required">कॉल अनुमति आवश्यक</string>
+    <string name="call_permission_desc">किरायेदार को सीधे कॉल करने के लिए कॉल अनुमति दें।</string>
+    <string name="open_settings">सेटिंग खोलें</string>
+    <string name="use_dialer">डायलर उपयोग करें</string>
+    <string name="payment_options">भुगतान विकल्प</string>
+    <string name="share_via_whatsapp">WhatsApp से भुगतान विवरण शेयर करें</string>
+    <string name="pay_here_upi">यहाँ भुगतान करें (UPI/ऑनलाइन)</string>
+
+    <!-- Task Screens -->
+    <string name="tasks">कार्य</string>
+    <string name="search_tasks">कार्य खोजें</string>
+    <string name="add_task">नया कार्य जोड़ें</string>
+    <string name="task_title">कार्य शीर्षक *</string>
+    <string name="assigned_to">सौंपा गया *</string>
+    <string name="status_label">स्थिति</string>
+    <string name="due_date_label">देय तिथि</string>
+    <string name="save_task">कार्य सहेजें</string>
+    <string name="task_details">कार्य विवरण</string>
+    <string name="task_not_found">कार्य नहीं मिला</string>
+    <string name="edit_task">कार्य संपादित करें</string>
+    <string name="update_task">कार्य अपडेट करें</string>
+    <string name="no_tasks_found">कोई कार्य नहीं मिला</string>
+    <string name="no_tasks_for_search">\'%s\' के लिए कोई कार्य नहीं मिला</string>
+    <string name="status_pending">लंबित</string>
+    <string name="status_in_progress">प्रगति में</string>
+    <string name="status_completed">पूर्ण</string>
+    <string name="status_done">हो गया</string>
+    <string name="status_started">शुरू हो गया</string>
+
+    <!-- Construction Screens -->
+    <string name="construction_projects">निर्माण परियोजनाएं</string>
+    <string name="search_project">परियोजना खोजें</string>
+    <string name="add_construction">निर्माण परियोजना जोड़ें</string>
+    <string name="project_name">परियोजना का नाम</string>
+    <string name="location">स्थान</string>
+    <string name="start_date">प्रारंभ तिथि</string>
+    <string name="end_date">समाप्ति तिथि</string>
+    <string name="cost">लागत</string>
+    <string name="save_project">परियोजना सहेजें</string>
+    <string name="edit_project">परियोजना संपादित करें</string>
+    <string name="update_project">परियोजना अपडेट करें</string>
+    <string name="construction_detail_location">स्थान: %s</string>
+    <string name="construction_start">प्रारंभ तिथि: %s</string>
+    <string name="construction_end">समाप्ति तिथि: %s</string>
+    <string name="construction_cost">लागत: %s</string>
+    <string name="construction_status">स्थिति: %s</string>
+    <string name="construction_notes">नोट्स: %s</string>
+
+    <!-- Plot Screens -->
+    <string name="plot_management">भूखंड प्रबंधन</string>
+    <string name="search_plots">भूखंड, आगंतुक या स्थान खोजें</string>
+    <string name="add_plot">भूखंड भ्रमण जोड़ें</string>
+    <string name="plot_name">भूखंड का नाम *</string>
+    <string name="plot_id">भूखंड ID *</string>
+    <string name="plot_location">स्थान *</string>
+    <string name="plot_size">भूखंड का आकार (वर्ग फुट) *</string>
+    <string name="initial_price">प्रारंभिक मूल्य (₹) *</string>
+    <string name="visitor_name">आगंतुक का नाम *</string>
+    <string name="visitor_phone">आगंतुक का फोन *</string>
+    <string name="visitor_address">आगंतुक का पता</string>
+    <string name="asking_amount">मांगी गई राशि (₹) *</string>
+    <string name="attended_by">किसने देखा *</string>
+    <string name="visit_date">भ्रमण तिथि</string>
+    <string name="notes_remarks">नोट्स और टिप्पणी</string>
+    <string name="save_plot">भूखंड भ्रमण सहेजें</string>
+    <string name="update_plot">भूखंड भ्रमण अपडेट करें</string>
+    <string name="edit_plot">भूखंड भ्रमण संपादित करें</string>
+    <string name="plot_info">भूखंड जानकारी</string>
+    <string name="visitor_info">आगंतुक जानकारी</string>
+    <string name="visit_details">भ्रमण विवरण</string>
+    <string name="status_positive">सकारात्मक</string>
+    <string name="status_negotiate">बातचीत करें</string>
+    <string name="status_new">नया</string>
+    <string name="plot_header_name">भूखंड नाम</string>
+    <string name="plot_header_location">स्थान</string>
+    <string name="plot_header_visitor">आगंतुक</string>
+    <string name="plot_header_contact">संपर्क</string>
+    <string name="plot_header_asking">मांगी राशि</string>
+    <string name="plot_header_initial">प्रारंभिक मूल्य</string>
+    <string name="plot_header_size">आकार</string>
+    <string name="plot_header_attended">किसने देखा</string>
+    <string name="plot_tab">भूखंड</string>
+    <string name="construction_tab">निर्माण</string>
+
+    <!-- Profile Screen -->
+    <string name="my_profile">मेरी प्रोफ़ाइल</string>
+    <string name="account_information">खाता जानकारी</string>
+    <string name="email_address">ईमेल पता</string>
+    <string name="account_role">खाता भूमिका</string>
+    <string name="user_id">उपयोगकर्ता ID</string>
+    <string name="quick_actions_profile">त्वरित क्रियाएं</string>
+    <string name="app_settings">ऐप सेटिंग्स</string>
+    <string name="app_settings_desc">एप्लिकेशन प्राथमिकताएं कॉन्फ़िगर करें</string>
+    <string name="logout">लॉगआउट</string>
+    <string name="logout_desc">अपने खाते से साइन आउट करें</string>
+    <string name="mybiz_business">माइबिज़ - व्यवसाय प्रबंधन</string>
+    <string name="streamline_operations">अपने व्यावसायिक कार्यों को सुव्यवस्थित करें</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="app_information">ऐप जानकारी</string>
+    <string name="about_us">हमारे बारे में</string>
+    <string name="about_us_subtitle">माइबिज़ के बारे में जानें</string>
+    <string name="privacy_policy">गोपनीयता नीति</string>
+    <string name="privacy_policy_subtitle">हम आपका डेटा कैसे संभालते हैं</string>
+    <string name="email_support">ईमेल सहायता</string>
+    <string name="email_support_subtitle">हमारी सहायता टीम से संपर्क करें</string>
+    <string name="share_app">ऐप शेयर करें</string>
+    <string name="share_app_subtitle">माइबिज़ को दूसरों के साथ शेयर करें</string>
+    <string name="share_app_subject">माइबिज़ ऐप देखें</string>
+    <string name="no_email_app">कोई ईमेल ऐप नहीं मिला।</string>
+    <string name="unable_to_share">ऐप शेयर करने में असमर्थ</string>
+    <string name="language">भाषा</string>
+    <string name="change_language">भाषा बदलें</string>
+    <string name="change_language_subtitle">अपनी पसंदीदा भाषा चुनें</string>
+
+    <!-- About Screen -->
+    <string name="about_mybiz">माइबिज़ के बारे में</string>
+    <string name="about_description">माइबिज़ एक व्यापक व्यवसाय प्रबंधन प्रणाली है जो बिल, किराया, कार्य और निर्माण परियोजनाओं को कुशलतापूर्वक प्रबंधित करने में मदद करती है।</string>
+    <string name="key_features">मुख्य विशेषताएं</string>
+    <string name="feature_bills">बिल प्रबंधन</string>
+    <string name="feature_rental">किराया प्रबंधन</string>
+    <string name="feature_task">कार्य प्रबंधन</string>
+    <string name="feature_construction">निर्माण परियोजनाएं</string>
+    <string name="feature_user_roles">उपयोगकर्ता भूमिका प्रबंधन</string>
+    <string name="feature_mobile">मोबाइल-प्रथम डिज़ाइन</string>
+    <string name="tech_stack">प्रौद्योगिकी स्टैक</string>
+    <string name="tech_kotlin">Kotlin और Jetpack Compose</string>
+    <string name="tech_firebase">Firebase प्रमाणीकरण</string>
+    <string name="tech_sheets">Google Sheets एकीकरण</string>
+    <string name="tech_material">Material Design 3</string>
+
+    <!-- About Us (Settings) -->
+    <string name="about_us_title">माइबिज़ - व्यक्तिगत व्यवसाय प्रबंधन प्रणाली</string>
+    <string name="about_us_welcome">माइबिज़ में आपका स्वागत है, व्यावसायिक कार्यों को कुशलतापूर्वक प्रबंधित करने का आपका समाधान।</string>
+    <string name="about_us_mission_title">हमारा उद्देश्य</string>
+    <string name="about_us_mission">व्यवसाय मालिकों को एक सरल लेकिन शक्तिशाली उपकरण प्रदान करना जो प्रशासनिक कार्यों को आसान बनाए।</string>
+
+    <!-- Privacy Policy -->
+    <string name="privacy_last_updated">अंतिम अपडेट: %s</string>
+    <string name="privacy_data_collection">डेटा संग्रह और उपयोग</string>
+    <string name="privacy_data_storage">डेटा संग्रहण</string>
+    <string name="privacy_authentication">प्रमाणीकरण</string>
+    <string name="privacy_user_roles">उपयोगकर्ता भूमिकाएं और पहुंच</string>
+    <string name="privacy_data_ownership">डेटा स्वामित्व</string>
+    <string name="privacy_contact">संपर्क जानकारी</string>
+    <string name="privacy_agreement">माइबिज़ का उपयोग करके, आप इस गोपनीयता नीति की शर्तों से सहमत होते हैं।</string>
+
+    <!-- User Management -->
+    <string name="user_management_title">उपयोगकर्ता प्रबंधन</string>
+    <string name="search_users">उपयोगकर्ता खोजें</string>
+    <string name="no_users_found">कोई उपयोगकर्ता नहीं मिला</string>
+    <string name="no_users_for_search">\'%s\' के लिए कोई उपयोगकर्ता नहीं मिला</string>
+    <string name="role_label">भूमिका: %s</string>
+    <string name="block_user">अवरुद्ध करें</string>
+    <string name="unblock_user">अनब्लॉक करें</string>
+    <string name="user_blocked">%s अवरुद्ध किया गया</string>
+    <string name="user_unblocked">%s अनब्लॉक किया गया</string>
+    <string name="failed_update_status">स्थिति अपडेट करने में विफल</string>
+    <string name="error_loading_users">उपयोगकर्ता लोड करने में त्रुटि: %s</string>
+
+    <!-- PDF Generation -->
+    <string name="generate_monthly_pdf">मासिक रिपोर्ट PDF बनाएं</string>
+    <string name="generating_pdf">PDF रिपोर्ट बनाई जा रही है…</string>
+    <string name="pdf_takes_seconds">इसमें कुछ सेकंड लग सकते हैं</string>
+    <string name="report_details">रिपोर्ट विवरण</string>
+    <string name="report_bills">बिल: %d</string>
+    <string name="report_rentals">किराया: %d</string>
+    <string name="report_tasks">कार्य: %d</string>
+    <string name="pdf_includes">यह PDF रिपोर्ट इन्हें शामिल करेगी:</string>
+    <string name="loading_report_data">नोट: रिपोर्ट डेटा लोड हो रहा है…</string>
+
+    <!-- Payment -->
+    <string name="payment_options_title">भुगतान विकल्प</string>
+    <string name="payment_amount_tenant">₹%s, %s के लिए</string>
+</resources>

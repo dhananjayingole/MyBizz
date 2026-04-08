@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <!-- REMOVED THE DUPLICATE CALL_PHONE PERMISSION HERE -->
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.WAKE_LOCK"
         tools:ignore="CoarseFineLocation" />
@@ -19,6 +19,7 @@
         tools:ignore="CoarseFineLocation" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:name=".MyBizApp"
         android:allowBackup="true"
@@ -31,6 +32,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyBizz">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -38,10 +40,10 @@
             android:theme="@style/Theme.MyBizz">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <!-- WorkManager initialization -->
         <provider
             android:name="androidx.startup.InitializationProvider"
@@ -53,7 +55,7 @@
                 android:value="androidx.startup" />
         </provider>
 
-        <!-- ADD THIS: FileProvider for sharing QR image via WhatsApp -->
+        <!-- FileProvider for sharing QR image via WhatsApp -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -64,5 +66,4 @@
                 android:resource="@xml/file_paths" />
         </provider>
     </application>
-
 </manifest>

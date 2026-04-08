@@ -46,6 +46,8 @@ object Routes {
 
     const val BankSMSScreen = "banksmsscreen"
 
+    const val LanguageSelectionScreen = "languageselectionscreen"
+
     // Helper functions to build routes with parameters
     fun constructionDetail(constructionId: String): String = "construction_detail/$constructionId"
     fun editConstruction(constructionId: String): String = "edit_construction/$constructionId"

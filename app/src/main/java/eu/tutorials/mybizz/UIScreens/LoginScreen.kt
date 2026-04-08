@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Navigation.Routes
+import eu.tutorials.mybizz.R
 
 @Composable
 fun LoginScreen(
@@ -62,7 +64,7 @@ fun LoginScreen(
         ) {
             // Modern Header
             Text(
-                text = "Welcome Back",
+                text = stringResource(R.string.welcome_back),
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.5.sp
@@ -70,7 +72,7 @@ fun LoginScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
-                text = "Sign in to continue your journey",
+                text = stringResource(R.string.sign_in_to_continue),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 modifier = Modifier.padding(bottom = 32.dp)
@@ -94,7 +96,7 @@ fun LoginScreen(
                     LoginTextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = "Email",
+                        label = stringResource(R.string.email),
                         icon = Icons.Default.Email,
                         keyboardType = KeyboardType.Email
                     )
@@ -105,7 +107,7 @@ fun LoginScreen(
                     LoginTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = "Password",
+                        label = stringResource(R.string.password),
                         icon = Icons.Default.Lock,
                         isPassword = true,
                         passwordVisible = passwordVisible,
@@ -117,12 +119,12 @@ fun LoginScreen(
                         onClick = { /* Implement Forget Password */ },
                         modifier = Modifier.align(Alignment.End)
                     ) {
-                        Text("Forgot password?", style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.forgot_password), style = MaterialTheme.typography.labelMedium)
                     }
 
                     // Modern Role Selector (Chip style)
                     Text(
-                        text = "Login as",
+                        text = stringResource(R.string.login_as),
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
                     )
@@ -190,7 +192,7 @@ fun LoginScreen(
                 },
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text("Don't have an account? Sign Up", color = MaterialTheme.colorScheme.onBackground)
+                Text(stringResource(R.string.no_account_sign_up), color = MaterialTheme.colorScheme.onBackground)
             }
         }
     }
@@ -238,7 +240,7 @@ fun AnimatedLoginButton(isLoading: Boolean, onClick: () -> Unit) {
         if (isLoading) {
             CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
         } else {
-            Text("LOGIN", fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(stringResource(R.string.login), fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
         }
     }
 }

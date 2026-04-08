@@ -32,6 +32,8 @@ import kotlinx.coroutines.launch
 import java.util.*
 import android.provider.Settings
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.res.stringResource
+import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +63,7 @@ fun RentalListScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Rental Management") },
+                title = { Text(stringResource(R.string.rental_management)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -84,7 +86,7 @@ fun RentalListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Search Tenant or Property") },
+                label = { Text(stringResource(R.string.search_tenant_property)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -103,7 +105,7 @@ fun RentalListScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No rentals found.")
+                    Text(stringResource(R.string.no_rentals_found))
                 }
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -321,20 +323,6 @@ fun RentalDetailScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                actions = {
-                    // Add call icon in top bar
-                    if (rental.contactNo.isNotBlank()) {
-                        IconButton(onClick = {
-                            makePhoneCall(rental.contactNo)
-                        }) {
-                            Icon(
-                                Icons.Default.Call,
-                                contentDescription = "Call Tenant",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
             )
         }
     ) { padding ->
@@ -391,15 +379,9 @@ fun RentalDetailScreen(
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(
-                                        Icons.Default.Phone,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(20.dp)
-                                    )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        "📞 ${rental.contactNo}",
+                                        "${rental.contactNo}",
                                         fontSize = 16.sp
                                     )
                                 }

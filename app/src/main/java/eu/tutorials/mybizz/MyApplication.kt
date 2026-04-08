@@ -2,6 +2,7 @@ package eu.tutorials.mybizz
 
 import android.app.Application
 import android.content.Context
+import eu.tutorials.mybizz.language.LocaleManager
 
 class MyApplication : Application() {
     companion object {

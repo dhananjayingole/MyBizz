@@ -1,6 +1,7 @@
 package eu.tutorials.mybizz
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -20,9 +21,16 @@ import eu.tutorials.mybizz.Notification.NotificationHelper
 import eu.tutorials.mybizz.Notification.NotificationPermissionHelper
 import eu.tutorials.mybizz.Notification.ReminderScheduler
 import eu.tutorials.mybizz.bankingSms.BankSMSScreen
+import eu.tutorials.mybizz.language.LocaleManager
 import eu.tutorials.mybizz.ui.theme.MyBizzTheme
 
 class MainActivity : ComponentActivity() {
+
+    // ── 1. Apply saved locale BEFORE the activity inflates any view ────────
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleManager.applyLocale(newBase))
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {

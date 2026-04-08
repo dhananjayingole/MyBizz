@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Navigation.Routes
+import eu.tutorials.mybizz.R
 
 @Composable
 fun SignupScreen(
@@ -67,7 +69,7 @@ fun SignupScreen(
         ) {
             // Header with entry animation
             Text(
-                text = "Join MyBizz",
+                text = stringResource(R.string.join_mybiz),
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp
@@ -75,7 +77,7 @@ fun SignupScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
-                text = "Let's get your account set up",
+                text = stringResource(R.string.setup_account),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 modifier = Modifier.padding(bottom = 32.dp)
@@ -99,7 +101,7 @@ fun SignupScreen(
                     CustomTextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = "Email",
+                        label = stringResource(R.string.email),
                         icon = Icons.Default.Email,
                         keyboardType = KeyboardType.Email
                     )
@@ -109,7 +111,7 @@ fun SignupScreen(
                     CustomTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = "Password",
+                        label = stringResource(R.string.password),
                         icon = Icons.Default.Lock,
                         isPassword = true,
                         passwordVisible = passwordVisible,
@@ -121,7 +123,7 @@ fun SignupScreen(
                     CustomTextField(
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
-                        label = "Confirm Password",
+                        label = stringResource(R.string.confirm_password),
                         icon = Icons.Default.Lock,
                         isPassword = true,
                         passwordVisible = confirmPasswordVisible,
@@ -169,7 +171,7 @@ fun SignupScreen(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text("Already have an account? Login", color = MaterialTheme.colorScheme.onBackground)
+                Text(stringResource(R.string.already_have_account), color = MaterialTheme.colorScheme.onBackground)
             }
         }
     }
@@ -225,7 +227,7 @@ fun AnimatedSignupButton(isLoading: Boolean, onClick: () -> Unit) {
         if (isLoading) {
             CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
         } else {
-            Text("SIGN UP", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.sign_up), fontWeight = FontWeight.Bold)
         }
     }
 }
