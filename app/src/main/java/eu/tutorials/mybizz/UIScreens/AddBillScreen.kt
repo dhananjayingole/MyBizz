@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -23,6 +24,7 @@ import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,12 +86,12 @@ fun AddBillScreen(
                         showDatePicker = false
                     }
                 ) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
@@ -100,14 +102,14 @@ fun AddBillScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add New Bill") },
+                title = { Text(stringResource(R.string.add_new_bill)) },
                 navigationIcon = {
                     IconButton(onClick = {
                         if (!isLoading) {
                             navController.popBackStack()
                         }
                     }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -124,13 +126,13 @@ fun AddBillScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Bill Title*") },
+                label = { Text(stringResource(R.string.bill_title)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 isError = title.isBlank() && error != null,
                 supportingText = {
                     if (title.isBlank() && error != null) {
-                        Text("Title is required")
+                        Text(stringResource(R.string.title_required))
                     }
                 }
             )
@@ -141,7 +143,7 @@ fun AddBillScreen(
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Description") },
+                label = { Text(stringResource(R.string.description)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),
@@ -158,16 +160,16 @@ fun AddBillScreen(
                         amount = it
                     }
                 },
-                label = { Text("Amount*") },
+                label = { Text(stringResource(R.string.amount)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 prefix = { Text("₹") },
                 isError = (amount.isBlank() || amount.toDoubleOrNull() == null) && error != null,
                 supportingText = {
                     if (amount.isBlank() && error != null) {
-                        Text("Amount is required")
+                        Text(stringResource(R.string.amount_required))
                     } else if (amount.isNotBlank() && amount.toDoubleOrNull() == null) {
-                        Text("Please enter a valid number")
+                        Text(stringResource(R.string.enter_valid_number))
                     }
                 }
             )
@@ -176,7 +178,7 @@ fun AddBillScreen(
 
             // Due Date Field with Date Picker
             Text(
-                text = "Due Date*",
+                text = stringResource(R.string.due_date),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -185,7 +187,7 @@ fun AddBillScreen(
             OutlinedTextField(
                 value = dueDate,
                 onValueChange = { },
-                label = { Text("Select due date") },
+                label = { Text(stringResource(R.string.select_due_date)) },
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
                 trailingIcon = {
@@ -193,13 +195,13 @@ fun AddBillScreen(
                         Icon(Icons.Default.DateRange, contentDescription = "Pick date")
                     }
                 },
-                placeholder = { Text("Tap to select date") },
+                placeholder = { Text(stringResource(R.string.tap_to_select_date)) },
                 isError = dueDate.isBlank() && error != null,
                 supportingText = {
                     if (dueDate.isBlank() && error != null) {
-                        Text("Due date is required")
+                        Text(stringResource(R.string.due_date_required))
                     } else if (dueDate.isNotBlank() && !isValidDate(dueDate)) {
-                        Text("Please select a valid date")
+                        Text(stringResource(R.string.select_valid_date))
                     }
                 }
             )
@@ -232,7 +234,7 @@ fun AddBillScreen(
 
             // Category Dropdown
             Text(
-                text = "Category*",
+                text = stringResource(R.string.category),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -251,7 +253,7 @@ fun AddBillScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor(),
-                    placeholder = { Text("Select a category") }
+                    placeholder = { Text(stringResource(R.string.select_category)) }
                 )
 
                 ExposedDropdownMenu(
@@ -305,7 +307,7 @@ fun AddBillScreen(
                                 val success = billRepository.addBill(newBill, sheetsRepository)
 
                                 if (success) {
-                                    Toast.makeText(context, "Bill added successfully!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.bill_added_success), Toast.LENGTH_SHORT).show()
                                     billAddedSuccessfully = true // Trigger navigation
                                 } else {
                                     error = "Failed to add bill. Please check your internet connection and try again."
@@ -333,9 +335,9 @@ fun AddBillScreen(
                         strokeWidth = 2.dp
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Adding Bill...")
+                    Text(stringResource(R.string.adding_bill))
                 } else {
-                    Text("Add Bill", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.add_bill), style = MaterialTheme.typography.bodyLarge)
                 }
             }
 
@@ -352,7 +354,7 @@ fun AddBillScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Warning,
-                            contentDescription = "Error",
+                            contentDescription = stringResource(R.string.error),
                             tint = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -375,7 +377,7 @@ fun AddBillScreen(
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(
-                            text = "Adding bill to Google Sheets...",
+                            text = stringResource(R.string.adding_to_sheets),
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Medium
                         )
@@ -386,7 +388,7 @@ fun AddBillScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "This may take a few seconds.",
+                            text = stringResource(R.string.may_take_seconds),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -403,18 +405,18 @@ fun AddBillScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Form Guidelines",
+                        text = stringResource(R.string.form_guidelines),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    GuideLineItem("Title: Brief description of the bill")
-                    GuideLineItem("Amount: Enter numeric value only (e.g., 1500.50)")
-                    GuideLineItem("Due Date: Select using date picker or quick buttons")
-                    GuideLineItem("Category: Select appropriate category from dropdown")
+                    GuideLineItem(stringResource(R.string.bill_description))
+                    GuideLineItem(stringResource(R.string.bill_amount))
+                    GuideLineItem(stringResource(R.string.select_due_date))
+                    GuideLineItem(stringResource(R.string.select_category))
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "Note: Bills are saved to Google Sheets and may take 2-3 seconds to process.",
+                        stringResource(R.string.note_sheets_sync),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

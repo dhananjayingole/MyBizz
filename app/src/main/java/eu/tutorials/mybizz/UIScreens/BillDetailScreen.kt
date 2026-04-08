@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -143,10 +145,10 @@ fun BillDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Bill Details") },
+                title = { Text(stringResource(R.string.bill_details)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -154,12 +156,12 @@ fun BillDetailsScreen(
                         IconButton(onClick = {
                             navController.navigate("edit_bill/${billId}")
                         }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit")
+                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_bill))
                         }
                     }
 
                     IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_bill))
                     }
                 }
             )
@@ -191,7 +193,7 @@ fun BillDetailsScreen(
                             modifier = Modifier.padding(16.dp)
                         )
                         Button(onClick = { reloadBillDetails() }) {
-                            Text("Retry")
+                            Text(stringResource(R.string.retry))
                         }
                     }
                 }
@@ -200,7 +202,7 @@ fun BillDetailsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Bill not found")
+                    Text(stringResource(R.string.bill_not_found))
                 }
             } else {
                 BillDetailsContent(bill = bill!!)
@@ -224,7 +226,7 @@ fun BillDetailsScreen(
                         ) {
                             Icon(
                                 Icons.Default.Clear,
-                                contentDescription = "Pay",
+                                contentDescription = stringResource(R.string.pay_now),
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -242,9 +244,9 @@ fun BillDetailsScreen(
                             onClick = { showMarkPaidDialog = true },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Icon(Icons.Default.Check, "Mark Paid")
+                            Icon(Icons.Default.Check, stringResource(R.string.mark_as_paid))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Mark as Paid (Manual)")
+                            Text(stringResource(R.string.mark_paid_manual))
                         }
                     } else {
                         // Show Paid Status Card
@@ -269,7 +271,7 @@ fun BillDetailsScreen(
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column {
                                     Text(
-                                        "Payment Completed",
+                                        stringResource(R.string.payment_completed),
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 18.sp,
                                         color = Color(0xFF2E7D32)
@@ -310,16 +312,16 @@ fun BillDetailsScreen(
     if (showMarkPaidDialog) {
         AlertDialog(
             onDismissRequest = { showMarkPaidDialog = false },
-            title = { Text("Mark as Paid") },
-            text = { Text("Are you sure you want to manually mark this bill as paid? Use 'Pay Now' for payment processing.") },
+            title = { Text(stringResource(R.string.mark_as_paid)) },
+            text = { Text(stringResource(R.string.mark_paid_confirm)) },
             confirmButton = {
                 TextButton(onClick = { markBillAsPaid() }) {
-                    Text("Mark Paid")
+                    Text(stringResource(R.string.mark_as_paid))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showMarkPaidDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.mark_as_paid))
                 }
             }
         )
@@ -328,8 +330,8 @@ fun BillDetailsScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Bill") },
-            text = { Text("Are you sure you want to delete this bill? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.delete_bill)) },
+            text = { Text(stringResource(R.string.delete_bill_confirm)) },
             confirmButton = {
                 TextButton(
                     onClick = { deleteBill() },
@@ -337,12 +339,12 @@ fun BillDetailsScreen(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -413,7 +415,7 @@ fun BillDetailsContent(bill: Bill) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Bill Information",
+            text = stringResource(R.string.bill_info),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -429,9 +431,9 @@ fun BillDetailsContent(bill: Bill) {
         InfoRow(label = "Last Modified By", value = bill.modifiedBy)
 
         if (bill.status == Bill.STATUS_PAID) {
-            InfoRow(label = "Paid Date", value = bill.paidDate)
+            InfoRow(label = stringResource(R.string.paid_on), value = bill.paidDate)
             if (bill.paidBy.isNotEmpty()) {
-                InfoRow(label = "Paid By", value = bill.paidBy)
+                InfoRow(label = stringResource(R.string.paid_by), value = bill.paidBy)
             }
         }
 
@@ -447,12 +449,12 @@ fun BillDetailsContent(bill: Bill) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = "Info",
+                        contentDescription = stringResource(R.string.bill_info),
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "This bill has been paid and cannot be edited.",
+                        text = stringResource(R.string.bill_paid_info),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -509,18 +511,18 @@ fun BillHistorySection(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Warning,
-                        contentDescription = "No History",
+                        contentDescription = stringResource(R.string.no_history),
                         modifier = Modifier.size(48.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "No History Available",
+                        text =  stringResource(R.string.no_history),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "Bill modifications will appear here",
+                        text = stringResource(R.string.bill_modifications_appear),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -540,7 +542,7 @@ fun BillHistorySection(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Bill ID",
+                            text = stringResource(R.string.bill_id_col),
                             style = MaterialTheme.typography.labelMedium,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
@@ -548,7 +550,7 @@ fun BillHistorySection(
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Version",
+                            text = stringResource(R.string.version_col),
                             style = MaterialTheme.typography.labelMedium,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
@@ -556,7 +558,7 @@ fun BillHistorySection(
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Modified By",
+                            text = stringResource(R.string.modified_by_col),
                             style = MaterialTheme.typography.labelMedium,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
@@ -564,7 +566,7 @@ fun BillHistorySection(
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Date",
+                            text = stringResource(R.string.date_col),
                             style = MaterialTheme.typography.labelMedium,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
@@ -572,7 +574,7 @@ fun BillHistorySection(
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Amount",
+                            text = stringResource(R.string.bill_amount),
                             style = MaterialTheme.typography.labelMedium,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
@@ -580,7 +582,7 @@ fun BillHistorySection(
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Change",
+                            text = stringResource(R.string.change_col),
                             style = MaterialTheme.typography.labelMedium,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
@@ -652,13 +654,13 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
             )
             if (isCreated) {
                 Text(
-                    text = "Created",
+                    text = stringResource(R.string.created),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
             } else {
                 Text(
-                    text = "Updated",
+                    text = stringResource(R.string.updated),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.secondary
                 )
@@ -690,7 +692,7 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = "Total",
+                text = stringResource(R.string.total),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
@@ -710,7 +712,7 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
                     else MaterialTheme.colorScheme.error
                 )
                 Text(
-                    text = if (amountChange > 0) "Increase" else "Decrease",
+                    text = if (amountChange > 0) stringResource(R.string.increase) else stringResource(R.string.decrease),
                     style = MaterialTheme.typography.labelSmall,
                     color = if (amountChange > 0) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.error
@@ -722,7 +724,7 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
                 Text(
-                    text = if (historyEntry.version == 1) "Initial" else "No Change",
+                    text = if (historyEntry.version == 1) stringResource(R.string.initial) else stringResource(R.string.no_change),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
@@ -739,15 +741,15 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Version History Summary",
+                text = stringResource(R.string.version_history_summary),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
             val latestVersion = billHistory.maxByOrNull { it.version }
-            val createdEntry = billHistory.find { it.changeType == "CREATED" }
-            val modifications = billHistory.count { it.changeType == "MODIFIED" }
+            val createdEntry = billHistory.find { it.changeType == stringResource(R.string.created) }
+            val modifications = billHistory.count { it.changeType == stringResource(R.string.modified_by_col) }
 
             val initialAmount = billHistory.firstOrNull()?.amount ?: 0.0
             val currentAmount = latestVersion?.amount ?: 0.0
@@ -759,7 +761,7 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
             ) {
                 Column {
                     Text(
-                        text = "Current Version",
+                        text = stringResource(R.string.current_version_label),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -772,7 +774,7 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
 
                 Column {
                     Text(
-                        text = "Modifications",
+                        text = stringResource(R.string.modifications),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -785,7 +787,7 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
 
                 Column {
                     Text(
-                        text = "Amount Change",
+                        text = stringResource(R.string.amount_change),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -808,7 +810,7 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
             ) {
                 Column {
                     Text(
-                        text = "Created",
+                        text = stringResource(R.string.created),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -821,7 +823,7 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
 
                 Column {
                     Text(
-                        text = "Last Updated",
+                        text = stringResource(R.string.last_updated),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -834,7 +836,7 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
 
                 Column {
                     Text(
-                        text = "Current Amount",
+                        text = stringResource(R.string.current_amount),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
