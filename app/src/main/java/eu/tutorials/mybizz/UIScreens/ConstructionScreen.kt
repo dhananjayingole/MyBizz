@@ -18,7 +18,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +49,7 @@ fun ConstructionListScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Construction Projects") },
+                title = { Text(stringResource(R.string.construction_projects)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -60,7 +62,7 @@ fun ConstructionListScreen(
                 onClick = onAddClicked,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Project", tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_construction), tint = MaterialTheme.colorScheme.onPrimary)
             }
         }
     ) { padding ->
@@ -73,8 +75,8 @@ fun ConstructionListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Search Project") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                label = { Text(stringResource(R.string.search_project)) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_project)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -136,10 +138,10 @@ fun AddConstructionScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Add Construction Project") },
+                title = { Text(stringResource(R.string.add_construction)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -175,7 +177,7 @@ fun AddConstructionScreen(
                             endDate = date
                         }
                         showEndPicker = false
-                    }) { Text("OK") }
+                    }) { Text(stringResource(R.string.ok)) }
                 }
             ) {
                 DatePicker(state = datePickerStateEnd)
@@ -189,17 +191,17 @@ fun AddConstructionScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            OutlinedTextField(value = projectName, onValueChange = { projectName = it }, label = { Text("Project Name") })
-            OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text("Location") })
+            OutlinedTextField(value = projectName, onValueChange = { projectName = it }, label = { Text(stringResource(R.string.project_name)) })
+            OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text(stringResource(R.string.location)) })
 
             OutlinedTextField(
                 value = startDate,
                 onValueChange = {},
-                label = { Text("Start Date") },
+                label = { Text(stringResource(R.string.start_date)) },
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { showStartPicker = true }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Pick Start Date")
+                        Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.construction_start))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -208,17 +210,17 @@ fun AddConstructionScreen(
             OutlinedTextField(
                 value = endDate,
                 onValueChange = {},
-                label = { Text("End Date") },
+                label = { Text(stringResource(R.string.end_date)) },
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { showEndPicker = true }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Pick End Date")
+                        Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.construction_end))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            OutlinedTextField(value = cost, onValueChange = { cost = it }, label = { Text("Cost") })
+            OutlinedTextField(value = cost, onValueChange = { cost = it }, label = { Text(stringResource(R.string.construction_cost)) })
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -248,7 +250,7 @@ fun AddConstructionScreen(
                 }
             }
 
-            OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text("Notes") })
+            OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text(stringResource(R.string.notes)) })
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -271,7 +273,7 @@ fun AddConstructionScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Save Project")
+                Text(stringResource(R.string.save_project))
             }
         }
     }
@@ -291,7 +293,7 @@ fun ConstructionDetailScreen(
                 title = { Text(construction.projectName) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -315,10 +317,10 @@ fun ConstructionDetailScreen(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = { onEdit(construction) }, modifier = Modifier.weight(1f)) {
-                    Text("Edit")
+                    Text(stringResource(R.string.edit))
                 }
                 OutlinedButton(onClick = { onDelete(construction) }, modifier = Modifier.weight(1f)) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             }
         }
@@ -354,10 +356,10 @@ fun EditConstructionScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Edit Project") },
+                title = { Text(stringResource(R.string.edit_project)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -375,7 +377,7 @@ fun EditConstructionScreen(
                             startDate = date
                         }
                         showStartPicker = false
-                    }) { Text("OK") }
+                    }) { Text(stringResource(R.string.ok)) }
                 }
             ) {
                 DatePicker(state = datePickerStateStart)
@@ -393,7 +395,7 @@ fun EditConstructionScreen(
                             endDate = date
                         }
                         showEndPicker = false
-                    }) { Text("OK") }
+                    }) { Text(stringResource(R.string.ok)) }
                 }
             ) {
                 DatePicker(state = datePickerStateEnd)
@@ -407,17 +409,17 @@ fun EditConstructionScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            OutlinedTextField(value = projectName, onValueChange = { projectName = it }, label = { Text("Project Name") })
-            OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text("Location") })
+            OutlinedTextField(value = projectName, onValueChange = { projectName = it }, label = { Text(stringResource(R.string.project_name)) })
+            OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text(stringResource(R.string.location)) })
 
             OutlinedTextField(
                 value = startDate,
                 onValueChange = {},
-                label = { Text("Start Date") },
+                label = { Text(stringResource(R.string.start_date)) },
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { showStartPicker = true }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Pick Start Date")
+                        Icon(Icons.Default.DateRange, contentDescription =stringResource(R.string.construction_start))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -426,17 +428,17 @@ fun EditConstructionScreen(
             OutlinedTextField(
                 value = endDate,
                 onValueChange = {},
-                label = { Text("End Date") },
+                label = { Text(stringResource(R.string.end_date)) },
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { showEndPicker = true }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Pick End Date")
+                        Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.construction_end))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            OutlinedTextField(value = cost, onValueChange = { cost = it }, label = { Text("Cost") })
+            OutlinedTextField(value = cost, onValueChange = { cost = it }, label = { Text(stringResource(R.string.construction_cost)) })
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -446,7 +448,7 @@ fun EditConstructionScreen(
                     value = status,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Status") },
+                    label = { Text(stringResource(R.string.construction_status)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier.menuAnchor().fillMaxWidth()
                 )
@@ -466,7 +468,7 @@ fun EditConstructionScreen(
                 }
             }
 
-            OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text("Notes") })
+            OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text(stringResource(R.string.notes)) })
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -488,7 +490,7 @@ fun EditConstructionScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Update Project")
+                Text(stringResource(R.string.update_project))
             }
         }
     }

@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -39,7 +40,7 @@ fun SplashScreen(navController: NavController) {
             if (isAuthenticated && currentUser != null) {
                 val role = currentUser!!.role
                 // Navigate to appropriate dashboard based on role
-                val destination = if (role == "admin") {
+                val destination = if (role ==  context.getString(R.string.admin)) {
                     Routes.AdminDashboardScreen
                 } else {
                     Routes.UserDashboardScreen
@@ -81,14 +82,14 @@ fun SplashScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "MyBizz",
+                text =  stringResource(R.string.project_id),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = "Business Management System",
+                text =  stringResource(R.string.app_tagline),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
@@ -105,7 +106,7 @@ fun SplashScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Loading...",
+                    text =  stringResource(R.string.loading),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )

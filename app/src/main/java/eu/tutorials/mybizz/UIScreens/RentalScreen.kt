@@ -66,14 +66,14 @@ fun RentalListScreen(
                 title = { Text(stringResource(R.string.rental_management)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddRental) {
-                Icon(Icons.Default.Add, contentDescription = "Add Rental")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_rental))
             }
         }
     ) { padding ->
@@ -87,7 +87,7 @@ fun RentalListScreen(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 label = { Text(stringResource(R.string.search_tenant_property)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -187,10 +187,10 @@ fun AddRentalScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Add Rental") },
+                title = { Text(stringResource(R.string.add_rental)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -206,19 +206,19 @@ fun AddRentalScreen(
             OutlinedTextField(
                 value = tenantName,
                 onValueChange = { tenantName = it },
-                label = { Text("Tenant Name") }
+                label = { Text(stringResource(R.string.tenant_name)) }
             )
 
             OutlinedTextField(
                 value = property,
                 onValueChange = { property = it },
-                label = { Text("Property/Shop") }
+                label = { Text(stringResource(R.string.property_shop)) }
             )
 
             OutlinedTextField(
                 value = rentAmount,
                 onValueChange = { rentAmount = it },
-                label = { Text("Rent Amount") }
+                label = { Text(stringResource(R.string.rent_amount)) }
             )
 
             OutlinedTextField(
@@ -241,7 +241,7 @@ fun AddRentalScreen(
             OutlinedTextField(
                 value = contactNo,
                 onValueChange = { contactNo = it },
-                label = { Text("Contact Number") }
+                label = { Text(stringResource(R.string.contact_number)) }
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -265,7 +265,7 @@ fun AddRentalScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Save Rental")
+                Text(stringResource(R.string.save_rental))
             }
         }
     }
@@ -317,10 +317,10 @@ fun RentalDetailScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Rental Details") },
+                title = { Text(stringResource(R.string.rental_details)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
             )
@@ -443,9 +443,9 @@ fun RentalDetailScreen(
                     onClick = { showMarkPaidDialog = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(Icons.Default.Check, "Mark Paid")
+                    Icon(Icons.Default.Check, stringResource(R.string.mark_paid_button))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Mark as Paid (Manual)")
+                    Text(stringResource(R.string.mark_paid_manual))
                 }
             } else {
                 Card(
@@ -469,7 +469,7 @@ fun RentalDetailScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                "Rent Paid ✓",
+                                stringResource(R.string.rent_paid),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
                                 color = Color(0xFF1565C0)
@@ -498,9 +498,9 @@ fun RentalDetailScreen(
                         onClick = onEdit,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Icon(Icons.Default.Edit, "Edit")
+                        Icon(Icons.Default.Edit, stringResource(R.string.edit))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Edit")
+                        Text(stringResource(R.string.edit))
                     }
                 }
 
@@ -511,9 +511,9 @@ fun RentalDetailScreen(
                         contentColor = Color.Red
                     )
                 ) {
-                    Icon(Icons.Default.Delete, "Delete")
+                    Icon(Icons.Default.Delete, stringResource(R.string.delete))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             }
         }
@@ -531,8 +531,8 @@ fun RentalDetailScreen(
                     modifier = Modifier.size(48.dp)
                 )
             },
-            title = { Text("Delete Rental?") },
-            text = { Text("Are you sure you want to delete this rental record? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.delete_rental)) },
+            text = { Text(stringResource(R.string.delete_rental_confirm)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -543,12 +543,12 @@ fun RentalDetailScreen(
                         containerColor = Color.Red
                     )
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -558,19 +558,19 @@ fun RentalDetailScreen(
     if (showMarkPaidDialog) {
         AlertDialog(
             onDismissRequest = { showMarkPaidDialog = false },
-            title = { Text("Mark as Paid") },
-            text = { Text("Are you sure you want to manually mark this rental as paid? Use 'Pay Now' for payment processing.") },
+            title = { Text(stringResource(R.string.mark_as_paid)) },
+            text = { Text(stringResource(R.string.mark_paid_confirm)) },
             confirmButton = {
                 TextButton(onClick = {
                     showMarkPaidDialog = false
                     onMarkPaid()
                 }) {
-                    Text("Mark Paid")
+                    Text(stringResource(R.string.mark_paid_title))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showMarkPaidDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -591,8 +591,8 @@ fun RentalDetailScreen(
     if (showCallDialog) {
         AlertDialog(
             onDismissRequest = { showCallDialog = false },
-            title = { Text("Call Permission Required") },
-            text = { Text("Please grant call permission to directly call the tenant. You can still use the dialer without permission.") },
+            title = { Text(stringResource(R.string.call_permission_required)) },
+            text = { Text(stringResource(R.string.call_permission_desc)) },
             confirmButton = {
                 TextButton(onClick = {
                     showCallDialog = false
@@ -614,7 +614,7 @@ fun RentalDetailScreen(
                     }
                     context.startActivity(dialIntent)
                 }) {
-                    Text("Use Dialer")
+                    Text(stringResource(R.string.use_dialer))
                 }
             }
         )
@@ -640,10 +640,10 @@ fun EditRentalScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Edit Rental") },
+                title = { Text(stringResource(R.string.edit_rental)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -656,16 +656,16 @@ fun EditRentalScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            OutlinedTextField(value = tenantName, onValueChange = { tenantName = it }, label = { Text("Tenant Name") })
-            OutlinedTextField(value = property, onValueChange = { property = it }, label = { Text("Property/Shop") })
-            OutlinedTextField(value = rentAmount, onValueChange = { rentAmount = it }, label = { Text("Rent Amount") })
+            OutlinedTextField(value = tenantName, onValueChange = { tenantName = it }, label = { Text(stringResource(R.string.tenant_name)) })
+            OutlinedTextField(value = property, onValueChange = { property = it }, label = { Text(stringResource(R.string.property_shop)) })
+            OutlinedTextField(value = rentAmount, onValueChange = { rentAmount = it }, label = { Text(stringResource(R.string.rent_amount)) })
             OutlinedTextField(
                 value = month,
                 onValueChange = { month = it },
                 label = { Text("Month (YYYY-MM)") },
-                leadingIcon = { Icon(Icons.Default.DateRange, contentDescription = "Date") }
+                leadingIcon = { Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.date)) }
             )
-            OutlinedTextField(value = contactNo, onValueChange = { contactNo = it }, label = { Text("Contact No") })
+            OutlinedTextField(value = contactNo, onValueChange = { contactNo = it }, label = { Text(stringResource(R.string.contact_number)) })
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -686,7 +686,7 @@ fun EditRentalScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Update Rental")
+                Text(stringResource(R.string.update_rental))
             }
         }
     }

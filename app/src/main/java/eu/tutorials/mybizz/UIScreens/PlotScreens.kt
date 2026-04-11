@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,7 @@ import androidx.navigation.NavHostController
 import eu.tutorials.mybizz.Logic.plot.PlotRepository
 import eu.tutorials.mybizz.Logic.plot.PlotSheetsRepository
 import eu.tutorials.mybizz.Model.Plot
+import eu.tutorials.mybizz.R
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -61,10 +63,10 @@ fun PlotListScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Plot Management") },
+                title = { Text(stringResource(R.string.plot_management)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -74,7 +76,7 @@ fun PlotListScreen(
                 onClick = onAddClicked,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Plot", tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_plot), tint = MaterialTheme.colorScheme.onPrimary)
             }
         }
     ) { padding ->
@@ -87,8 +89,8 @@ fun PlotListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Search Plots, Visitors, or Locations") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                label = { Text(stringResource(R.string.search_plots)) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -195,7 +197,7 @@ fun PlotTableRow(plot: Plot, onClick: () -> Unit) {
                 status = if (plot.askingAmount.isNotEmpty() && plot.initialPrice.isNotEmpty()) {
                     val asking = plot.askingAmount.toDoubleOrNull() ?: 0.0
                     val initial = plot.initialPrice.toDoubleOrNull() ?: 0.0
-                    if (asking >= initial) "Positive" else "Negotiate"
+                    if (asking >= initial) stringResource(R.string.status_positive) else stringResource(R.string.status_negotiate)
                 } else "New",
                 width = 80.dp
             )
@@ -229,8 +231,8 @@ fun StatusCell(status: String, width: androidx.compose.ui.unit.Dp) {
         contentAlignment = Alignment.Center
     ) {
         val (backgroundColor, textColor) = when (status) {
-            "Positive" -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
-            "Negotiate" -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
+            stringResource(R.string.status_positive) -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+            stringResource(R.string.status_negotiate) -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
             else -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
         }
 
@@ -275,10 +277,10 @@ fun AddPlotScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Add Plot Visit") },
+                title = { Text(stringResource(R.string.add_plot)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -296,7 +298,7 @@ fun AddPlotScreen(
                             visitDate = date
                         }
                         showDatePicker = false
-                    }) { Text("OK") }
+                    }) { Text(stringResource(R.string.ok)) }
                 }
             ) {
                 DatePicker(state = datePickerState)
@@ -311,13 +313,13 @@ fun AddPlotScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                Text("Plot Information", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.plot_info), style = MaterialTheme.typography.titleMedium)
             }
             item {
                 OutlinedTextField(
                     value = plotName,
                     onValueChange = { plotName = it },
-                    label = { Text("Plot Name *") },
+                    label = { Text(stringResource(R.string.plot_name)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -325,7 +327,7 @@ fun AddPlotScreen(
                 OutlinedTextField(
                     value = plotId,
                     onValueChange = { plotId = it },
-                    label = { Text("Plot ID *") },
+                    label = { Text(stringResource(R.string.plot_id)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -333,7 +335,7 @@ fun AddPlotScreen(
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
-                    label = { Text("Location *") },
+                    label = { Text(stringResource(R.string.location)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -341,7 +343,7 @@ fun AddPlotScreen(
                 OutlinedTextField(
                     value = plotSize,
                     onValueChange = { plotSize = it },
-                    label = { Text("Plot Size (sq. ft.) *") },
+                    label = { Text(stringResource(R.string.plot_size)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -349,20 +351,20 @@ fun AddPlotScreen(
                 OutlinedTextField(
                     value = initialPrice,
                     onValueChange = { initialPrice = it },
-                    label = { Text("Initial Price (₹) *") },
+                    label = { Text(stringResource(R.string.initial_price)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("Visitor Information", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.visitor_info), style = MaterialTheme.typography.titleMedium)
             }
             item {
                 OutlinedTextField(
                     value = visitorName,
                     onValueChange = { visitorName = it },
-                    label = { Text("Visitor Name *") },
+                    label = { Text(stringResource(R.string.visitor_name)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -370,7 +372,7 @@ fun AddPlotScreen(
                 OutlinedTextField(
                     value = visitorNumber,
                     onValueChange = { visitorNumber = it },
-                    label = { Text("Visitor Phone *") },
+                    label = { Text(stringResource(R.string.visitor_phone)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -378,7 +380,7 @@ fun AddPlotScreen(
                 OutlinedTextField(
                     value = visitorAddress,
                     onValueChange = { visitorAddress = it },
-                    label = { Text("Visitor Address") },
+                    label = { Text(stringResource(R.string.visitor_address)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = false,
                     maxLines = 3
@@ -388,20 +390,20 @@ fun AddPlotScreen(
                 OutlinedTextField(
                     value = askingAmount,
                     onValueChange = { askingAmount = it },
-                    label = { Text("Asking Amount (₹) *") },
+                    label = { Text(stringResource(R.string.asking_amount)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("Visit Details", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.visit_details), style = MaterialTheme.typography.titleMedium)
             }
             item {
                 OutlinedTextField(
                     value = attendedBy,
                     onValueChange = { attendedBy = it },
-                    label = { Text("Attended By *") },
+                    label = { Text(stringResource(R.string.attended_by)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -409,11 +411,11 @@ fun AddPlotScreen(
                 OutlinedTextField(
                     value = visitDate,
                     onValueChange = {},
-                    label = { Text("Visit Date") },
+                    label = { Text(stringResource(R.string.visit_date)) },
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Pick Visit Date")
+                            Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.visit_date))
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -423,7 +425,7 @@ fun AddPlotScreen(
                 OutlinedTextField(
                     value = notes,
                     onValueChange = { notes = it },
-                    label = { Text("Notes & Remarks") },
+                    label = { Text(stringResource(R.string.notes_remarks)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = false,
                     maxLines = 4
@@ -460,7 +462,7 @@ fun AddPlotScreen(
                             askingAmount.isNotEmpty() && attendedBy.isNotEmpty() &&
                             initialPrice.isNotEmpty() && plotSize.isNotEmpty()
                 ) {
-                    Text("Save Plot Visit")
+                    Text(stringResource(R.string.save_plot))
                 }
             }
         }
@@ -481,7 +483,7 @@ fun PlotDetailScreen(
                 title = { Text(plot.plotName) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription =stringResource(R.string.back))
                     }
                 }
             )
@@ -533,11 +535,11 @@ fun PlotDetailScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Visit Details", style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.visit_details), style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(12.dp))
-                        InfoRow("Attended By:", plot.attendedBy)
-                        InfoRow("Visit Date:", plot.visitDate)
-                        InfoRow("Notes:", plot.notes)
+                        InfoRow(stringResource(R.string.attended_by), plot.attendedBy)
+                        InfoRow(stringResource(R.string.visit_date), plot.visitDate)
+                        InfoRow(stringResource(R.string.construction_notes), plot.notes)
                     }
                 }
             }
@@ -558,7 +560,7 @@ fun PlotDetailScreen(
                     ) {
                         Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Delete")
+                        Text(stringResource(R.string.delete))
                     }
                 }
             }
@@ -596,10 +598,10 @@ fun EditPlotScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Edit Plot Visit") },
+                title = { Text(stringResource(R.string.edit_plot)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -617,7 +619,7 @@ fun EditPlotScreen(
                             visitDate = date
                         }
                         showDatePicker = false
-                    }) { Text("OK") }
+                    }) { Text(stringResource(R.string.ok)) }
                 }
             ) {
                 DatePicker(state = datePickerState)
@@ -661,7 +663,7 @@ fun EditPlotScreen(
                             askingAmount.isNotEmpty() && attendedBy.isNotEmpty() &&
                             initialPrice.isNotEmpty() && plotSize.isNotEmpty()
                 ) {
-                    Text("Update Plot Visit")
+                    Text(stringResource(R.string.update_plot))
                 }
             }
         }

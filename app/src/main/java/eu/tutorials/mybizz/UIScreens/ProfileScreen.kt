@@ -27,6 +27,7 @@ import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Navigation.Routes
 import eu.tutorials.mybizz.R
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,10 +42,10 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Profile") },
+                title = { Text(stringResource(R.string.my_profile)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -165,7 +166,7 @@ private fun AnimatedProfileHeader(userName: String, userRole: String) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             painter = painterResource(R.drawable.img_5),
-                            contentDescription = "Profile",
+                            contentDescription = stringResource(R.string.profile),
                             modifier = Modifier.size(48.dp),
                             tint = Color.Black
                         )
@@ -189,11 +190,11 @@ private fun AnimatedProfileHeader(userName: String, userRole: String) {
             Surface(
                 shape = MaterialTheme.shapes.small,
                 color = when (userRole.lowercase()) {
-                    "admin" -> MaterialTheme.colorScheme.errorContainer
+                    stringResource(R.string.admin) -> MaterialTheme.colorScheme.errorContainer
                     else -> MaterialTheme.colorScheme.surfaceVariant
                 },
                 contentColor = when (userRole.lowercase()) {
-                    "admin" -> MaterialTheme.colorScheme.onErrorContainer
+                    stringResource(R.string.admin) -> MaterialTheme.colorScheme.onErrorContainer
                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                 }
             ) {
@@ -202,9 +203,9 @@ private fun AnimatedProfileHeader(userName: String, userRole: String) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = if (userRole.lowercase() == "admin") Icons.Default.Lock
+                        imageVector = if (userRole.lowercase() == stringResource(R.string.admin)) Icons.Default.Lock
                         else Icons.Default.Person,
-                        contentDescription = "Role",
+                        contentDescription = stringResource(R.string.role_label),
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -229,7 +230,7 @@ private fun UserInfoCard(email: String, role: String, userId: String) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                text = "Account Information",
+                text = stringResource(R.string.account_information),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -238,7 +239,7 @@ private fun UserInfoCard(email: String, role: String, userId: String) {
             // Email
             InfoRow(
                 icon = Icons.Default.Email,
-                label = "Email Address",
+                label = stringResource(R.string.email_address),
                 value = email
             )
 
@@ -247,7 +248,7 @@ private fun UserInfoCard(email: String, role: String, userId: String) {
             // Role
             InfoRow(
                 icon = Icons.Default.Face,
-                label = "Account Role",
+                label = stringResource(R.string.account_role),
                 value = role.replaceFirstChar { it.uppercase() }
             )
 
@@ -256,7 +257,7 @@ private fun UserInfoCard(email: String, role: String, userId: String) {
             // User ID
             InfoRow(
                 icon = Icons.Default.Lock,
-                label = "User ID",
+                label = stringResource(R.string.user_id),
                 value = userId.take(8) + "..." // Show only first 8 chars for security
             )
         }
@@ -308,7 +309,7 @@ private fun QuickActionsSection(
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                text = "Quick Actions",
+                text = stringResource(R.string.quick_actions),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -316,14 +317,14 @@ private fun QuickActionsSection(
 
             ActionButton(
                 icon = Icons.Default.Settings,
-                text = "App Settings",
+                text = stringResource(R.string.app_settings),
                 description = "Configure application preferences",
                 onClick = onSettings
             )
 
             ActionButton(
                 icon = Icons.Default.Clear,
-                text = "Logout",
+                text = stringResource(R.string.logout),
                 description = "Sign out from your account",
                 onClick = onLogout
             )
@@ -395,19 +396,19 @@ private fun AppInfoCard() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "MyBiz - Business Management",
+                text = stringResource(R.string.mybiz_business),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Version 1.0.0",
+                text = stringResource(R.string.app_version),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Streamline your business operations",
+                text = stringResource(R.string.streamline_operations),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

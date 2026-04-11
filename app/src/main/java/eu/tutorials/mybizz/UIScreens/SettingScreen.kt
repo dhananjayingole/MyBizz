@@ -58,7 +58,7 @@ fun SettingsScreen(navController: NavController, authRepo: AuthRepository) {
                 title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -211,7 +211,7 @@ fun sendSupportEmail(context: android.content.Context) {
     } catch (e: Exception) {
         Toast.makeText(
             context,
-            "No email app found. Please contact navtejsinghr8913@gmail.com",
+            context.getString(R.string.no_email_app),
             Toast.LENGTH_LONG
         ).show()
     }
@@ -220,7 +220,7 @@ fun sendSupportEmail(context: android.content.Context) {
 fun shareApp(context: android.content.Context) {
     val shareIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_SUBJECT, "Check out MyBiz App")
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_app_subject))
         putExtra(
             Intent.EXTRA_TEXT,
             "Discover MyBiz - Your comprehensive business management solution! " +
@@ -233,7 +233,7 @@ fun shareApp(context: android.content.Context) {
     try {
         context.startActivity(Intent.createChooser(shareIntent, "Share MyBiz App"))
     } catch (e: Exception) {
-        Toast.makeText(context, "Unable to share app", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.unable_to_share), Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -243,10 +243,10 @@ fun AboutUsScreen(onBackClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("About Us") },
+                title = { Text(stringResource(R.string.about_us)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -265,7 +265,7 @@ fun AboutUsScreen(onBackClick: () -> Unit) {
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
                     Text(
-                        text = "MyBiz - Personal Business Management System",
+                        text = stringResource(R.string.about_us_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -274,13 +274,13 @@ fun AboutUsScreen(onBackClick: () -> Unit) {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Text(
-                        text = "Welcome to MyBiz, your comprehensive solution for managing business operations efficiently. Our application is designed specifically for property owners and construction project managers to streamline administrative tasks and maintain complete control over their business activities.",
+                        text = stringResource(R.string.about_us_welcome),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
                     Text(
-                        text = "Key Features:",
+                        text = stringResource(R.string.key_features),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -296,21 +296,21 @@ fun AboutUsScreen(onBackClick: () -> Unit) {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Text(
-                        text = "Our Mission",
+                        text = stringResource(R.string.about_us_mission_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
                     Text(
-                        text = "To provide business owners with a simple yet powerful tool that eliminates administrative headaches and lets them focus on growing their business. With real-time data synchronization and secure cloud storage, your business information is always accessible and protected.",
+                        text = stringResource(R.string.about_us_mission),
                         style = MaterialTheme.typography.bodyLarge
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Version 1.0.0",
+                        text = stringResource(R.string.app_version),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
@@ -327,10 +327,10 @@ fun PrivacyPolicyScreen(onBackClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Privacy Policy") },
+                title = { Text(stringResource(R.string.privacy_policy)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -349,7 +349,7 @@ fun PrivacyPolicyScreen(onBackClick: () -> Unit) {
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
                     Text(
-                        text = "Privacy Policy",
+                        text = stringResource(R.string.privacy_policy),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -365,39 +365,39 @@ fun PrivacyPolicyScreen(onBackClick: () -> Unit) {
                     )
 
                     PrivacySection(
-                        title = "Data Collection and Usage",
+                        title = stringResource(R.string.privacy_data_collection),
                         content = "MyBiz collects and stores your business data including bills, rental information, task details, and construction project data. This information is used solely to provide you with the application's core functionality and is never shared with third parties for marketing purposes."
                     )
 
                     PrivacySection(
-                        title = "Data Storage",
+                        title = stringResource(R.string.privacy_data_storage),
                         content = "Your operational data is stored securely in Google Sheets, while historical and audit data is maintained in Firebase Firestore. Both platforms provide enterprise-level security and data protection."
                     )
 
                     PrivacySection(
-                        title = "Authentication",
+                        title =  stringResource(R.string.privacy_authentication),
                         content = "We use Firebase Authentication to securely manage user accounts. Your login credentials are protected using industry-standard encryption methods."
                     )
 
                     PrivacySection(
-                        title = "User Roles and Access",
+                        title =  stringResource(R.string.privacy_user_roles),
                         content = "The application implements role-based access control. Administrators have full access to CRUD operations, while regular users have limited read-only access as defined by the administrator."
                     )
 
                     PrivacySection(
-                        title = "Data Ownership",
+                        title =  stringResource(R.string.privacy_data_ownership),
                         content = "You retain complete ownership of all your business data. MyBiz acts as a service provider to help you manage and organize your information more efficiently."
                     )
 
                     PrivacySection(
-                        title = "Contact Information",
+                        title =  stringResource(R.string.privacy_contact),
                         content = "For any privacy-related concerns or questions, please contact our support team through the Help & Support section in the app."
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "By using MyBiz, you agree to the terms outlined in this privacy policy.",
+                        text =  stringResource(R.string.privacy_agreement),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )

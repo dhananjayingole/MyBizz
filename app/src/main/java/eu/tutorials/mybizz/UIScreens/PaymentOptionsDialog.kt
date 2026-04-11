@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +47,7 @@ fun PaymentOptionsDialog(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    "Payment Options",
+                    stringResource(R.string.payment_options),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -78,7 +79,7 @@ fun PaymentOptionsDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        "Share Payment Details via WhatsApp",
+                        stringResource(R.string.share_via_whatsapp),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -97,14 +98,14 @@ fun PaymentOptionsDialog(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        "Pay Here (UPI/Online)",
+                        stringResource(R.string.pay_here_upi),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
 
                 TextButton(onClick = onDismiss) {
-                    Text("Cancel", color = Color.Gray)
+                    Text(stringResource(R.string.cancel), color = Color.Gray)
                 }
             }
         }
@@ -121,13 +122,13 @@ fun sharePaymentViaWhatsApp(context: android.content.Context, rental: Rental) {
 💰 Amount Due: ₹${String.format("%.2f", rental.rentAmount)}
 ━━━━━━━━━━━━━━━━━━
 
-*Payment Gateway - Aryan Enterprises*
+*Payment Gateway - Navtej Singh*
 🏦 Bank: Axis Bank
-📋 A/C: 916020003646751
-🔑 IFSC: UTIB0000318
+📋 A/C: 41439039398
+🔑 IFSC: SBIN00021047
 
-📱 *Google Pay Only:* 9923170550
-🔗 UPI ID: 9923170550-1@okbizaxis
+📱 *Google Pay Only:* 7350337139
+🔗 UPI ID: navtejsingh891323-1@okaxis
 
 ✅ After payment, please send screenshot as confirmation.
 
@@ -182,7 +183,7 @@ fun sharePaymentViaWhatsApp(context: android.content.Context, rental: Rental) {
 fun getQrImageUri(context: android.content.Context): Uri? {
     return try {
         // Load QR from drawable resources
-        val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.img_15)
+        val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.img_28)
             ?: return null
 
         // Save to cache dir for sharing

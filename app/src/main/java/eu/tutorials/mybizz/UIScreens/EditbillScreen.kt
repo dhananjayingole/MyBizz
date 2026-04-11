@@ -14,12 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Logic.Bill.BillRepository
 import eu.tutorials.mybizz.Model.Bill
+import eu.tutorials.mybizz.R
 import eu.tutorials.mybizz.Repository.BillSheetsRepository
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -70,12 +72,12 @@ fun EditBillScreen(
                         showDatePicker = false
                     }
                 ) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
@@ -121,10 +123,10 @@ fun EditBillScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Bill") },
+                title = { Text(stringResource(R.string.edit_bill)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -142,7 +144,7 @@ fun EditBillScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Bill not found")
+                Text(stringResource(R.string.bill_not_found))
             }
         } else if (bill?.status == Bill.STATUS_PAID) {
             // Show message for paid bills - cannot edit
@@ -156,26 +158,26 @@ fun EditBillScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Warning,
-                        contentDescription = "Cannot Edit",
+                        contentDescription = stringResource(R.string.cannot_edit_paid),
                         modifier = Modifier.size(64.dp),
                         tint = MaterialTheme.colorScheme.error
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Cannot Edit Paid Bill",
+                        text = stringResource(R.string.cannot_edit_paid),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.error
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "This bill has been marked as paid and cannot be edited.",
+                        text = stringResource(R.string.cannot_edit_paid_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Button(onClick = { navController.popBackStack() }) {
-                        Text("Go Back")
+                        Text(stringResource(R.string.go_back))
                     }
                 }
             }
@@ -217,13 +219,13 @@ fun EditBillScreen(
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text("Bill Title*") },
+                    label = { Text(stringResource(R.string.bill_title)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     isError = title.isBlank() && error != null,
                     supportingText = {
                         if (title.isBlank() && error != null) {
-                            Text("Title is required")
+                            Text(stringResource(R.string.title_required))
                         }
                     }
                 )
@@ -234,7 +236,7 @@ fun EditBillScreen(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description") },
+                    label = { Text(stringResource(R.string.description)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(100.dp),
@@ -251,16 +253,16 @@ fun EditBillScreen(
                             amount = it
                         }
                     },
-                    label = { Text("Amount*") },
+                    label = { Text(stringResource(R.string.bill_amount)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     prefix = { Text("₹") },
                     isError = (amount.isBlank() || amount.toDoubleOrNull() == null) && error != null,
                     supportingText = {
                         if (amount.isBlank() && error != null) {
-                            Text("Amount is required")
+                            Text(stringResource(R.string.amount_required))
                         } else if (amount.isNotBlank() && amount.toDoubleOrNull() == null) {
-                            Text("Please enter a valid number")
+                            Text(stringResource(R.string.enter_valid_number))
                         }
                     }
                 )
@@ -269,7 +271,7 @@ fun EditBillScreen(
 
                 // Due Date Field with Date Picker
                 Text(
-                    text = "Due Date*",
+                    text = stringResource(R.string.due_date),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -278,21 +280,21 @@ fun EditBillScreen(
                 OutlinedTextField(
                     value = dueDate,
                     onValueChange = { },
-                    label = { Text("Select due date") },
+                    label = { Text(stringResource(R.string.select_due_date)) },
                     modifier = Modifier.fillMaxWidth(),
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Pick date")
+                            Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.select_valid_date))
                         }
                     },
-                    placeholder = { Text("Tap to select date") },
+                    placeholder = { Text(stringResource(R.string.tap_to_select_date)) },
                     isError = dueDate.isBlank() && error != null,
                     supportingText = {
                         if (dueDate.isBlank() && error != null) {
-                            Text("Due date is required")
+                            Text(stringResource(R.string.due_date_required))
                         } else if (dueDate.isNotBlank() && !isValidDate(dueDate)) {
-                            Text("Please select a valid date")
+                            Text(stringResource(R.string.select_valid_date))
                         }
                     }
                 )
@@ -325,7 +327,7 @@ fun EditBillScreen(
 
                 // Category Dropdown
                 Text(
-                    text = "Category*",
+                    text = stringResource(R.string.category),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -344,7 +346,7 @@ fun EditBillScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .menuAnchor(),
-                        placeholder = { Text("Select a category") }
+                        placeholder = { Text(stringResource(R.string.select_category)) }
                     )
 
                     ExposedDropdownMenu(
@@ -385,10 +387,10 @@ fun EditBillScreen(
                                     val success = billRepository.updateBill(updatedBill, sheetsRepository, currentUserEmail)
 
                                     if (success) {
-                                        Toast.makeText(context, "Bill updated successfully! New version created.", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(R.string.bill_updated_success), Toast.LENGTH_SHORT).show()
                                         navController.popBackStack()
                                     } else {
-                                        error = "Failed to update bill. Please check your internet connection and try again."
+                                        error = context.getString(R.string.failed_update_bill)
                                         isLoading = false
                                     }
                                 } catch (e: Exception) {
@@ -397,7 +399,7 @@ fun EditBillScreen(
                                 }
                             }
                         } else {
-                            error = "Please fill all required fields correctly"
+                            error = context.getString(R.string.please_fill_all_fields)
                         }
                     },
                     modifier = Modifier
@@ -413,7 +415,7 @@ fun EditBillScreen(
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Updating Bill...")
+                        Text(stringResource(R.string.updating_bill))
                     } else {
                         Text("Update Bill (Version ${bill!!.version + 1})", style = MaterialTheme.typography.bodyLarge)
                     }
@@ -432,7 +434,7 @@ fun EditBillScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Warning,
-                                contentDescription = "Error",
+                                contentDescription = stringResource(R.string.error),
                                 tint = MaterialTheme.colorScheme.error
                             )
                             Spacer(modifier = Modifier.width(8.dp))

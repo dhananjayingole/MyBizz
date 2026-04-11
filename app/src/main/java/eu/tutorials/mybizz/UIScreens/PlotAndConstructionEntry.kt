@@ -31,11 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import eu.tutorials.mybizz.Logic.Construction.ConstructionSheetsRepository
 import eu.tutorials.mybizz.Logic.plot.PlotSheetsRepository
 import eu.tutorials.mybizz.Navigation.Routes
+import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -51,7 +53,6 @@ fun PlotAndConstructionEntry(
             .fillMaxSize()
             .padding(top = 18.dp)
     ) {
-
         // -------- Centered Toggle Buttons with Beautiful UI ------------
         Box(
             modifier = Modifier
@@ -70,7 +71,7 @@ fun PlotAndConstructionEntry(
             ) {
 
                 ToggleChip(
-                    text = "Plot",
+                    text = stringResource(R.string.plot_tab),
                     isSelected = selectedTab == 0,
                     modifier = Modifier.weight(1f)
                 ) {
@@ -78,7 +79,7 @@ fun PlotAndConstructionEntry(
                 }
 
                 ToggleChip(
-                    text = "Construction",
+                    text = stringResource(R.string.construction_tab),
                     isSelected = selectedTab == 1,
                     modifier = Modifier.weight(1f)
                 ) {
