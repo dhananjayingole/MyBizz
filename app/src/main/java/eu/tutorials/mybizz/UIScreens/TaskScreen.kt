@@ -6,13 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -20,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import eu.tutorials.mybizz.Logic.Task.TaskRepository
@@ -29,6 +27,7 @@ import eu.tutorials.mybizz.Navigation.Routes
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +59,7 @@ fun TaskListScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Tasks") },
+                title = { Text(stringResource(R.string.edit_task)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -75,7 +74,7 @@ fun TaskListScreen(
                 },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Task", tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_task), tint = MaterialTheme.colorScheme.onPrimary)
             }
         }
     ) { padding ->
@@ -88,8 +87,8 @@ fun TaskListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Search Tasks") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                label = { Text(stringResource(R.string.search_tasks)) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -103,7 +102,7 @@ fun TaskListScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         if (searchQuery.isNotEmpty()) "No tasks found for '$searchQuery'"
-                        else "No tasks found",
+                        else stringResource(R.string.no_tasks_found),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -162,7 +161,7 @@ fun AddTaskScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Add New Task") },
+                title = { Text(stringResource(R.string.add_task)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -183,7 +182,7 @@ fun AddTaskScreen(
                             dueDate = date
                         }
                         showDatePicker = false
-                    }) { Text("OK") }
+                    }) { Text(stringResource(R.string.ok)) }
                 }
             ) {
                 DatePicker(state = datePickerState)
@@ -200,14 +199,14 @@ fun AddTaskScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Task Title *") },
+                label = { Text(stringResource(R.string.task_title)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Description") },
+                label = { Text(stringResource(R.string.description)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),
@@ -217,7 +216,7 @@ fun AddTaskScreen(
             OutlinedTextField(
                 value = assignedTo,
                 onValueChange = { assignedTo = it },
-                label = { Text("Assigned To *") },
+                label = { Text(stringResource(R.string.assigned_to)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -230,7 +229,7 @@ fun AddTaskScreen(
                     value = status,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Status") },
+                    label = { Text(stringResource(R.string.status)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier.menuAnchor().fillMaxWidth()
                 )
@@ -254,7 +253,7 @@ fun AddTaskScreen(
             OutlinedTextField(
                 value = dueDate,
                 onValueChange = {},
-                label = { Text("Due Date") },
+                label = { Text(stringResource(R.string.due_date)) },
                 readOnly = true,
                 placeholder = { Text("YYYY-MM-DD") },
                 trailingIcon = {
@@ -268,7 +267,7 @@ fun AddTaskScreen(
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = { Text("Notes") },
+                label = { Text(stringResource(R.string.notes)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp),
@@ -298,7 +297,7 @@ fun AddTaskScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = title.isNotEmpty() && assignedTo.isNotEmpty()
             ) {
-                Text("Save Task")
+                Text(stringResource(R.string.save_task))
             }
         }
     }
@@ -328,7 +327,7 @@ fun TaskDetailScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(task?.title ?: "Task Details") },
+                title = { Text(task?.title ?: stringResource(R.string.task_details)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -351,7 +350,7 @@ fun TaskDetailScreen(
                 .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Task not found")
+                Text(stringResource(R.string.task_not_found))
             }
         } else {
             TaskDetailContent(
@@ -407,20 +406,20 @@ fun TaskDetailContent(
         }
 
         // Task Details
-        DetailItem(label = "Description", value = task.description)
-        DetailItem(label = "Assigned To", value = task.assignedTo)
-        DetailItem(label = "Due Date", value = task.dueDate)
-        DetailItem(label = "Notes", value = task.notes)
+        DetailItem(label = stringResource(R.string.description), value = task.description)
+        DetailItem(label = stringResource(R.string.assigned_to), value = task.assignedTo)
+        DetailItem(label = stringResource(R.string.due_date), value = task.dueDate)
+        DetailItem(label = stringResource(R.string.notes), value = task.notes)
 
         Spacer(modifier = Modifier.height(20.dp))
 
         // Action Buttons
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = onEdit, modifier = Modifier.weight(1f)) {
-                Text("Edit")
+                Text(stringResource(R.string.edit))
             }
             OutlinedButton(onClick = onDelete, modifier = Modifier.weight(1f)) {
-                Text("Delete")
+                Text(stringResource(R.string.delete))
             }
         }
 
@@ -431,7 +430,7 @@ fun TaskDetailContent(
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
         ) {
-            Text("Back")
+            Text(stringResource(R.string.back))
         }
     }
 }
@@ -482,10 +481,10 @@ fun EditTaskScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Edit Task") },
+                title = { Text(stringResource(R.string.edit_task)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -503,7 +502,7 @@ fun EditTaskScreen(
                             dueDate = date
                         }
                         showDatePicker = false
-                    }) { Text("OK") }
+                    }) { Text(stringResource(R.string.ok)) }
                 }
             ) {
                 DatePicker(state = datePickerState)
@@ -524,7 +523,7 @@ fun EditTaskScreen(
                 .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Task not found")
+                Text(stringResource(R.string.task_not_found))
             }
         } else {
             Column(
@@ -537,14 +536,14 @@ fun EditTaskScreen(
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text("Task Title *") },
+                    label = { Text(stringResource(R.string.task_title)) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description") },
+                    label = { Text(stringResource(R.string.description)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(100.dp),
@@ -554,7 +553,7 @@ fun EditTaskScreen(
                 OutlinedTextField(
                     value = assignedTo,
                     onValueChange = { assignedTo = it },
-                    label = { Text("Assigned To *") },
+                    label = { Text(stringResource(R.string.assigned_to)) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -567,7 +566,7 @@ fun EditTaskScreen(
                         value = status,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Status") },
+                        label = { Text(stringResource(R.string.status)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = Modifier.menuAnchor().fillMaxWidth()
                     )
@@ -591,12 +590,12 @@ fun EditTaskScreen(
                 OutlinedTextField(
                     value = dueDate,
                     onValueChange = {},
-                    label = { Text("Due Date") },
+                    label = { Text(stringResource(R.string.due_date)) },
                     readOnly = true,
                     placeholder = { Text("YYYY-MM-DD") },
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Pick Due Date")
+                            Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.select_due_date))
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -605,7 +604,7 @@ fun EditTaskScreen(
                 OutlinedTextField(
                     value = notes,
                     onValueChange = { notes = it },
-                    label = { Text("Notes") },
+                    label = { Text(stringResource(R.string.notes)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(80.dp),
@@ -635,7 +634,7 @@ fun EditTaskScreen(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = title.isNotEmpty() && assignedTo.isNotEmpty()
                 ) {
-                    Text("Update Task")
+                    Text(stringResource(R.string.update_task))
                 }
             }
         }

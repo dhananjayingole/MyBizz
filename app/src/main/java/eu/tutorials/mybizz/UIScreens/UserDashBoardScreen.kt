@@ -119,7 +119,7 @@ fun UserDashboardScreen(
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Notifications,
-                                    contentDescription = "Generate PDF"
+                                    contentDescription = stringResource(R.string.generate_pdf)
                                 )
                             }
                         )

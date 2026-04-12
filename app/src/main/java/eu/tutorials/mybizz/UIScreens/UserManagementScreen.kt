@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
 import eu.tutorials.mybizz.Model.User
+import eu.tutorials.mybizz.R
 import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,10 +60,10 @@ fun UserManagementScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("User Management") },
+                title = { Text(stringResource(R.string.user_management_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -77,8 +79,8 @@ fun UserManagementScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Search Users") },
-                leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Search") },
+                label = { Text(stringResource(R.string.search_users)) },
+                leadingIcon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.search)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -92,7 +94,7 @@ fun UserManagementScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         if (searchQuery.isNotEmpty()) "No users found for '$searchQuery'"
-                        else "No users found",
+                        else stringResource(R.string.no_users_for_search),
                         color = Color.Gray
                     )
                 }
@@ -116,7 +118,7 @@ fun UserManagementScreen(
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
-                                        Toast.makeText(context, "Failed to update status", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(R.string.failed_update_status), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             }
@@ -152,7 +154,7 @@ fun UserCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "User",
+                    contentDescription = stringResource(R.string.user),
                     tint = if (user.isBlocked) Color.Gray else MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(32.dp)
                 )
