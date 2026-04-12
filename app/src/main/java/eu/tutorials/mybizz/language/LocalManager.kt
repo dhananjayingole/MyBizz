@@ -8,7 +8,6 @@ import java.util.Locale
 
 object LocaleManager {
 
-    // ── Supported languages ────────────────────────────────────────────────
     /** Map of language code → display name shown in the picker UI */
     val supportedLanguages: Map<String, String> = linkedMapOf(
         "en" to "English",
@@ -21,7 +20,6 @@ object LocaleManager {
     private const val KEY_LANGUAGE = "selected_language"
     private const val DEFAULT_LANGUAGE = "en"
 
-    // ── Public API ─────────────────────────────────────────────────────────
 
     /** Returns the currently saved language code (e.g. "en", "hi", "mr"). */
     fun getSelectedLanguage(context: Context): String {
