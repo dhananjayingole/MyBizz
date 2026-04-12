@@ -171,7 +171,7 @@ fun UserCard(
                         color = Color.Gray
                     )
                     Text(
-                        text = if (user.isBlocked) "🔴 Blocked" else "🟢 Active",
+                        text = if (user.isBlocked) stringResource(R.string.blocked) else stringResource(R.string.active),
                         color = if (user.isBlocked) Color.Red else Color.Green,
                         fontSize = 14.sp
                     )
@@ -183,7 +183,7 @@ fun UserCard(
             ) {
                 Icon(
                     imageVector = if (user.isBlocked) Icons.Default.CheckCircle else Icons.Default.Close,
-                    contentDescription = if (user.isBlocked) "Unblock" else "Block",
+                    contentDescription = if (user.isBlocked) stringResource(R.string.unblock_user) else stringResource(R.string.blocked),
                     tint = if (user.isBlocked) Color.Green else Color.Red
                 )
             }
