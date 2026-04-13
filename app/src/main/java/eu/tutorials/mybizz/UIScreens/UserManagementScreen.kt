@@ -1,4 +1,3 @@
-// UIScreens/UserManagementScreen.kt
 package eu.tutorials.mybizz.UIScreens
 
 import android.widget.Toast

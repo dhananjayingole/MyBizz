@@ -1,6 +1,8 @@
 // UIScreens/SplashScreen.kt - Optimized for fast navigation
 package eu.tutorials.mybizz.UIScreens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -22,6 +24,7 @@ import eu.tutorials.mybizz.Navigation.Routes
 import eu.tutorials.mybizz.R
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SplashScreen(navController: NavController) {
     val context = LocalContext.current
@@ -32,25 +35,30 @@ fun SplashScreen(navController: NavController) {
     val currentUser by authRepo.currentUser.collectAsState()
     val isLoading by authRepo.isLoading.collectAsState()
 
+    // Track if we've started navigation to avoid multiple navigations
+    var hasNavigated by remember { mutableStateOf(false) }
+
     LaunchedEffect(isLoading, isAuthenticated, currentUser) {
-        if (!isLoading) {
+        if (!isLoading && !hasNavigated) {
             // Small delay for better UX (optional)
-            delay(1000)
+            delay(1500)
 
             if (isAuthenticated && currentUser != null) {
                 val role = currentUser!!.role
                 // Navigate to appropriate dashboard based on role
-                val destination = if (role ==  context.getString(R.string.admin)) {
+                val destination = if (role == context.getString(R.string.admin)) {
                     Routes.AdminDashboardScreen
                 } else {
                     Routes.UserDashboardScreen
                 }
 
+                hasNavigated = true
                 navController.navigate(destination) {
                     popUpTo(Routes.SplashScreen) { inclusive = true }
                 }
-            } else {
+            } else if (!isAuthenticated) {
                 // User not logged in, go to login screen
+                hasNavigated = true
                 navController.navigate(Routes.LoginScreen) {
                     popUpTo(Routes.SplashScreen) { inclusive = true }
                 }
@@ -69,47 +77,66 @@ fun SplashScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(32.dp)
         ) {
-            // App Icon with Rounded Corners
-            Image(
-                painter = painterResource(id = R.drawable.img),
-                contentDescription = "MyBiz Logo",
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(RoundedCornerShape(24.dp)),
-                contentScale = ContentScale.Crop
-            )
+            // Animated logo entrance
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn() + scaleIn()
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.img),
+                    contentDescription = "MyBiz Logo",
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(RoundedCornerShape(24.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text =  stringResource(R.string.project_id),
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
-            )
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn(animationSpec = tween(delayMillis = 300))
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.project_id),
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
 
-            Text(
-                text =  stringResource(R.string.app_tagline),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
+                    Text(
+                        text = stringResource(R.string.app_tagline),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
             if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(32.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 3.dp
-                )
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn() + slideInVertically()
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(32.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 3.dp
+                        )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text =  stringResource(R.string.loading),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+                        Text(
+                            text = stringResource(R.string.loading),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    }
+                }
             }
         }
     }

@@ -2,6 +2,7 @@ package eu.tutorials.mybizz
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -61,10 +62,15 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val context = LocalContext.current
                     NavGraph(navController, context)
-//                    BankSMSScreen(onBack = {navController.popBackStack()})
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // App open ad will be handled by the lifecycle observer
+        // No need to call anything here
     }
 
     @Deprecated("Deprecated in Java")
@@ -89,6 +95,12 @@ class MainActivity : ComponentActivity() {
                     ).show()
                 }
             }
+        }
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context, MainActivity::class.java)
         }
     }
 }
