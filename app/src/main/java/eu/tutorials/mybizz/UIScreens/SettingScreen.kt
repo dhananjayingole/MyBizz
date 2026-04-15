@@ -85,7 +85,7 @@ fun SettingsScreen(navController: NavController, authRepo: AuthRepository) {
 
                     // ── Language Selector ──────────────────────────────────
                     SettingItem(
-                        icon = painterResource(R.drawable.img_16), // use any suitable icon you have
+                        icon = painterResource(R.drawable.img_29), // use any suitable icon you have
                         title = stringResource(R.string.change_language),
                         subtitle = stringResource(R.string.change_language_subtitle),
                         onClick = { showLanguageDialog = true }
