@@ -46,13 +46,7 @@ object Routes {
 
     const val BankSMSScreen = "banksmsscreen"
 
-    const val LanguageSelectionScreen = "languageselectionscreen"
-
-    const val TenantListScreen = "tenantlistscreen"
-    const val AddRentalToTenantScreen = "addtotenantscreen"
-    const val TenantDetailScreen = "tenantdetailscreen"
-    const val AddTenantWithRentalsScreen = "addtenantwithrentalscreen"
-
+    const val TenantPropertiesScreen = "tenantpropertiesscreen"
     // Helper functions to build routes with parameters
     fun constructionDetail(constructionId: String): String = "construction_detail/$constructionId"
     fun editConstruction(constructionId: String): String = "edit_construction/$constructionId"

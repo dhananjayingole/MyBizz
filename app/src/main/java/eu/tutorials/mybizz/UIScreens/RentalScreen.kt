@@ -33,31 +33,41 @@ import java.util.*
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.res.stringResource
+import eu.tutorials.mybizz.Logic.Rental.RentalSharedViewModel
 import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RentalListScreen(
     sheetsRepo: RentalSheetsRepository,
-    onRentalSelected: (Rental) -> Unit,
+    // Key change: instead of (Rental) we now pass (tenantName, tenantRentals)
+    onTenantSelected: (tenantName: String, rentals: List<Rental>) -> Unit,
     onAddRental: () -> Unit,
     onBack: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var rentals by remember { mutableStateOf<List<Rental>>(emptyList()) }
+    var allRentals by remember { mutableStateOf<List<Rental>>(emptyList()) }
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         scope.launch {
-            rentals = sheetsRepo.getAllRentals()
-            isLoading = false
+            allRentals = sheetsRepo.getAllRentals()
+            isLoading  = false
         }
     }
 
-    val filteredList = rentals.filter {
-        it.tenantName.contains(searchQuery.text, ignoreCase = true) ||
-                it.property.contains(searchQuery.text, ignoreCase = true)
+    // ── Group by tenant name (unique key) ────────────────────────────────────
+    // Filter first, then group so search still works across property names too
+    val grouped: List<Map.Entry<String, List<Rental>>> = remember(allRentals, searchQuery.text) {
+        allRentals
+            .filter { rental ->
+                rental.tenantName.contains(searchQuery.text, ignoreCase = true) ||
+                        rental.property.contains(searchQuery.text, ignoreCase = true)
+            }
+            .groupBy { it.tenantName.trim() }   // trim avoids "Atul " ≠ "Atul"
+            .entries
+            .toList()
     }
 
     Scaffold(
@@ -66,7 +76,10 @@ fun RentalListScreen(
                 title = { Text(stringResource(R.string.rental_management)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
                     }
                 }
             )
@@ -87,56 +100,134 @@ fun RentalListScreen(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 label = { Text(stringResource(R.string.search_tenant_property)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search)) },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search))
+                },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            if (isLoading) {
-                Box(
+            when {
+                isLoading -> Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else if (filteredList.isEmpty()) {
-                Box(
+                ) { CircularProgressIndicator() }
+
+                grouped.isEmpty() -> Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ) {
-                    Text(stringResource(R.string.no_rentals_found))
-                }
-            } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(filteredList) { rental ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onRentalSelected(rental) },
-                            elevation = CardDefaults.cardElevation(6.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(rental.tenantName, style = MaterialTheme.typography.titleMedium)
-                                Text("🏠 ${rental.property}")
-                                Text("💰 ₹${rental.rentAmount}")
-                                Text("📅 Month: ${rental.month}")
-                                Text(
-                                    "Status: ${rental.status}",
-                                    color = if (rental.status == Rental.STATUS_PAID)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.error
-                                )
-                            }
-                        }
+                ) { Text(stringResource(R.string.no_rentals_found)) }
+
+                else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    items(grouped, key = { it.key }) { (tenantName, rentals) ->
+                        TenantCard(
+                            tenantName = tenantName,
+                            rentals    = rentals,
+                            onClick    = { onTenantSelected(tenantName, rentals) }
+                        )
                     }
                 }
             }
         }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Tenant summary card  —  ONE per unique tenant name
+// ─────────────────────────────────────────────────────────────────────────────
+@Composable
+fun TenantCard(
+    tenantName: String,
+    rentals: List<Rental>,
+    onClick: () -> Unit
+) {
+    val paidCount   = rentals.count { it.status == Rental.STATUS_PAID }
+    val unpaidCount = rentals.size - paidCount
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Avatar circle with initials
+            Surface(
+                modifier = Modifier.size(48.dp),
+                shape    = MaterialTheme.shapes.extraLarge,
+                color    = MaterialTheme.colorScheme.primaryContainer
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text  = tenantName.take(1).uppercase(),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(14.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                // Tenant name
+                Text(
+                    text  = tenantName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Property count
+                Text(
+                    text  = "🏠 ${rentals.size} ${if (rentals.size == 1) "property" else "properties"}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // Paid / Unpaid pills
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (paidCount > 0)   RentalStatusPill("$paidCount Paid",   isPaid = true)
+                    if (unpaidCount > 0) RentalStatusPill("$unpaidCount Unpaid", isPaid = false)
+                }
+            }
+
+            // Chevron
+            Icon(
+                imageVector        = Icons.Default.KeyboardArrowRight,
+                contentDescription = null,
+                tint               = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun RentalStatusPill(label: String, isPaid: Boolean) {
+    Surface(
+        shape = MaterialTheme.shapes.extraLarge,
+        color = if (isPaid) MaterialTheme.colorScheme.primaryContainer
+        else        MaterialTheme.colorScheme.errorContainer
+    ) {
+        Text(
+            text     = label,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+            style    = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.SemiBold,
+            color    = if (isPaid) MaterialTheme.colorScheme.onPrimaryContainer
+            else        MaterialTheme.colorScheme.onErrorContainer
+        )
     }
 }
 
@@ -689,5 +780,252 @@ fun EditRentalScreen(
                 Text(stringResource(R.string.update_rental))
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TenantPropertiesScreen(
+    viewModel: RentalSharedViewModel,
+    onPropertySelected: (Rental) -> Unit,
+    onBack: () -> Unit
+) {
+    val tenantName = viewModel.selectedTenantName
+    val rentals    = viewModel.selectedTenantRentals   // live — updates if ViewModel refreshed
+
+    val totalRent   = rentals.sumOf { it.rentAmount }
+    val paidCount   = rentals.count { it.status == Rental.STATUS_PAID }
+    val unpaidCount = rentals.size - paidCount
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(tenantName) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                }
+            )
+        }
+    ) { padding ->
+
+        if (rentals.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No properties found for $tenantName")
+            }
+            return@Scaffold
+        }
+
+        LazyColumn(
+            modifier            = Modifier
+                .padding(padding)
+                .padding(horizontal = 16.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding      = PaddingValues(vertical = 16.dp)
+        ) {
+
+            // ── Summary header ──────────────────────────────────────────────
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors   = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Big initial circle
+                            Surface(
+                                modifier = Modifier.size(56.dp),
+                                shape    = MaterialTheme.shapes.extraLarge,
+                                color    = MaterialTheme.colorScheme.primary
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text       = tenantName.take(1).uppercase(),
+                                        color      = MaterialTheme.colorScheme.onPrimary,
+                                        fontSize   = 24.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(14.dp))
+
+                            Column {
+                                Text(
+                                    text       = tenantName,
+                                    style      = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color      = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Text(
+                                    text  = "Total rent: ₹$totalRent / month",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f))
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Stats row
+                        Row(
+                            modifier              = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            StatBox(label = "Properties", value = "${rentals.size}")
+                            StatBox(label = "Paid",       value = "$paidCount",   valueColor = MaterialTheme.colorScheme.primary)
+                            StatBox(label = "Unpaid",     value = "$unpaidCount", valueColor = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text  = "Rented Properties",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            // ── One card per property ───────────────────────────────────────
+            items(rentals, key = { it.id }) { rental ->
+                PropertyDetailCard(
+                    rental  = rental,
+                    onClick = { onPropertySelected(rental) }
+                )
+            }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Individual property card  (child node)
+// ─────────────────────────────────────────────────────────────────────────────
+@Composable
+private fun PropertyDetailCard(rental: Rental, onClick: () -> Unit) {
+    val isPaid = rental.status == Rental.STATUS_PAID
+
+    Card(
+        modifier  = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier            = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment   = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Left: property icon + details
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier          = Modifier.weight(1f)
+            ) {
+                // Property icon circle
+                Surface(
+                    modifier = Modifier.size(42.dp),
+                    shape    = MaterialTheme.shapes.medium,
+                    color    = if (isPaid)
+                        MaterialTheme.colorScheme.primaryContainer
+                    else
+                        MaterialTheme.colorScheme.errorContainer
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(text = "🏠", fontSize = 18.sp)
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text       = rental.property,
+                        style      = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text  = "₹${rental.rentAmount}  •  ${rental.month}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (rental.paymentDate.isNotEmpty()) {
+                        Text(
+                            text  = "Paid on: ${rental.paymentDate}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
+            }
+
+            // Right: status pill + chevron
+            Column(horizontalAlignment = Alignment.End) {
+                Surface(
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = if (isPaid) MaterialTheme.colorScheme.primaryContainer
+                    else        MaterialTheme.colorScheme.errorContainer
+                ) {
+                    Text(
+                        text     = if (isPaid) "PAID" else "UNPAID",
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        style    = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color    = if (isPaid) MaterialTheme.colorScheme.onPrimaryContainer
+                        else        MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Icon(
+                    imageVector        = Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint               = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier           = Modifier.size(18.dp)
+                )
+            }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Small stat box used in the summary card
+// ─────────────────────────────────────────────────────────────────────────────
+@Composable
+private fun StatBox(
+    label: String,
+    value: String,
+    valueColor: Color = MaterialTheme.colorScheme.onPrimaryContainer
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text       = value,
+            style      = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color      = valueColor
+        )
+        Text(
+            text  = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+        )
     }
 }

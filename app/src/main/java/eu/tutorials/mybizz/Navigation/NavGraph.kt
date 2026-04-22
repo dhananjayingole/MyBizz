@@ -3,7 +3,6 @@ package eu.tutorials.mybizz.Navigation
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -32,6 +31,7 @@ import eu.tutorials.mybizz.Logic.Bill.BillRepository
 import eu.tutorials.mybizz.Logic.Construction.ConstructionRepository
 import eu.tutorials.mybizz.Logic.Construction.ConstructionSheetsRepository
 import eu.tutorials.mybizz.Logic.Rental.RentalRepository
+import eu.tutorials.mybizz.Logic.Rental.RentalSharedViewModel
 import eu.tutorials.mybizz.Logic.Rental.RentalSheetsRepository
 import eu.tutorials.mybizz.Logic.Task.TaskRepository
 import eu.tutorials.mybizz.Logic.Task.TaskSheetsRepository
@@ -67,14 +67,18 @@ fun NavGraph(
     val constructionRepository = remember { ConstructionRepository() }
     val taskSheetsRepo = remember { TaskSheetsRepository(context) }
 
-    // NEW: Add Bill and Payment repositories
     val billSheetsRepo = remember { BillSheetsRepository(context) }
     val billRepo = remember { BillRepository() }
     val paymentSheetsRepo = remember { PaymentSheetsRepository(context) }
-    // plot sheet Repos.
+
     val plotSheetsRepo = remember { PlotSheetsRepository(context) }
     val plotRepository = remember { PlotRepository() }
     val taskRepo = remember { TaskRepository() }
+
+    // ── Shared ViewModel for tenant → properties flow ─────────────────────────
+    // viewModel() scopes it to the NavGraph's lifecycle so it survives
+    // navigation between rental screens without being recreated.
+    val rentalSharedViewModel: RentalSharedViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -106,7 +110,7 @@ fun NavGraph(
             BillDetailsScreen(navController, billId, authRepository)
         }
 
-        // NEW: Payment Screen for Bills
+        // Payment Screen for Bills
         composable(
             route = "payment_bill/{billId}",
             arguments = listOf(navArgument("billId") { type = NavType.StringType })
@@ -130,42 +134,45 @@ fun NavGraph(
                         bill = b,
                         rental = null,
                         onPaymentSuccess = {
-                            // Navigate back to bill details with refresh flag
                             navController.navigate(Routes.BillsListScreen) {
                                 popUpTo(Routes.BillsListScreen) { inclusive = true }
                             }
                         },
-                        onBack = {
-                            navController.popBackStack()
-                        }
+                        onBack = { navController.popBackStack() }
                     )
                 }
             }
         }
 
-        // ------------------ Rental Screens ------------------
+        // ── RENTAL SCREENS ────────────────────────────────────────────────────
 
-        // Rental List
+        // ① Rental List — ONE card per unique tenant name
         composable(Routes.RentalListScreen) {
-            var rentals by remember { mutableStateOf<List<Rental>>(emptyList()) }
-            var isLoading by remember { mutableStateOf(true) }
-
-            LaunchedEffect(Unit) {
-                rentals = rentalSheetsRepo.getAllRentals()
-                isLoading = false
-            }
-
             RentalListScreen(
                 sheetsRepo = rentalSheetsRepo,
-                onRentalSelected = { rental ->
-                    navController.navigate("${Routes.RentalDetailScreen}/${rental.id}")
+                onTenantSelected = { tenantName, tenantRentals ->
+                    // Store in shared VM, then navigate to the properties screen
+                    rentalSharedViewModel.selectTenant(tenantName, tenantRentals)
+                    navController.navigate(Routes.TenantPropertiesScreen)
                 },
                 onAddRental = { navController.navigate(Routes.AddRentalScreen) },
-                onBack = {navController.popBackStack()}
+                onBack = { navController.popBackStack() }
             )
         }
 
-        // Add Rental
+        // ② Tenant Properties — all properties for the selected tenant
+        composable(Routes.TenantPropertiesScreen) {
+            TenantPropertiesScreen(
+                viewModel = rentalSharedViewModel,
+                onPropertySelected = { rental ->
+                    // Navigate to the existing detail screen, passing rental id
+                    navController.navigate("${Routes.RentalDetailScreen}/${rental.id}")
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // ③ Add Rental — unchanged
         composable(Routes.AddRentalScreen) {
             AddRentalScreen(
                 sheetsRepo = rentalSheetsRepo,
@@ -174,7 +181,8 @@ fun NavGraph(
             )
         }
 
-        // Rental Detail
+        // ④ Rental Detail — unchanged structure, but now also updates the shared VM
+        //    so the properties screen reflects edits / deletes / mark-paid on back press.
         composable(
             route = "${Routes.RentalDetailScreen}/{rentalId}",
             arguments = listOf(navArgument("rentalId") { type = NavType.StringType })
@@ -189,23 +197,32 @@ fun NavGraph(
             rental?.let { r ->
                 RentalDetailScreen(
                     rental = r,
-                    onEdit = { navController.navigate("${Routes.EditRentalScreen}/${r.id}") },
+                    onEdit = {
+                        navController.navigate("${Routes.EditRentalScreen}/${r.id}")
+                    },
                     onDelete = {
                         scope.launch {
                             rentalRepo.deleteRental(r.id, rentalSheetsRepo)
-                            navController.popBackStack()
+                            rentalSharedViewModel.removeRental(r.id)   // keep VM in sync
+                            navController.popBackStack()               // back to TenantPropertiesScreen
                         }
                     },
                     onMarkPaid = {
                         scope.launch {
                             rentalRepo.markRentalAsPaid(r.id, rentalSheetsRepo)
-                            navController.navigate(Routes.RentalListScreen) {
-                                popUpTo(Routes.RentalListScreen) { inclusive = true }
-                            }
+                            // Build updated copy and refresh VM so list reflects new status
+                            val updated = r.copy(
+                                status = Rental.STATUS_PAID,
+                                paymentDate = java.text.SimpleDateFormat(
+                                    "yyyy-MM-dd", java.util.Locale.getDefault()
+                                ).format(java.util.Date())
+                            )
+                            rentalSharedViewModel.refreshRental(updated) // keep VM in sync
+                            navController.popBackStack()                 // back to TenantPropertiesScreen
                         }
                     },
                     onBack = { navController.popBackStack() },
-                    navController = navController // NEW: Pass navController
+                    navController = navController
                 )
             } ?: run {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -214,7 +231,7 @@ fun NavGraph(
             }
         }
 
-        // Edit Rental
+        // ⑤ Edit Rental — unchanged
         composable(
             route = "${Routes.EditRentalScreen}/{rentalId}",
             arguments = listOf(navArgument("rentalId") { type = NavType.StringType })
@@ -230,7 +247,14 @@ fun NavGraph(
                 EditRentalScreen(
                     rental = r,
                     sheetsRepo = rentalSheetsRepo,
-                    onRentalUpdated = { navController.popBackStack() },
+                    onRentalUpdated = {
+                        // Refresh the VM entry so TenantPropertiesScreen shows new data
+                        scope.launch {
+                            val refreshed = rentalSheetsRepo.getAllRentals().find { it.id == r.id }
+                            refreshed?.let { rentalSharedViewModel.refreshRental(it) }
+                        }
+                        navController.popBackStack()
+                    },
                     onBack = { navController.popBackStack() }
                 )
             } ?: run {
@@ -240,7 +264,7 @@ fun NavGraph(
             }
         }
 
-        // NEW: Payment Screen for Rentals
+        // ⑥ Payment Screen for Rentals — unchanged
         composable(
             route = "payment_rental/{rentalId}",
             arguments = listOf(navArgument("rentalId") { type = NavType.StringType })
@@ -264,26 +288,24 @@ fun NavGraph(
                         bill = null,
                         rental = r,
                         onPaymentSuccess = {
-                            // Navigate back to rental list with refresh
                             navController.navigate(Routes.RentalListScreen) {
                                 popUpTo(Routes.RentalListScreen) { inclusive = true }
                             }
                         },
-                        onBack = {
-                            navController.popBackStack()
-                        }
+                        onBack = { navController.popBackStack() }
                     )
                 }
             }
         }
 
-        // Construction List
+        // ── CONSTRUCTION SCREENS ──────────────────────────────────────────────
+
         composable(Routes.ConstructionListScreen) {
             ConstructionListScreen(
                 sheetsRepo = constructionSheetsRepo,
                 onAddClicked = { navController.navigate(Routes.AddConstructionScreen) },
                 navController = navController,
-                onBack = {navController.popBackStack()}
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -295,7 +317,6 @@ fun NavGraph(
             )
         }
 
-        // Add Construction
         composable(Routes.AddConstructionScreen) {
             AddConstructionScreen(
                 sheetsRepo = constructionSheetsRepo,
@@ -303,7 +324,6 @@ fun NavGraph(
             )
         }
 
-        // Construction Detail
         composable(
             route = "construction_detail/{constructionId}",
             arguments = listOf(navArgument("constructionId") { type = NavType.StringType })
@@ -337,7 +357,6 @@ fun NavGraph(
             }
         }
 
-        // Edit Construction
         composable(
             route = "edit_construction/{constructionId}",
             arguments = listOf(navArgument("constructionId") { type = NavType.StringType })
@@ -363,7 +382,8 @@ fun NavGraph(
             }
         }
 
-        // Task screens
+        // ── TASK SCREENS ──────────────────────────────────────────────────────
+
         composable(Routes.TaskListScreen) {
             TaskListScreen(
                 navController = navController,
@@ -402,14 +422,15 @@ fun NavGraph(
             )
         }
 
-        composable(Routes.UserManagementScreen){
+        composable(Routes.UserManagementScreen) {
             UserManagementScreen(
                 navController = navController,
                 authRepository
             )
         }
 
-        // Plot List Screen
+        // ── PLOT SCREENS ──────────────────────────────────────────────────────
+
         composable(Routes.PlotListScreen) {
             PlotListScreen(
                 navController = navController,
@@ -419,7 +440,6 @@ fun NavGraph(
             )
         }
 
-        // Add Plot Screen
         composable(Routes.AddPlotScreen) {
             AddPlotScreen(
                 sheetsRepo = plotSheetsRepo,
@@ -427,7 +447,6 @@ fun NavGraph(
             )
         }
 
-        // Plot Detail Screen
         composable(
             route = Routes.PlotDetailScreen,
             arguments = listOf(navArgument("plotId") { type = NavType.StringType })
@@ -461,7 +480,6 @@ fun NavGraph(
             }
         }
 
-        // Edit Plot Screen
         composable(
             route = Routes.EditPlotScreen,
             arguments = listOf(navArgument("plotId") { type = NavType.StringType })
@@ -487,7 +505,8 @@ fun NavGraph(
             }
         }
 
-        // Monthly Report Screen
+        // ── REPORTING ─────────────────────────────────────────────────────────
+
         composable(Routes.MonthlyReportScreen) {
             val viewModel: MonthlyReportViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
@@ -503,13 +522,14 @@ fun NavGraph(
             )
         }
 
-//        Chatbot Screen
-        composable(Routes.ChatScreen){
+        // ── CHATBOT / SMS ─────────────────────────────────────────────────────
+
+        composable(Routes.ChatScreen) {
             ChatScreen(navController = navController)
         }
 
-        composable(Routes.BankSMSScreen){
-            BankSMSScreen({navController.popBackStack()})
+        composable(Routes.BankSMSScreen) {
+            BankSMSScreen({ navController.popBackStack() })
         }
     }
 }
