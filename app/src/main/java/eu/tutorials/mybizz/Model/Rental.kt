@@ -5,7 +5,7 @@ data class Rental(
     val tenantName: String = "",
     val property: String = "",
     val rentAmount: Double = 0.0,
-    val month: String = "", // Format: "2025-10"
+    val month: String = "",
     val status: String = STATUS_UNPAID,
     val paymentDate: String = "",
     val contactNo: String = ""
