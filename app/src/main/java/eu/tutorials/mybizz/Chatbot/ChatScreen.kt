@@ -49,7 +49,7 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel(), navController: NavControl
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    // Auto scroll to bottom on new message
+   
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
