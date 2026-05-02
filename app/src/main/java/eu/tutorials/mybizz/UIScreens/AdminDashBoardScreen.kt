@@ -51,13 +51,13 @@ fun AdminDashboardScreen(
     val selectedMonth = reportViewModel.selectedMonth.observeAsState("").value
 
     val menuItems = listOf(
-        MenuItem("bills", "Bills Management", Routes.BillsListScreen, R.drawable.img_13),
-        MenuItem("users", "User Management", Routes.UserManagementScreen, R.drawable.img_14),
-        MenuItem("RentalManagement", "RentalManagement", Routes.RentalListScreen, R.drawable.img_12),
-        MenuItem("Task", "Task", Routes.TaskListScreen, R.drawable.img_15),
-        MenuItem("Construction", "plots & Construction", Routes.PlotAndConstructionEntry, R.drawable.img_10),
-        MenuItem("Profile", "Profile", Routes.ProfileScreen, R.drawable.img_11),
-        MenuItem("Setting", "Setting", Routes.SettingScreen, R.drawable.img_16)
+        MenuItem("bills", context.getString(R.string.bills_management), Routes.BillsListScreen, R.drawable.img_13),
+        MenuItem("users", context.getString(R.string.user_management), Routes.UserManagementScreen, R.drawable.img_14),
+        MenuItem("RentalManagement", context.getString(R.string.rental_management), Routes.RentalListScreen, R.drawable.img_12),
+        MenuItem("Task", context.getString(R.string.task), Routes.TaskListScreen, R.drawable.img_15),
+        MenuItem("Construction", context.getString(R.string.plot_constructions), Routes.PlotAndConstructionEntry, R.drawable.img_10),
+        MenuItem("Profile", context.getString(R.string.profile), Routes.ProfileScreen, R.drawable.img_11),
+        MenuItem("Setting", context.getString(R.string.setting), Routes.SettingScreen, R.drawable.img_16)
     )
 
     Scaffold(

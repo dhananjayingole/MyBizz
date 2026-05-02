@@ -403,4 +403,5 @@
     <!-- Payment -->
     <string name="payment_options_title">Payment Options</string>
     <string name="payment_amount_tenant">₹%s for %s</string>
+    <string name="my_bizz_name">MyBizz</string>
 </resources>

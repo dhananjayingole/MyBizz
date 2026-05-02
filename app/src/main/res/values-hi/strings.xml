@@ -402,4 +402,6 @@
     <!-- Payment -->
     <string name="payment_options_title">भुगतान विकल्प</string>
     <string name="payment_amount_tenant">₹%s, %s के लिए</string>
+    <string name="my_bizz_name">मायबिझ</string>
+
 </resources>

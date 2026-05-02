@@ -51,12 +51,12 @@ fun UserDashboardScreen(
     val selectedMonth = reportViewModel.selectedMonth.observeAsState("").value
 
     val menuItems = listOf(
-        MenuItem("bills", "View Bills", Routes.BillsListScreen, R.drawable.img_13),
-        MenuItem("settings", "Settings", Routes.SettingScreen, R.drawable.img_16),
-        MenuItem("RentalManagement", "Rental Management", Routes.RentalListScreen, R.drawable.img_12),
-        MenuItem("Task", "Task", Routes.TaskListScreen, R.drawable.img_15),
-        MenuItem("Construction", "Plot & Constructions", Routes.PlotAndConstructionEntry, R.drawable.img_10),
-        MenuItem("Profile", "Profile", Routes.ProfileScreen, R.drawable.img_11)// Add a report icon
+        MenuItem("bills", context.getString(R.string.view_bills), Routes.BillsListScreen, R.drawable.img_13),
+        MenuItem("settings", context.getString(R.string.setting), Routes.SettingScreen, R.drawable.img_16),
+        MenuItem("RentalManagement", context.getString(R.string.rental_management), Routes.RentalListScreen, R.drawable.img_12),
+        MenuItem("Task", context.getString(R.string.task), Routes.TaskListScreen, R.drawable.img_15),
+        MenuItem("Construction", context.getString(R.string.plot_constructions), Routes.PlotAndConstructionEntry, R.drawable.img_10),
+        MenuItem("Profile", context.getString(R.string.profile), Routes.ProfileScreen, R.drawable.img_11)// Add a report icon
     )
 
     Scaffold(

@@ -345,6 +345,7 @@
 
     <!-- About Screen -->
     <string name="about_mybiz">माय बिझ बद्दल</string>
+    <string name="mybizz">माइबिज़</string>
     <string name="about_description">माय बिझ एक सर्वसमावेशक व्यवसाय व्यवस्थापन प्रणाली आहे जी बिले, भाडे, कार्ये आणि बांधकाम प्रकल्प कार्यक्षमतेने व्यवस्थापित करण्यात मदत करते.</string>
     <string name="key_features">मुख्य वैशिष्ट्ये</string>
     <string name="feature_bills">बिल व्यवस्थापन</string>
@@ -402,4 +403,5 @@
     <!-- Payment -->
     <string name="payment_options_title">देयक पर्याय</string>
     <string name="payment_amount_tenant">₹%s, %s साठी</string>
+    <string name="my_bizz_name">मायबिझ</string>
 </resources>
