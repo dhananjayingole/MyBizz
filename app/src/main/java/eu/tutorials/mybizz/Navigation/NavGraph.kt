@@ -88,7 +88,9 @@ fun NavGraph(
         composable(Routes.LoginScreen) { LoginScreen(navController, authRepository) }
         composable(Routes.SignUpScreen) { SignupScreen(navController, authRepository) }
         composable(Routes.AdminDashboardScreen) { AdminDashboardScreen(navController, authRepository) }
-        composable(Routes.UserDashboardScreen) { UserDashboardScreen(navController, authRepository) }
+        composable(Routes.UserDashboardScreen) {
+            UserDashboardScreen(navController, authRepository, plotSheetsRepo)
+        }
         composable(Routes.ProfileScreen) { ProfileScreen(navController, authRepository) }
         composable(Routes.BillsListScreen) { BillsListScreen(navController, authRepository) }
         composable(Routes.AddBillScreen) { AddBillScreen(navController, authRepository) }

@@ -1,7 +1,11 @@
 // UserDashboardScreen.kt - User Dashboard
 package eu.tutorials.mybizz.UIScreens
 
+import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -13,21 +17,19 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import android.content.Intent
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.ui.res.stringResource
 import eu.tutorials.mybizz.Logic.Auth.AuthRepository
+import eu.tutorials.mybizz.Logic.plot.PlotSheetsRepository
 import eu.tutorials.mybizz.Model.MenuItem
 import eu.tutorials.mybizz.Navigation.Routes
 import eu.tutorials.mybizz.R
-import eu.tutorials.mybizz.pdfgen.PdfGenerator
 import eu.tutorials.mybizz.Reporting.MonthlyReportViewModel
+import eu.tutorials.mybizz.pdfgen.PdfGenerator
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -36,17 +38,16 @@ import kotlinx.coroutines.launch
 fun UserDashboardScreen(
     navController: NavController,
     authRepo: AuthRepository,
+    plotSheetsRepo: PlotSheetsRepository,                    // ← NEW: pass from NavGraph
     reportViewModel: MonthlyReportViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    // State for menu and dialogs
     var showMenu by remember { mutableStateOf(false) }
     var showPdfDialog by remember { mutableStateOf(false) }
     var isGeneratingPdf by remember { mutableStateOf(false) }
 
-    // Observe report data
     val monthlyReport = reportViewModel.monthlyReport.observeAsState().value
     val selectedMonth = reportViewModel.selectedMonth.observeAsState("").value
 
@@ -56,7 +57,7 @@ fun UserDashboardScreen(
         MenuItem("RentalManagement", context.getString(R.string.rental_management), Routes.RentalListScreen, R.drawable.img_12),
         MenuItem("Task", context.getString(R.string.task), Routes.TaskListScreen, R.drawable.img_15),
         MenuItem("Construction", context.getString(R.string.plot_constructions), Routes.PlotAndConstructionEntry, R.drawable.img_10),
-        MenuItem("Profile", context.getString(R.string.profile), Routes.ProfileScreen, R.drawable.img_11)// Add a report icon
+        MenuItem("Profile", context.getString(R.string.profile), Routes.ProfileScreen, R.drawable.img_11)
     )
 
     Scaffold(
@@ -64,20 +65,13 @@ fun UserDashboardScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.user_dashboard)) },
                 actions = {
-                    // Three-dot menu button
                     IconButton(onClick = { showMenu = true }) {
-                        Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = stringResource(R.string.more_options)
-                        )
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options))
                     }
-
-                    // Dropdown menu
                     DropdownMenu(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
-                        // Monthly Summary option
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.monthly_summary)) },
                             onClick = {
@@ -85,16 +79,10 @@ fun UserDashboardScreen(
                                 navController.navigate(Routes.MonthlyReportScreen)
                             },
                             leadingIcon = {
-                                Icon(
-                                    Icons.Default.DateRange,
-                                    contentDescription = stringResource(R.string.monthly_summary)
-                                )
+                                Icon(Icons.Default.DateRange, contentDescription = null)
                             }
                         )
-
                         Divider()
-
-                        // Generate PDF option
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.generate_pdf)) },
                             onClick = {
@@ -102,13 +90,9 @@ fun UserDashboardScreen(
                                 showPdfDialog = true
                             },
                             leadingIcon = {
-                                Icon(
-                                    Icons.Default.Build,
-                                    contentDescription = stringResource(R.string.generate_pdf)
-                                )
+                                Icon(Icons.Default.Build, contentDescription = null)
                             }
                         )
-
                         Divider()
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.banking_sms)) },
@@ -117,10 +101,7 @@ fun UserDashboardScreen(
                                 navController.navigate(Routes.BankSMSScreen)
                             },
                             leadingIcon = {
-                                Icon(
-                                    Icons.Default.Notifications,
-                                    contentDescription = stringResource(R.string.generate_pdf)
-                                )
+                                Icon(Icons.Default.Notifications, contentDescription = null)
                             }
                         )
                     }
@@ -129,10 +110,7 @@ fun UserDashboardScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    // Navigate to Chatbot screen
-                    navController.navigate(Routes.ChatScreen)
-                },
+                onClick = { navController.navigate(Routes.ChatScreen) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.navigationBarsPadding()
@@ -145,60 +123,86 @@ fun UserDashboardScreen(
             }
         }
     ) { innerPadding ->
-        Column(
+
+        // LazyColumn lets the poster + grid scroll as one page
+        LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(bottom = 88.dp)   // clear the FAB
         ) {
-            // Welcome Section
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.welcome_user),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
+
+            // ── 1. Welcome card ──────────────────────────────────────────────
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = stringResource(R.string.welcome_user),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // ── 2. Plot Ad Poster (most recent plot from Sheet) ──────────────
+            item {
+                PlotAdBannerSection(
+                    sheetsRepo = plotSheetsRepo,
+                    onViewAllPlots = { navController.navigate(Routes.PlotListScreen) }
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
-            Text(
-                text = stringResource(R.string.available_options),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
+            // ── 3. "Available Options" heading ───────────────────────────────
+            item {
+                Text(
+                    text = stringResource(R.string.available_options),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(menuItems) { item ->
-                    MenuItemCard(
-                        menuItem = item,
-                        onClick = {
-                            navController.navigate(item.route)
-                        }
-                    )
+            // ── 4. Menu items 2-column grid ──────────────────────────────────
+            // LazyVerticalGrid inside LazyColumn must have a fixed height.
+            // 6 items / 2 cols = 3 rows × ~146dp ≈ 438dp
+            item {
+                val rowCount = (menuItems.size + 1) / 2
+                val gridHeight = (rowCount * 146).dp
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    userScrollEnabled = false,          // outer LazyColumn handles scroll
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(gridHeight)
+                ) {
+                    items(menuItems) { item ->
+                        MenuItemCard(
+                            menuItem = item,
+                            onClick = { navController.navigate(item.route) }
+                        )
+                    }
                 }
             }
         }
     }
 
-    // PDF Generation Dialog
+    // ── PDF Generation Dialog (100% unchanged from original) ─────────────────
     if (showPdfDialog) {
         AlertDialog(
             onDismissRequest = {
-                if (!isGeneratingPdf) {
-                    showPdfDialog = false
-                }
+                if (!isGeneratingPdf) showPdfDialog = false
             },
             icon = {
                 Icon(
@@ -217,14 +221,11 @@ fun UserDashboardScreen(
             text = {
                 Column {
                     if (isGeneratingPdf) {
-                        // Loading state
                         Column(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp)
-                            )
+                            CircularProgressIndicator(modifier = Modifier.size(48.dp))
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 stringResource(R.string.generating_pdf),
@@ -239,7 +240,6 @@ fun UserDashboardScreen(
                             )
                         }
                     } else {
-                        // Information state
                         Column {
                             if (monthlyReport != null) {
                                 Card(
@@ -263,7 +263,6 @@ fun UserDashboardScreen(
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))
                             }
-
                             Text(
                                 stringResource(R.string.pdf_includes),
                                 style = MaterialTheme.typography.bodyMedium
@@ -275,7 +274,6 @@ fun UserDashboardScreen(
                                 Text("• Rental Information", style = MaterialTheme.typography.bodySmall)
                                 Text("• Financial Overview", style = MaterialTheme.typography.bodySmall)
                             }
-
                             if (monthlyReport == null) {
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
@@ -296,9 +294,7 @@ fun UserDashboardScreen(
                             monthlyReport?.let { report ->
                                 val pdfGenerator = PdfGenerator(context)
                                 val pdfFile = pdfGenerator.generateMonthlyReport(report, selectedMonth)
-
                                 pdfFile?.let { file ->
-                                    // Open PDF with system PDF viewer
                                     try {
                                         val uri = FileProvider.getUriForFile(
                                             context,
@@ -310,7 +306,9 @@ fun UserDashboardScreen(
                                             flags = Intent.FLAG_ACTIVITY_NO_HISTORY or
                                                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                                         }
-                                        context.startActivity(Intent.createChooser(intent, "Open PDF Report"))
+                                        context.startActivity(
+                                            Intent.createChooser(intent, "Open PDF Report")
+                                        )
                                     } catch (e: Exception) {
                                         e.printStackTrace()
                                     }
@@ -322,11 +320,7 @@ fun UserDashboardScreen(
                     },
                     enabled = !isGeneratingPdf && monthlyReport != null
                 ) {
-                    Icon(
-                        Icons.Default.Build,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
+                    Icon(Icons.Default.Build, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.generate_pdf))
                 }
