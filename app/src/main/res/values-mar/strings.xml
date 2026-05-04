@@ -345,7 +345,6 @@
 
     <!-- About Screen -->
     <string name="about_mybiz">माय बिझ बद्दल</string>
-    <string name="mybizz">माइबिज़</string>
     <string name="about_description">माय बिझ एक सर्वसमावेशक व्यवसाय व्यवस्थापन प्रणाली आहे जी बिले, भाडे, कार्ये आणि बांधकाम प्रकल्प कार्यक्षमतेने व्यवस्थापित करण्यात मदत करते.</string>
     <string name="key_features">मुख्य वैशिष्ट्ये</string>
     <string name="feature_bills">बिल व्यवस्थापन</string>
@@ -404,4 +403,44 @@
     <string name="payment_options_title">देयक पर्याय</string>
     <string name="payment_amount_tenant">₹%s, %s साठी</string>
     <string name="my_bizz_name">मायबिझ</string>
+
+    <!-- Monthly Report Screen -->
+    <string name="monthly_reports_title">मासिक अहवाल</string>
+    <string name="financial_overview">आर्थिक विहंगावलोकन</string>
+    <string name="income">उत्पन्न</string>
+    <string name="expenses">खर्च</string>
+    <string name="net_profit">निव्वळ नफा</string>
+    <string name="net_loss">निव्वळ तोटा</string>
+    <string name="previous_month">मागील महिना</string>
+    <string name="next_month">पुढील महिना</string>
+    <string name="bills_tab">बिले</string>
+    <string name="rentals_tab">भाडे</string>
+    <string name="tasks_tab">कार्ये</string>
+    <string name="bills_summary">बिल सारांश</string>
+    <string name="rentals_summary">भाडे सारांश</string>
+    <string name="tasks_summary">कार्य सारांश</string>
+    <string name="payment_status_distribution">देयक स्थिती वितरण</string>
+    <string name="collection_status">संकलन स्थिती</string>
+    <string name="task_completion_rate">कार्य पूर्णता दर</string>
+    <string name="expenses_by_category">वर्गानुसार खर्च</string>
+    <string name="income_by_property">मालमत्तेनुसार उत्पन्न</string>
+    <string name="collected">गोळा केले</string>
+    <string name="pending">प्रलंबित</string>
+    <string name="completed">पूर्ण</string>
+    <string name="total_amount_desc">एकूण</string>
+    <string name="something_went_wrong">काहीतरी चूक झाली</string>
+    <string name="of_singular">पैकी</string>
+    <string name="of_plural">पैकी</string>
+
+    <!-- Table Headers -->
+    <string name="bill_hash">बिल #</string>
+    <string name="title_table">शीर्षक</string>
+    <string name="category_table">वर्ग</string>
+    <string name="amount_table">रक्कम</string>
+    <string name="status_table">स्थिती</string>
+    <string name="tenant_name_table">भाडेकरूचे नाव</string>
+    <string name="property_table">मालमत्ता</string>
+    <string name="assigned_to_table">नियुक्त केले</string>
+    <string name="due_date_table">देय तारीख</string>
+
 </resources>

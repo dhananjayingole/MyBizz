@@ -404,4 +404,43 @@
     <string name="payment_amount_tenant">₹%s, %s के लिए</string>
     <string name="my_bizz_name">मायबिझ</string>
 
+    <!-- Monthly Report Screen -->
+    <string name="monthly_reports_title">मासिक रिपोर्ट</string>
+    <string name="financial_overview">वित्तीय अवलोकन</string>
+    <string name="income">आय</string>
+    <string name="expenses">व्यय</string>
+    <string name="net_profit">शुद्ध लाभ</string>
+    <string name="net_loss">शुद्ध हानि</string>
+    <string name="previous_month">पिछला महीना</string>
+    <string name="next_month">अगला महीना</string>
+    <string name="bills_tab">बिल</string>
+    <string name="rentals_tab">किराया</string>
+    <string name="tasks_tab">कार्य</string>
+    <string name="bills_summary">बिल सारांश</string>
+    <string name="rentals_summary">किराया सारांश</string>
+    <string name="tasks_summary">कार्य सारांश</string>
+    <string name="payment_status_distribution">भुगतान स्थिति वितरण</string>
+    <string name="collection_status">संग्रह स्थिति</string>
+    <string name="task_completion_rate">कार्य पूर्णता दर</string>
+    <string name="expenses_by_category">श्रेणी के अनुसार व्यय</string>
+    <string name="income_by_property">संपत्ति के अनुसार आय</string>
+    <string name="collected">एकत्रित</string>
+    <string name="pending">लंबित</string>
+    <string name="completed">पूर्ण</string>
+    <string name="total_amount_desc">कुल</string>
+    <string name="something_went_wrong">कुछ गलत हो गया</string>
+    <string name="of_singular">में से</string>
+    <string name="of_plural">में से</string>
+
+    <!-- Table Headers -->
+    <string name="bill_hash">बिल #</string>
+    <string name="title_table">शीर्षक</string>
+    <string name="category_table">श्रेणी</string>
+    <string name="amount_table">राशि</string>
+    <string name="status_table">स्थिति</string>
+    <string name="tenant_name_table">किरायेदार का नाम</string>
+    <string name="property_table">संपत्ति</string>
+    <string name="assigned_to_table">सौंपा गया</string>
+    <string name="due_date_table">देय तिथि</string>
+
 </resources>

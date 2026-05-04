@@ -35,9 +35,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
+import eu.tutorials.mybizz.R
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +60,7 @@ fun MonthlyReportScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Monthly Reports",
+                        stringResource(R.string.monthly_reports_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
@@ -145,7 +147,7 @@ fun MonthlyReportScreen(
                                     onClick = { scope.launch { pagerState.animateScrollToPage(0) } },
                                     text = {
                                         Text(
-                                            "Bills",
+                                            stringResource(R.string.bills_tab),
                                             fontWeight = if (pagerState.currentPage == 0) FontWeight.Bold else FontWeight.Medium,
                                             fontSize = 15.sp
                                         )
@@ -156,7 +158,7 @@ fun MonthlyReportScreen(
                                     onClick = { scope.launch { pagerState.animateScrollToPage(1) } },
                                     text = {
                                         Text(
-                                            "Rentals",
+                                            stringResource(R.string.rentals_tab),
                                             fontWeight = if (pagerState.currentPage == 1) FontWeight.Bold else FontWeight.Medium,
                                             fontSize = 15.sp
                                         )
@@ -167,7 +169,7 @@ fun MonthlyReportScreen(
                                     onClick = { scope.launch { pagerState.animateScrollToPage(2) } },
                                     text = {
                                         Text(
-                                            "Tasks",
+                                            stringResource(R.string.tasks_tab),
                                             fontWeight = if (pagerState.currentPage == 2) FontWeight.Bold else FontWeight.Medium,
                                             fontSize = 15.sp
                                         )
@@ -226,7 +228,7 @@ fun FinancialOverviewCard(report: MonthlyReport) {
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "Financial Overview",
+                    text = stringResource(R.string.financial_overview),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF212121)
@@ -241,14 +243,14 @@ fun FinancialOverviewCard(report: MonthlyReport) {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 FinancialMetricCard(
-                    label = "Income",
+                    label = stringResource(R.string.income),
                     amount = report.getTotalIncome(),
                     color = Color(0xFF4CAF50),
                     icon = Icons.Default.KeyboardArrowUp
                 )
 
                 FinancialMetricCard(
-                    label = "Expenses",
+                    label = stringResource(R.string.expenses),
                     amount = report.getTotalExpenses(),
                     color = Color(0xFFF44336),
                     icon = Icons.Default.KeyboardArrowDown
@@ -290,7 +292,7 @@ fun FinancialOverviewCard(report: MonthlyReport) {
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                text = if (isProfit) "Net Profit" else "Net Loss",
+                                text = if (isProfit) stringResource(R.string.net_profit) else stringResource(R.string.net_loss),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color(0xFF757575),
                                 fontWeight = FontWeight.Medium
@@ -384,7 +386,7 @@ fun MonthSelector(
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     Icons.Default.KeyboardArrowLeft,
-                    "Previous Month",
+                    stringResource(R.string.previous_month),
                     tint = Color(0xFF1976D2),
                     modifier = Modifier.size(28.dp)
                 )
@@ -408,7 +410,7 @@ fun MonthSelector(
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     Icons.Default.KeyboardArrowRight,
-                    "Next Month",
+                    stringResource(R.string.next_month),
                     tint = Color(0xFF1976D2),
                     modifier = Modifier.size(28.dp)
                 )
@@ -428,7 +430,7 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
     ) {
         item {
             SummaryCard(
-                title = "Bills Summary",
+                title = stringResource(R.string.bills_summary),
                 totalAmount = summary.totalAmount,
                 paidAmount = summary.paidAmount,
                 unpaidAmount = summary.unpaidAmount,
@@ -452,7 +454,7 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Payment Status Distribution",
+                            text = stringResource(R.string.payment_status_distribution),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF212121)
@@ -461,8 +463,8 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
 
                         PieChart(
                             data = listOf(
-                                PieChartData("Paid", summary.paidAmount, Color(0xFFF44336)),
-                                PieChartData("Unpaid", summary.unpaidAmount, Color(0xFFFF9800))
+                                PieChartData(stringResource(R.string.paid), summary.paidAmount, Color(0xFFF44336)),
+                                PieChartData(stringResource(R.string.unpaid), summary.unpaidAmount, Color(0xFFFF9800))
                             )
                         )
                     }
@@ -486,7 +488,7 @@ fun BillsReportPage(summary: MonthlyReportSummary) {
                     ) {
                         Column(modifier = Modifier.padding(24.dp)) {
                             Text(
-                                text = "Expenses by Category",
+                                text = stringResource(R.string.expenses_by_category),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF212121)
@@ -522,7 +524,7 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
     ) {
         item {
             SummaryCard(
-                title = "Rentals Summary",
+                title = stringResource(R.string.rentals_summary),
                 totalAmount = summary.totalAmount,
                 paidAmount = summary.paidAmount,
                 unpaidAmount = summary.unpaidAmount,
@@ -546,7 +548,7 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Collection Status",
+                            text = stringResource(R.string.collection_status),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF212121)
@@ -555,8 +557,8 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
 
                         PieChart(
                             data = listOf(
-                                PieChartData("Collected", summary.paidAmount, Color(0xFF4CAF50)),
-                                PieChartData("Pending", summary.unpaidAmount, Color(0xFFFF9800))
+                                PieChartData(stringResource(R.string.collected), summary.paidAmount, Color(0xFF4CAF50)),
+                                PieChartData(stringResource(R.string.pending), summary.unpaidAmount, Color(0xFFFF9800))
                             )
                         )
                     }
@@ -580,7 +582,7 @@ fun RentalsReportPage(summary: MonthlyReportSummary) {
                     ) {
                         Column(modifier = Modifier.padding(24.dp)) {
                             Text(
-                                text = "Income by Property",
+                                text = stringResource(R.string.income_by_property),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF212121)
@@ -631,7 +633,7 @@ fun TasksReportPage(summary: MonthlyReportSummary) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Task Completion Rate",
+                            text = stringResource(R.string.task_completion_rate),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF212121)
@@ -676,11 +678,11 @@ fun BillsTable(items: List<BillReportItem>) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TableHeaderText("Bill #", Modifier.weight(0.8f))
-                TableHeaderText("Title", Modifier.weight(1.8f))
-                TableHeaderText("Category", Modifier.weight(1.3f))
-                TableHeaderText("Amount", Modifier.weight(1f), TextAlign.End)
-                TableHeaderText("Status", Modifier.weight(0.9f), TextAlign.Center)
+                TableHeaderText(stringResource(R.string.bill_hash), Modifier.weight(0.8f))
+                TableHeaderText(stringResource(R.string.title_table), Modifier.weight(1.8f))
+                TableHeaderText(stringResource(R.string.category_table), Modifier.weight(1.3f))
+                TableHeaderText(stringResource(R.string.amount_table), Modifier.weight(1f), TextAlign.End)
+                TableHeaderText(stringResource(R.string.status_table), Modifier.weight(0.9f), TextAlign.Center)
             }
 
             Divider(thickness = 2.dp, color = Color(0xFFE0E0E0))
@@ -737,10 +739,10 @@ fun RentalsTable(items: List<RentalReportItem>) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TableHeaderText("Tenant Name", Modifier.weight(2f))
-                TableHeaderText("Property", Modifier.weight(1.8f))
-                TableHeaderText("Amount", Modifier.weight(1.2f), TextAlign.End)
-                TableHeaderText("Status", Modifier.weight(0.9f), TextAlign.Center)
+                TableHeaderText(stringResource(R.string.tenant_name_table), Modifier.weight(2f))
+                TableHeaderText(stringResource(R.string.property_table), Modifier.weight(1.8f))
+                TableHeaderText(stringResource(R.string.amount_table), Modifier.weight(1.2f), TextAlign.End)
+                TableHeaderText(stringResource(R.string.status_table), Modifier.weight(0.9f), TextAlign.Center)
             }
 
             Divider(thickness = 2.dp, color = Color(0xFFE0E0E0))
@@ -795,10 +797,10 @@ fun TasksTable(items: List<TaskReportItem>) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TableHeaderText("Title", Modifier.weight(2.5f))
-                TableHeaderText("Assigned To", Modifier.weight(1.5f))
-                TableHeaderText("Due Date", Modifier.weight(1.3f))
-                TableHeaderText("Status", Modifier.weight(1f), TextAlign.Center)
+                TableHeaderText(stringResource(R.string.title_table), Modifier.weight(2.5f))
+                TableHeaderText(stringResource(R.string.assigned_to_table), Modifier.weight(1.5f))
+                TableHeaderText(stringResource(R.string.due_date_table), Modifier.weight(1.3f))
+                TableHeaderText(stringResource(R.string.status_table), Modifier.weight(1f), TextAlign.Center)
             }
 
             Divider(thickness = 2.dp, color = Color(0xFFE0E0E0))
@@ -1113,13 +1115,13 @@ fun SummaryCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                AmountColumn("Total", totalAmount, Color(0xFF757575))
+                AmountColumn(stringResource(R.string.total_amount_desc), totalAmount, Color(0xFF757575))
                 AmountColumn(
-                    "Paid",
+                    stringResource(R.string.paid),
                     paidAmount,
                     if (isExpense) Color(0xFFF44336) else Color(0xFF4CAF50)
                 )
-                AmountColumn("Unpaid", unpaidAmount, Color(0xFFFF9800))
+                AmountColumn(stringResource(R.string.unpaid), unpaidAmount, Color(0xFFFF9800))
             }
 
             Divider(modifier = Modifier.padding(vertical = 16.dp), color = Color(0xFFE0E0E0))
@@ -1128,9 +1130,9 @@ fun SummaryCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                CountColumn("Total", totalCount)
-                CountColumn("Paid", paidCount)
-                CountColumn("Unpaid", unpaidCount)
+                CountColumn(stringResource(R.string.total), totalCount)
+                CountColumn(stringResource(R.string.paid), paidCount)
+                CountColumn(stringResource(R.string.unpaid), unpaidCount)
             }
         }
     }
@@ -1148,7 +1150,7 @@ fun TaskSummaryCard(summary: MonthlyReportSummary) {
             modifier = Modifier.padding(24.dp)
         ) {
             Text(
-                text = "Tasks Summary",
+                text = stringResource(R.string.tasks_summary),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF212121)
@@ -1159,9 +1161,9 @@ fun TaskSummaryCard(summary: MonthlyReportSummary) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                CountColumn("Total", summary.totalCount)
-                CountColumn("Completed", summary.paidCount)
-                CountColumn("Pending", summary.unpaidCount)
+                CountColumn(stringResource(R.string.total), summary.totalCount)
+                CountColumn(stringResource(R.string.completed), summary.paidCount)
+                CountColumn(stringResource(R.string.pending), summary.unpaidCount)
             }
         }
     }
@@ -1237,7 +1239,7 @@ fun ErrorView(errorMessage: String) {
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Something went wrong",
+                text = stringResource(R.string.something_went_wrong),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF212121)

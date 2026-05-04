@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 fun UserDashboardScreen(
     navController: NavController,
     authRepo: AuthRepository,
-    plotSheetsRepo: PlotSheetsRepository,                    // ← NEW: pass from NavGraph
+    plotSheetsRepo: PlotSheetsRepository,
     reportViewModel: MonthlyReportViewModel = viewModel()
 ) {
     val context = LocalContext.current

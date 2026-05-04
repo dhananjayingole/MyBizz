@@ -404,4 +404,44 @@
     <string name="payment_options_title">Payment Options</string>
     <string name="payment_amount_tenant">₹%s for %s</string>
     <string name="my_bizz_name">MyBizz</string>
+
+    <!-- Monthly Report Screen -->
+    <string name="monthly_reports_title">Monthly Reports</string>
+    <string name="financial_overview">Financial Overview</string>
+    <string name="income">Income</string>
+    <string name="expenses">Expenses</string>
+    <string name="net_profit">Net Profit</string>
+    <string name="net_loss">Net Loss</string>
+    <string name="previous_month">Previous Month</string>
+    <string name="next_month">Next Month</string>
+    <string name="bills_tab">Bills</string>
+    <string name="rentals_tab">Rentals</string>
+    <string name="tasks_tab">Tasks</string>
+    <string name="bills_summary">Bills Summary</string>
+    <string name="rentals_summary">Rentals Summary</string>
+    <string name="tasks_summary">Tasks Summary</string>
+    <string name="payment_status_distribution">Payment Status Distribution</string>
+    <string name="collection_status">Collection Status</string>
+    <string name="task_completion_rate">Task Completion Rate</string>
+    <string name="expenses_by_category">Expenses by Category</string>
+    <string name="income_by_property">Income by Property</string>
+    <string name="collected">Collected</string>
+    <string name="pending">Pending</string>
+    <string name="completed">Completed</string>
+    <string name="total_amount_desc">Total</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="of_singular">of</string>
+    <string name="of_plural">of</string>
+
+    <!-- Table Headers -->
+    <string name="bill_hash">Bill #</string>
+    <string name="title_table">Title</string>
+    <string name="category_table">Category</string>
+    <string name="amount_table">Amount</string>
+    <string name="status_table">Status</string>
+    <string name="tenant_name_table">Tenant Name</string>
+    <string name="property_table">Property</string>
+    <string name="assigned_to_table">Assigned To</string>
+    <string name="due_date_table">Due Date</string>
+
 </resources>
