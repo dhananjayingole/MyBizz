@@ -444,4 +444,42 @@
     <string name="assigned_to_table">Assigned To</string>
     <string name="due_date_table">Due Date</string>
 
+    <!-- Settings Screen Additional Strings -->
+    <string name="support_email_subject">MyBiz App Support Request</string>
+    <string name="support_email_body">Hello MyBiz Support Team,
+
+I need assistance with:
+
+[Please describe your issue here]
+
+Device Information:
+- App Version: 1.0.0
+- Android Version: %s
+
+Thank you!</string>
+    <string name="send_email_using">Send email using</string>
+    <string name="share_mybiz_app">Share MyBiz App</string>
+    <string name="share_app_text">Discover MyBiz - Your comprehensive business management solution!
+Manage bills, rentals, tasks, and construction projects all in one place.
+
+Download now and streamline your business operations!
+
+Download link: https://play.google.com/store/apps/details?id=eu.tutorials.mybizz</string>
+
+    <!-- Feature Descriptions -->
+    <string name="feature_bills_desc">📊 Bills Management - Track and manage all your payments</string>
+    <string name="feature_rental_desc">🏢 Rentals Management - Monitor rental properties and payments</string>
+    <string name="feature_task_desc">✅ Task Management - Assign and track worker tasks</string>
+    <string name="feature_construction_desc">🏗️ Construction &amp; Plots - Monitor projects and plot information</string>
+    <string name="feature_secure_desc">🔐 Secure Access - Role-based authentication system</string>
+    <string name="feature_mobile_desc">📱 Mobile First - Optimized for Android devices</string>
+
+    <!-- Privacy Policy Content -->
+    <string name="privacy_data_collection_content">MyBiz collects and stores your business data including bills, rental information, task details, and construction project data. This information is used solely to provide you with the application\'s core functionality and is never shared with third parties for marketing purposes.</string>
+    <string name="privacy_data_storage_content">Your operational data is stored securely in Google Sheets, while historical and audit data is maintained in Firebase Firestore. Both platforms provide enterprise-level security and data protection.</string>
+    <string name="privacy_authentication_content">We use Firebase Authentication to securely manage user accounts. Your login credentials are protected using industry-standard encryption methods.</string>
+    <string name="privacy_user_roles_content">The application implements role-based access control. Administrators have full access to CRUD operations, while regular users have limited read-only access as defined by the administrator.</string>
+    <string name="privacy_data_ownership_content">You retain complete ownership of all your business data. MyBiz acts as a service provider to help you manage and organize your information more efficiently.</string>
+    <string name="privacy_contact_content">For any privacy-related concerns or questions, please contact our support team through the Help &amp; Support section in the app.</string>
+
 </resources>

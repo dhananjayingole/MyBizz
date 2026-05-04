@@ -443,4 +443,42 @@
     <string name="assigned_to_table">सौंपा गया</string>
     <string name="due_date_table">देय तिथि</string>
 
+    <!-- Settings Screen Additional Strings -->
+    <string name="support_email_subject">मायबिज़ ऐप सहायता अनुरोध</string>
+    <string name="support_email_body">प्रिय मायबिज़ सहायता टीम,
+
+मुझे निम्नलिखित में सहायता चाहिए:
+
+[कृपया अपनी समस्या यहाँ लिखें]
+
+डिवाइस जानकारी:
+- ऐप संस्करण: 1.0.0
+- एंड्रॉइड संस्करण: %s
+
+धन्यवाद!</string>
+    <string name="send_email_using">इसके माध्यम से ईमेल भेजें</string>
+    <string name="share_mybiz_app">मायबिज़ ऐप शेयर करें</string>
+    <string name="share_app_text">मायबिज़ खोजें - आपका व्यापक व्यवसाय प्रबंधन समाधान!
+बिल, किराया, कार्य और निर्माण परियोजनाओं को एक ही स्थान पर प्रबंधित करें।
+
+अभी डाउनलोड करें और अपने व्यवसाय संचालन को सुव्यवस्थित करें!
+
+डाउनलोड लिंक: https://play.google.com/store/apps/details?id=eu.tutorials.mybizz</string>
+
+    <!-- Feature Descriptions -->
+    <string name="feature_bills_desc">📊 बिल प्रबंधन - अपने सभी भुगतानों को ट्रैक और प्रबंधित करें</string>
+    <string name="feature_rental_desc">🏢 किराया प्रबंधन - किराये की संपत्तियों और भुगतानों की निगरानी करें</string>
+    <string name="feature_task_desc">✅ कार्य प्रबंधन - कर्मचारियों के कार्यों को असाइन और ट्रैक करें</string>
+    <string name="feature_construction_desc">🏗️ निर्माण और भूखंड - परियोजनाओं और भूखंड जानकारी की निगरानी करें</string>
+    <string name="feature_secure_desc">🔐 सुरक्षित पहुंच - भूमिका-आधारित प्रमाणीकरण प्रणाली</string>
+    <string name="feature_mobile_desc">📱 मोबाइल प्रथम - एंड्रॉइड डिवाइसों के लिए अनुकूलित</string>
+
+    <!-- Privacy Policy Content -->
+    <string name="privacy_data_collection_content">मायबिज़ आपके व्यवसाय डेटा को एकत्र और संग्रहीत करता है जिसमें बिल, किराया जानकारी, कार्य विवरण और निर्माण परियोजना डेटा शामिल है। यह जानकारी केवल आपको एप्लिकेशन की मुख्य कार्यक्षमता प्रदान करने के लिए उपयोग की जाती है और विपणन उद्देश्यों के लिए तीसरे पक्षों के साथ कभी साझा नहीं की जाती है।</string>
+    <string name="privacy_data_storage_content">आपका परिचालन डेटा Google Sheets में सुरक्षित रूप से संग्रहीत किया जाता है, जबकि ऐतिहासिक और ऑडिट डेटा Firebase Firestore में बनाए रखा जाता है। दोनों प्लेटफॉर्म एंटरप्राइज़-स्तरीय सुरक्षा और डेटा संरक्षण प्रदान करते हैं।</string>
+    <string name="privacy_authentication_content">हम उपयोगकर्ता खातों को सुरक्षित रूप से प्रबंधित करने के लिए Firebase Authentication का उपयोग करते हैं। आपके लॉगिन क्रेडेंशियल उद्योग-मानक एन्क्रिप्शन विधियों का उपयोग करके सुरक्षित हैं।</string>
+    <string name="privacy_user_roles_content">एप्लिकेशन भूमिका-आधारित पहुंच नियंत्रण लागू करता है। प्रशासकों को CRUD संचालन तक पूर्ण पहुंच होती है, जबकि सामान्य उपयोगकर्ताओं के पास प्रशासक द्वारा परिभाषित सीमित केवल-पढ़ने की पहुंच होती है।</string>
+    <string name="privacy_data_ownership_content">आप अपने सभी व्यवसाय डेटा का पूर्ण स्वामित्व बनाए रखते हैं। मायबिज़ आपकी जानकारी को अधिक कुशलता से प्रबंधित और व्यवस्थित करने में मदद करने के लिए एक सेवा प्रदाता के रूप में कार्य करता है।</string>
+    <string name="privacy_contact_content">किसी भी गोपनीयता-संबंधी चिंता या प्रश्नों के लिए, कृपया ऐप में सहायता और समर्थन अनुभाग के माध्यम से हमारी सहायता टीम से संपर्क करें।</string>
+
 </resources>
