@@ -52,7 +52,6 @@ fun SignupScreen(
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. ANIMATED BACKGROUND
         AnimatedBackgroundGradient()
 
         Column(
@@ -63,7 +62,6 @@ fun SignupScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Header with entry animation
             Text(
                 text = stringResource(R.string.join_mybiz),
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -82,7 +80,7 @@ fun SignupScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .animateContentSize(), // Smoothes transitions when errors appear
+                    .animateContentSize(),
                 shape = RoundedCornerShape(32.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
@@ -93,7 +91,6 @@ fun SignupScreen(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Fields
                     CustomTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -126,28 +123,34 @@ fun SignupScreen(
                         onVisibilityChange = { confirmPasswordVisible = !confirmPasswordVisible }
                     )
 
-                    // Role Selection
                     RoleSelector(role) { role = it }
 
-                    // 2. ANIMATED SIGN UP BUTTON
                     AnimatedSignupButton(
                         isLoading = isLoading,
                         onClick = {
                             if (validate(email, password, confirmPassword) { error = it }) {
                                 isLoading = true
-                                authRepo.signUp(email, password, role) { success, err, _ ->
+                                error = null
+                                authRepo.signUp(email, password, role) { success, err, user ->
                                     isLoading = false
-                                    if (success) {
-                                        navController.navigate(Routes.UserDashboardScreen) // Logic here
+                                    if (success && user != null) {
+                                        // ✅ FIX: Navigate based on the ACTUAL role, not hardcoded UserDashboard
+                                        val destination = if (user.role == "admin") {
+                                            Routes.AdminDashboardScreen
+                                        } else {
+                                            Routes.UserDashboardScreen
+                                        }
+                                        navController.navigate(destination) {
+                                            popUpTo(Routes.SplashScreen) { inclusive = true }
+                                        }
                                     } else {
-                                        error = err ?:  context.getString(R.string.signup_failed)
+                                        error = err ?: context.getString(R.string.signup_failed)
                                     }
                                 }
                             }
                         }
                     )
 
-                    // Error display with Animation
                     AnimatedVisibility(
                         visible = error != null,
                         enter = fadeIn() + expandVertically(),
@@ -157,7 +160,13 @@ fun SignupScreen(
                             text = error ?: "",
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(top = 16.dp)
+                            modifier = Modifier
+                                .padding(top = 16.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.error.copy(0.1f),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(8.dp)
                         )
                     }
                 }
@@ -167,7 +176,10 @@ fun SignupScreen(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text(stringResource(R.string.already_have_account), color = MaterialTheme.colorScheme.onBackground)
+                Text(
+                    stringResource(R.string.already_have_account),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
     }
@@ -201,7 +213,6 @@ fun AnimatedSignupButton(isLoading: Boolean, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    // Scale down effect on press
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.92f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
@@ -257,7 +268,8 @@ fun CustomTextField(
         visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
+        singleLine = true
     )
 }
 
@@ -285,7 +297,8 @@ fun RoleSelector(selectedRole: String, onRoleSelected: (String) -> Unit) {
             ) {
                 Text(
                     text = role.replaceFirstChar { it.uppercase() },
-                    color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                    color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onSurface
                 )
             }
         }

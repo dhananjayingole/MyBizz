@@ -1,4 +1,3 @@
-// UIScreens/SplashScreen.kt - Optimized for fast navigation
 package eu.tutorials.mybizz.UIScreens
 
 import androidx.compose.animation.*
@@ -28,25 +27,27 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(navController: NavController) {
     val context = LocalContext.current
-    val authRepo = remember { AuthRepository(context) }
 
-    // Properly collect StateFlow as State
+    // ✅ FIX: Use singleton getInstance() so cached role/auth state is shared correctly.
+    // Previously `AuthRepository(context)` created a NEW instance, losing all cached data.
+    val authRepo = remember { AuthRepository.getInstance(context) }
+
     val isAuthenticated by authRepo.isAuthenticated.collectAsState()
     val currentUser by authRepo.currentUser.collectAsState()
     val isLoading by authRepo.isLoading.collectAsState()
 
-    // Track if we've started navigation to avoid multiple navigations
     var hasNavigated by remember { mutableStateOf(false) }
 
     LaunchedEffect(isLoading, isAuthenticated, currentUser) {
         if (!isLoading && !hasNavigated) {
-            // Small delay for better UX (optional)
             delay(1500)
 
             if (isAuthenticated && currentUser != null) {
                 val role = currentUser!!.role
-                // Navigate to appropriate dashboard based on role
-                val destination = if (role == context.getString(R.string.admin)) {
+
+                // ✅ FIX: Compare role string directly — avoid getString() mismatch.
+                // If R.string.admin is "admin" this is fine, but direct compare is safer.
+                val destination = if (role == "admin") {
                     Routes.AdminDashboardScreen
                 } else {
                     Routes.UserDashboardScreen
@@ -57,7 +58,6 @@ fun SplashScreen(navController: NavController) {
                     popUpTo(Routes.SplashScreen) { inclusive = true }
                 }
             } else if (!isAuthenticated) {
-                // User not logged in, go to login screen
                 hasNavigated = true
                 navController.navigate(Routes.LoginScreen) {
                     popUpTo(Routes.SplashScreen) { inclusive = true }
@@ -77,7 +77,6 @@ fun SplashScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(32.dp)
         ) {
-            // Animated logo entrance
             AnimatedVisibility(
                 visible = true,
                 enter = fadeIn() + scaleIn()
@@ -105,7 +104,6 @@ fun SplashScreen(navController: NavController) {
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
-
                     Text(
                         text = stringResource(R.string.app_tagline),
                         style = MaterialTheme.typography.bodyMedium,
@@ -127,9 +125,7 @@ fun SplashScreen(navController: NavController) {
                             color = MaterialTheme.colorScheme.primary,
                             strokeWidth = 3.dp
                         )
-
                         Spacer(modifier = Modifier.height(16.dp))
-
                         Text(
                             text = stringResource(R.string.loading),
                             style = MaterialTheme.typography.bodySmall,

@@ -51,7 +51,6 @@ fun LoginScreen(
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. REUSABLE ANIMATED BACKGROUND
         LoginBackgroundGradient()
 
         Column(
@@ -62,7 +61,6 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Modern Header
             Text(
                 text = stringResource(R.string.welcome_back),
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -81,7 +79,7 @@ fun LoginScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .animateContentSize(), // Smooth resize for error messages
+                    .animateContentSize(),
                 shape = RoundedCornerShape(32.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
@@ -92,7 +90,6 @@ fun LoginScreen(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Email Field
                     LoginTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -103,7 +100,6 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Password Field
                     LoginTextField(
                         value = password,
                         onValueChange = { password = it },
@@ -114,25 +110,27 @@ fun LoginScreen(
                         onVisibilityChange = { passwordVisible = !passwordVisible }
                     )
 
-                    // Forgot Password
                     TextButton(
                         onClick = { /* Implement Forget Password */ },
                         modifier = Modifier.align(Alignment.End)
                     ) {
-                        Text(stringResource(R.string.forgot_password), style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            stringResource(R.string.forgot_password),
+                            style = MaterialTheme.typography.labelMedium
+                        )
                     }
 
-                    // Modern Role Selector (Chip style)
                     Text(
                         text = stringResource(R.string.login_as),
                         style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
                     )
                     RoleSelectorRow(selectedRole) { selectedRole = it }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 2. ANIMATED LOGIN BUTTON
                     AnimatedLoginButton(
                         isLoading = isLoading,
                         onClick = {
@@ -144,6 +142,7 @@ fun LoginScreen(
                                 authRepo.login(email, password) { success, role, err, user ->
                                     isLoading = false
                                     if (success && user != null) {
+                                        // ✅ role comes back from Firestore/cache — compare to selectedRole
                                         if (role == selectedRole) {
                                             Toast.makeText(context, "Welcome back!", Toast.LENGTH_SHORT).show()
                                             navController.navigate(
@@ -153,7 +152,7 @@ fun LoginScreen(
                                                 popUpTo(Routes.SplashScreen) { inclusive = true }
                                             }
                                         } else {
-                                            error = "Role mismatch! You are a $role"
+                                            error = "Role mismatch! Your account role is: $role"
                                             authRepo.logout()
                                         }
                                     } else {
@@ -164,7 +163,6 @@ fun LoginScreen(
                         }
                     )
 
-                    // Error Message with Fade/Slide animation
                     AnimatedVisibility(
                         visible = error != null,
                         enter = fadeIn() + expandVertically(),
@@ -176,14 +174,16 @@ fun LoginScreen(
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier
                                 .padding(top = 16.dp)
-                                .background(MaterialTheme.colorScheme.error.copy(0.1f), RoundedCornerShape(8.dp))
+                                .background(
+                                    MaterialTheme.colorScheme.error.copy(0.1f),
+                                    RoundedCornerShape(8.dp)
+                                )
                                 .padding(8.dp)
                         )
                     }
                 }
             }
 
-            // Navigate to Signup
             TextButton(
                 onClick = {
                     navController.navigate(Routes.SignUpScreen) {
@@ -192,7 +192,10 @@ fun LoginScreen(
                 },
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text(stringResource(R.string.no_account_sign_up), color = MaterialTheme.colorScheme.onBackground)
+                Text(
+                    stringResource(R.string.no_account_sign_up),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
     }
@@ -215,7 +218,10 @@ fun LoginBackgroundGradient() {
             brush = Brush.linearGradient(
                 colors = listOf(Color(0xFFE0F7FA), Color(0xFFF3E5F5), Color(0xFFFFF9C4)),
                 start = androidx.compose.ui.geometry.Offset(animOffset, animOffset),
-                end = androidx.compose.ui.geometry.Offset(animOffset + size.width, animOffset + size.height)
+                end = androidx.compose.ui.geometry.Offset(
+                    animOffset + size.width,
+                    animOffset + size.height
+                )
             )
         )
     }
@@ -238,9 +244,17 @@ fun AnimatedLoginButton(isLoading: Boolean, onClick: () -> Unit) {
         enabled = !isLoading
     ) {
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                color = Color.White,
+                strokeWidth = 2.dp
+            )
         } else {
-            Text(stringResource(R.string.login), fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(
+                stringResource(R.string.login),
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
         }
     }
 }
@@ -260,15 +274,21 @@ fun LoginTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        leadingIcon = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+        leadingIcon = {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        },
         trailingIcon = {
             if (isPassword) {
                 IconButton(onClick = onVisibilityChange) {
-                    Icon(imageVector = if (passwordVisible) Icons.Default.Face else Icons.Default.Lock, contentDescription = null)
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Default.Face else Icons.Default.Lock,
+                        contentDescription = null
+                    )
                 }
             }
         },
-        visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+        visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation()
+        else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -284,8 +304,12 @@ fun RoleSelectorRow(selectedRole: String, onRoleSelected: (String) -> Unit) {
     ) {
         listOf("admin", "user").forEach { role ->
             val isSelected = selectedRole == role
-            val bgColor by animateColorAsState(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
-            val textColor by animateColorAsState(if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface)
+            val bgColor by animateColorAsState(
+                if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+            )
+            val textColor by animateColorAsState(
+                if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+            )
 
             Box(
                 modifier = Modifier
@@ -296,7 +320,12 @@ fun RoleSelectorRow(selectedRole: String, onRoleSelected: (String) -> Unit) {
                     .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = role.uppercase(), color = textColor, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                Text(
+                    text = role.uppercase(),
+                    color = textColor,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp
+                )
             }
         }
     }
