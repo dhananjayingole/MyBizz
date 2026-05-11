@@ -134,7 +134,7 @@ class AuthRepository(private val context: Context? = null) {
                     Log.d(TAG, "🎯 Calling onResult with success BEFORE Firestore")
                     onResult(true, null, userData)
 
-                    // ✅ SAVE TO FIRESTORE IN BACKGROUND (non-blocking)
+                    // ✅ SAVE TO FIRESTORE IN BACKGROUND
                     firestore.collection("users").document(uid).set(userData)
                         .addOnSuccessListener {
                             Log.d(TAG, "✅ Firestore user document created successfully (background)")
