@@ -1,15 +1,14 @@
 package eu.tutorials.mybizz.UIScreens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -61,9 +60,15 @@ fun PlotListScreen(
     val scrollState = rememberScrollState()
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.plot_management)) },
+            TopAppBar(
+                title = { Text(stringResource(R.string.plot_management), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -74,9 +79,10 @@ fun PlotListScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddClicked,
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = AppColors.Accent,
+                contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_plot), tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_plot))
             }
         }
     ) { padding ->
@@ -84,14 +90,16 @@ fun PlotListScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(AppDimens.ScreenPadding)
         ) {
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 label = { Text(stringResource(R.string.search_plots)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search)) },
-                modifier = Modifier.fillMaxWidth()
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search), tint = AppColors.TextMuted) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = AppShapes.CardSmall,
+                colors = mybizzFieldColors()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -107,7 +115,10 @@ fun PlotListScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                contentPadding = PaddingValues(bottom = 88.dp)
+            ) {
                 items(filteredList) { plot ->
                     Box(
                         modifier = Modifier.fillMaxWidth()
@@ -128,12 +139,10 @@ fun PlotListScreen(
 
 @Composable
 fun PlotTableHeader() {
-    Card(
+    Surface(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        elevation = CardDefaults.cardElevation(2.dp)
+        shape = AppShapes.CardSmall,
+        color = AppColors.Primary
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -163,7 +172,7 @@ fun TableHeaderCell(text: String, width: androidx.compose.ui.unit.Dp) {
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            color = Color.White,
             textAlign = TextAlign.Center
         )
     }
@@ -175,11 +184,10 @@ fun PlotTableRow(plot: Plot, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        ),
-        shape = MaterialTheme.shapes.small
+        shape = AppShapes.CardSmall,
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
+        border = BorderStroke(1.dp, AppColors.Border)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -217,7 +225,8 @@ fun TableCell(text: String, width: androidx.compose.ui.unit.Dp) {
             text = text,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            maxLines = 2
+            maxLines = 2,
+            color = AppColors.TextPrimary
         )
     }
 }
@@ -231,9 +240,9 @@ fun StatusCell(status: String, width: androidx.compose.ui.unit.Dp) {
         contentAlignment = Alignment.Center
     ) {
         val (backgroundColor, textColor) = when (status) {
-            stringResource(R.string.status_positive) -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
-            stringResource(R.string.status_negotiate) -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
-            else -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
+            stringResource(R.string.status_positive) -> AppColors.SuccessBg to AppColors.Success
+            stringResource(R.string.status_negotiate) -> AppColors.DangerBg to AppColors.Danger
+            else -> AppColors.SurfaceMuted to AppColors.TextSecondary
         }
 
         Text(
@@ -241,7 +250,7 @@ fun StatusCell(status: String, width: androidx.compose.ui.unit.Dp) {
             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
             color = textColor,
             modifier = Modifier
-                .clip(RoundedCornerShape(4.dp))
+                .clip(AppShapes.Chip)
                 .background(backgroundColor)
                 .padding(horizontal = 8.dp, vertical = 4.dp)
         )
@@ -270,14 +279,19 @@ fun AddPlotScreen(
     var visitDate by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
-    // For Date Picker
     val datePickerState = rememberDatePickerState()
     var showDatePicker by remember { mutableStateOf(false) }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.add_plot)) },
+            TopAppBar(
+                title = { Text(stringResource(R.string.add_plot), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -308,132 +322,79 @@ fun AddPlotScreen(
         LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(AppDimens.ScreenPadding)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             item {
-                Text(stringResource(R.string.plot_info), style = MaterialTheme.typography.titleMedium)
-            }
-            item {
-                OutlinedTextField(
-                    value = plotName,
-                    onValueChange = { plotName = it },
-                    label = { Text(stringResource(R.string.plot_name)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            item {
-                OutlinedTextField(
-                    value = plotId,
-                    onValueChange = { plotId = it },
-                    label = { Text(stringResource(R.string.plot_id)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            item {
-                OutlinedTextField(
-                    value = location,
-                    onValueChange = { location = it },
-                    label = { Text(stringResource(R.string.location)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            item {
-                OutlinedTextField(
-                    value = plotSize,
-                    onValueChange = { plotSize = it },
-                    label = { Text(stringResource(R.string.plot_size)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            item {
-                OutlinedTextField(
-                    value = initialPrice,
-                    onValueChange = { initialPrice = it },
-                    label = { Text(stringResource(R.string.initial_price)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                FormSectionCard(title = stringResource(R.string.plot_info)) {
+                    OutlinedTextField(value = plotName, onValueChange = { plotName = it }, label = { Text(stringResource(R.string.plot_name)) }, modifier = Modifier.fillMaxWidth(), shape = AppShapes.CardSmall, colors = mybizzFieldColors())
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(value = plotId, onValueChange = { plotId = it }, label = { Text(stringResource(R.string.plot_id)) }, modifier = Modifier.fillMaxWidth(), shape = AppShapes.CardSmall, colors = mybizzFieldColors())
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text(stringResource(R.string.location)) }, modifier = Modifier.fillMaxWidth(), shape = AppShapes.CardSmall, colors = mybizzFieldColors())
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(value = plotSize, onValueChange = { plotSize = it }, label = { Text(stringResource(R.string.plot_size)) }, modifier = Modifier.fillMaxWidth(), shape = AppShapes.CardSmall, colors = mybizzFieldColors())
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(value = initialPrice, onValueChange = { initialPrice = it }, label = { Text(stringResource(R.string.initial_price)) }, modifier = Modifier.fillMaxWidth(), shape = AppShapes.CardSmall, colors = mybizzFieldColors(), prefix = { Text("₹") })
+                }
             }
 
             item {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(stringResource(R.string.visitor_info), style = MaterialTheme.typography.titleMedium)
-            }
-            item {
-                OutlinedTextField(
-                    value = visitorName,
-                    onValueChange = { visitorName = it },
-                    label = { Text(stringResource(R.string.visitor_name)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            item {
-                OutlinedTextField(
-                    value = visitorNumber,
-                    onValueChange = { visitorNumber = it },
-                    label = { Text(stringResource(R.string.visitor_phone)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            item {
-                OutlinedTextField(
-                    value = visitorAddress,
-                    onValueChange = { visitorAddress = it },
-                    label = { Text(stringResource(R.string.visitor_address)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = false,
-                    maxLines = 3
-                )
-            }
-            item {
-                OutlinedTextField(
-                    value = askingAmount,
-                    onValueChange = { askingAmount = it },
-                    label = { Text(stringResource(R.string.asking_amount)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                FormSectionCard(title = stringResource(R.string.visitor_info)) {
+                    OutlinedTextField(value = visitorName, onValueChange = { visitorName = it }, label = { Text(stringResource(R.string.visitor_name)) }, modifier = Modifier.fillMaxWidth(), shape = AppShapes.CardSmall, colors = mybizzFieldColors())
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(value = visitorNumber, onValueChange = { visitorNumber = it }, label = { Text(stringResource(R.string.visitor_phone)) }, modifier = Modifier.fillMaxWidth(), shape = AppShapes.CardSmall, colors = mybizzFieldColors())
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = visitorAddress,
+                        onValueChange = { visitorAddress = it },
+                        label = { Text(stringResource(R.string.visitor_address)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = false,
+                        maxLines = 3,
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors()
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(value = askingAmount, onValueChange = { askingAmount = it }, label = { Text(stringResource(R.string.asking_amount)) }, modifier = Modifier.fillMaxWidth(), shape = AppShapes.CardSmall, colors = mybizzFieldColors(), prefix = { Text("₹") })
+                }
             }
 
             item {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(stringResource(R.string.visit_details), style = MaterialTheme.typography.titleMedium)
-            }
-            item {
-                OutlinedTextField(
-                    value = attendedBy,
-                    onValueChange = { attendedBy = it },
-                    label = { Text(stringResource(R.string.attended_by)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            item {
-                OutlinedTextField(
-                    value = visitDate,
-                    onValueChange = {},
-                    label = { Text(stringResource(R.string.visit_date)) },
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.visit_date))
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            item {
-                OutlinedTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
-                    label = { Text(stringResource(R.string.notes_remarks)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = false,
-                    maxLines = 4
-                )
+                FormSectionCard(title = stringResource(R.string.visit_details)) {
+                    OutlinedTextField(value = attendedBy, onValueChange = { attendedBy = it }, label = { Text(stringResource(R.string.attended_by)) }, modifier = Modifier.fillMaxWidth(), shape = AppShapes.CardSmall, colors = mybizzFieldColors())
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = visitDate,
+                        onValueChange = {},
+                        label = { Text(stringResource(R.string.visit_date)) },
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.visit_date), tint = AppColors.Primary)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors()
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = { notes = it },
+                        label = { Text(stringResource(R.string.notes_remarks)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = false,
+                        maxLines = 4,
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors()
+                    )
+                }
             }
 
             item {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Button(
                     onClick = {
                         scope.launch {
@@ -456,14 +417,19 @@ fun AddPlotScreen(
                             onBack()
                         }
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = AppShapes.Button,
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent),
                     enabled = plotName.isNotEmpty() && plotId.isNotEmpty() && location.isNotEmpty() &&
                             visitorName.isNotEmpty() && visitorNumber.isNotEmpty() &&
                             askingAmount.isNotEmpty() && attendedBy.isNotEmpty() &&
                             initialPrice.isNotEmpty() && plotSize.isNotEmpty()
                 ) {
-                    Text(stringResource(R.string.save_plot))
+                    Text(stringResource(R.string.save_plot), fontWeight = FontWeight.SemiBold)
                 }
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
@@ -478,12 +444,18 @@ fun PlotDetailScreen(
     onBack: () -> Unit
 ) {
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(plot.plotName) },
+            TopAppBar(
+                title = { Text(plot.plotName, fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription =stringResource(R.string.back))
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -492,71 +464,74 @@ fun PlotDetailScreen(
         LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(AppDimens.ScreenPadding)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             item {
-                Card(
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    shape = AppShapes.Card,
+                    color = AppColors.Surface,
+                    border = BorderStroke(1.dp, AppColors.Border)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Plot Information", style = MaterialTheme.typography.titleMedium)
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Text("Plot Information", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = AppColors.TextPrimary)
+                        Spacer(modifier = Modifier.height(4.dp))
                         InfoRow("Plot Name:", plot.plotName)
                         InfoRow("Plot ID:", plot.plotId)
                         InfoRow("Location:", plot.location)
                         InfoRow("Plot Size:", "${plot.plotSize} sq. ft.")
-                        InfoRow("Initial Price:", "₹${plot.initialPrice}")
+                        InfoRow("Initial Price:", "₹${plot.initialPrice}", showDivider = false)
                     }
                 }
             }
 
             item {
-                Card(
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    shape = AppShapes.Card,
+                    color = AppColors.Surface,
+                    border = BorderStroke(1.dp, AppColors.Border)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Visitor Information", style = MaterialTheme.typography.titleMedium)
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Text("Visitor Information", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = AppColors.TextPrimary)
+                        Spacer(modifier = Modifier.height(4.dp))
                         InfoRow("Visitor Name:", plot.visitorName)
                         InfoRow("Phone Number:", plot.visitorNumber)
                         InfoRow("Address:", plot.visitorAddress)
-                        InfoRow("Asking Amount:", "₹${plot.askingAmount}")
+                        InfoRow("Asking Amount:", "₹${plot.askingAmount}", showDivider = false)
                     }
                 }
             }
 
             item {
-                Card(
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    shape = AppShapes.Card,
+                    color = AppColors.Surface,
+                    border = BorderStroke(1.dp, AppColors.Border)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(stringResource(R.string.visit_details), style = MaterialTheme.typography.titleMedium)
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(stringResource(R.string.visit_details), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = AppColors.TextPrimary)
+                        Spacer(modifier = Modifier.height(4.dp))
                         InfoRow(stringResource(R.string.attended_by), plot.attendedBy)
                         InfoRow(stringResource(R.string.visit_date), plot.visitDate)
-                        InfoRow(stringResource(R.string.construction_notes), plot.notes)
+                        InfoRow(stringResource(R.string.construction_notes), plot.notes, showDivider = false)
                     }
                 }
             }
 
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-//                    Button(
-//                        onClick = { onEdit(plot) },
-//                        modifier = Modifier.weight(1f)
-//                    ) {
-//                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
-//                        Spacer(modifier = Modifier.width(8.dp))
-//                        Text("Edit")
-//                    }
                     OutlinedButton(
                         onClick = { onDelete(plot) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        shape = AppShapes.Button,
+                        border = BorderStroke(1.dp, AppColors.Danger),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Danger)
                     ) {
                         Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
@@ -596,9 +571,15 @@ fun EditPlotScreen(
     var showDatePicker by remember { mutableStateOf(false) }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.edit_plot)) },
+            TopAppBar(
+                title = { Text(stringResource(R.string.edit_plot), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -629,7 +610,7 @@ fun EditPlotScreen(
         LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(AppDimens.ScreenPadding)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -657,13 +638,17 @@ fun EditPlotScreen(
                             onBack()
                         }
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = AppShapes.Button,
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent),
                     enabled = plotName.isNotEmpty() && plotId.isNotEmpty() && location.isNotEmpty() &&
                             visitorName.isNotEmpty() && visitorNumber.isNotEmpty() &&
                             askingAmount.isNotEmpty() && attendedBy.isNotEmpty() &&
                             initialPrice.isNotEmpty() && plotSize.isNotEmpty()
                 ) {
-                    Text(stringResource(R.string.update_plot))
+                    Text(stringResource(R.string.update_plot), fontWeight = FontWeight.SemiBold)
                 }
             }
         }
