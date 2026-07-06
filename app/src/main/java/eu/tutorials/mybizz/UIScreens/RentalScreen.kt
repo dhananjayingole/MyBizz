@@ -6,10 +6,13 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.widget.DatePicker
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -17,6 +20,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -58,22 +62,27 @@ fun RentalListScreen(
     }
 
     // ── Group by tenant name (unique key) ────────────────────────────────────
-    // Filter first, then group so search still works across property names too
     val grouped: List<Map.Entry<String, List<Rental>>> = remember(allRentals, searchQuery.text) {
         allRentals
             .filter { rental ->
                 rental.tenantName.contains(searchQuery.text, ignoreCase = true) ||
                         rental.property.contains(searchQuery.text, ignoreCase = true)
             }
-            .groupBy { it.tenantName.trim() }   // trim avoids "Atul " ≠ "Atul"
+            .groupBy { it.tenantName.trim() }
             .entries
             .toList()
     }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.rental_management)) },
+                title = { Text(stringResource(R.string.rental_management), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -85,7 +94,11 @@ fun RentalListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddRental) {
+            FloatingActionButton(
+                onClick = onAddRental,
+                containerColor = AppColors.Accent,
+                contentColor = Color.White
+            ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_rental))
             }
         }
@@ -93,7 +106,7 @@ fun RentalListScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(AppDimens.ScreenPadding)
                 .fillMaxSize()
         ) {
             OutlinedTextField(
@@ -101,23 +114,25 @@ fun RentalListScreen(
                 onValueChange = { searchQuery = it },
                 label = { Text(stringResource(R.string.search_tenant_property)) },
                 leadingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search))
+                    Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search), tint = AppColors.TextMuted)
                 },
+                shape = AppShapes.CardSmall,
+                colors = mybizzFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             when {
                 isLoading -> Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+                ) { CircularProgressIndicator(color = AppColors.Accent) }
 
                 grouped.isEmpty() -> Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ) { Text(stringResource(R.string.no_rentals_found)) }
+                ) { Text(stringResource(R.string.no_rentals_found), color = AppColors.TextSecondary) }
 
                 else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     items(grouped, key = { it.key }) { (tenantName, rentals) ->
@@ -149,10 +164,10 @@ fun TenantCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(6.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        shape = AppShapes.CardSmall,
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = BorderStroke(1.dp, AppColors.Border)
     ) {
         Row(
             modifier = Modifier
@@ -161,38 +176,42 @@ fun TenantCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Avatar circle with initials
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape    = MaterialTheme.shapes.extraLarge,
-                color    = MaterialTheme.colorScheme.primaryContainer
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(AppColors.InfoBg),
+                contentAlignment = Alignment.Center
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text  = tenantName.take(1).uppercase(),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
+                Text(
+                    text  = tenantName.take(1).uppercase(),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.Primary
+                )
             }
 
             Spacer(modifier = Modifier.width(14.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                // Tenant name
                 Text(
                     text  = tenantName,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Property count
-                Text(
-                    text  = "🏠 ${rentals.size} ${if (rentals.size == 1) "property" else "properties"}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Home, contentDescription = null, tint = AppColors.TextMuted, modifier = Modifier.size(14.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text  = "${rentals.size} ${if (rentals.size == 1) "property" else "properties"}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AppColors.TextSecondary
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(6.dp))
 
@@ -203,11 +222,10 @@ fun TenantCard(
                 }
             }
 
-            // Chevron
             Icon(
                 imageVector        = Icons.Default.KeyboardArrowRight,
                 contentDescription = null,
-                tint               = MaterialTheme.colorScheme.onSurfaceVariant
+                tint               = AppColors.TextMuted
             )
         }
     }
@@ -215,18 +233,18 @@ fun TenantCard(
 
 @Composable
 private fun RentalStatusPill(label: String, isPaid: Boolean) {
+    val bg = if (isPaid) AppColors.SuccessBg else AppColors.DangerBg
+    val fg = if (isPaid) AppColors.Success else AppColors.Danger
     Surface(
-        shape = MaterialTheme.shapes.extraLarge,
-        color = if (isPaid) MaterialTheme.colorScheme.primaryContainer
-        else        MaterialTheme.colorScheme.errorContainer
+        shape = AppShapes.Chip,
+        color = bg
     ) {
         Text(
             text     = label,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
             style    = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
-            color    = if (isPaid) MaterialTheme.colorScheme.onPrimaryContainer
-            else        MaterialTheme.colorScheme.onErrorContainer
+            color    = fg
         )
     }
 }
@@ -276,9 +294,15 @@ fun AddRentalScreen(
     }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.add_rental)) },
+                title = { Text(stringResource(R.string.add_rental), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -290,52 +314,73 @@ fun AddRentalScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(AppDimens.ScreenPadding)
+                .fillMaxSize()
         ) {
-            OutlinedTextField(
-                value = tenantName,
-                onValueChange = { tenantName = it },
-                label = { Text(stringResource(R.string.tenant_name)) }
-            )
+            FormSectionCard(title = "Tenant & property") {
+                OutlinedTextField(
+                    value = tenantName,
+                    onValueChange = { tenantName = it },
+                    label = { Text(stringResource(R.string.tenant_name)) },
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+                OutlinedTextField(
+                    value = property,
+                    onValueChange = { property = it },
+                    label = { Text(stringResource(R.string.property_shop)) },
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+                OutlinedTextField(
+                    value = contactNo,
+                    onValueChange = { contactNo = it },
+                    label = { Text(stringResource(R.string.contact_number)) },
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
-            OutlinedTextField(
-                value = property,
-                onValueChange = { property = it },
-                label = { Text(stringResource(R.string.property_shop)) }
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = rentAmount,
-                onValueChange = { rentAmount = it },
-                label = { Text(stringResource(R.string.rent_amount)) }
-            )
+            FormSectionCard(title = "Rent details") {
+                OutlinedTextField(
+                    value = rentAmount,
+                    onValueChange = { rentAmount = it },
+                    label = { Text(stringResource(R.string.rent_amount)) },
+                    prefix = { Text("₹") },
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+                OutlinedTextField(
+                    value = month,
+                    onValueChange = { },
+                    label = { Text("Month (YYYY-MM)") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = "Pick Month",
+                            tint = AppColors.Primary,
+                            modifier = Modifier.clickable { openMonthYearPicker() }
+                        )
+                    },
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { openMonthYearPicker() },
+                    readOnly = true
+                )
+            }
 
-            OutlinedTextField(
-                value = month,
-                onValueChange = { },
-                label = { Text("Month (YYYY-MM)") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.DateRange,
-                        contentDescription = "Pick Month",
-                        modifier = Modifier.clickable { openMonthYearPicker() }
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { openMonthYearPicker() },
-                readOnly = true
-            )
-
-            OutlinedTextField(
-                value = contactNo,
-                onValueChange = { contactNo = it },
-                label = { Text(stringResource(R.string.contact_number)) }
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(22.dp))
 
             Button(
                 onClick = {
@@ -354,9 +399,13 @@ fun AddRentalScreen(
                         onRentalAdded()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = AppShapes.Button,
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
             ) {
-                Text(stringResource(R.string.save_rental))
+                Text(stringResource(R.string.save_rental), fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -376,6 +425,7 @@ fun RentalDetailScreen(
     var showMarkPaidDialog by remember { mutableStateOf(false) }
     var showCallDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val isPaid = rental.status == Rental.STATUS_PAID
 
     var showPaymentOptions by remember { mutableStateOf(false) }
 
@@ -385,7 +435,6 @@ fun RentalDetailScreen(
             val intent = Intent(Intent.ACTION_CALL).apply {
                 data = Uri.parse("tel:$phoneNumber")
             }
-            // Check if we have permission
             if (ContextCompat.checkSelfPermission(
                     context,
                     android.Manifest.permission.CALL_PHONE
@@ -393,11 +442,9 @@ fun RentalDetailScreen(
             ) {
                 context.startActivity(intent)
             } else {
-                // Request permission if not granted
                 showCallDialog = true
             }
         } catch (e: Exception) {
-            // Fallback to dial if call fails
             val dialIntent = Intent(Intent.ACTION_DIAL).apply {
                 data = Uri.parse("tel:$phoneNumber")
             }
@@ -406,9 +453,15 @@ fun RentalDetailScreen(
     }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.rental_details)) },
+                title = { Text(stringResource(R.string.rental_details), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -420,44 +473,56 @@ fun RentalDetailScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(AppDimens.ScreenPadding)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             // Rental Info Card
-            Card(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                shape = AppShapes.Card,
+                color = if (isPaid) AppColors.SuccessBg else AppColors.DangerBg
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "👤 Tenant: ${rental.tenantName}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Person, contentDescription = null, tint = AppColors.TextPrimary, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            rental.tenantName,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.TextPrimary
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Home, contentDescription = null, tint = AppColors.TextSecondary, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(rental.property, color = AppColors.TextSecondary)
+                    }
 
-                    Text("🏠 Property: ${rental.property}")
-
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        "💰 Rent: ₹${rental.rentAmount}",
-                        fontSize = 20.sp,
+                        "₹${rental.rentAmount}",
+                        fontSize = 26.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = AppColors.TextPrimary
                     )
-
-                    Text("📅 Month: ${rental.month}")
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.DateRange, contentDescription = null, tint = AppColors.TextSecondary, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Month: ${rental.month}", style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary)
+                    }
 
                     // Contact info with clickable call button
                     if (rental.contactNo.isNotBlank()) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                        Card(
+                        Surface(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            )
+                            shape = AppShapes.CardSmall,
+                            color = AppColors.Surface
                         ) {
                             Row(
                                 modifier = Modifier
@@ -467,21 +532,11 @@ fun RentalDetailScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        "${rental.contactNo}",
-                                        fontSize = 16.sp
-                                    )
-                                }
-
-                                // Small call button
+                                Text(rental.contactNo, fontSize = 16.dp.value.sp, color = AppColors.TextPrimary)
                                 Icon(
                                     Icons.Default.Call,
                                     contentDescription = "Call",
-                                    tint = MaterialTheme.colorScheme.primary,
+                                    tint = AppColors.Accent,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -489,61 +544,63 @@ fun RentalDetailScreen(
                     }
 
                     if (rental.paymentDate.isNotEmpty()) {
-                        Text("Payment Date: ${rental.paymentDate}")
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("Payment Date: ${rental.paymentDate}", color = AppColors.TextSecondary, style = MaterialTheme.typography.bodySmall)
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    // Status
                     Text(
                         "Status: ${rental.status.uppercase()}",
                         fontWeight = FontWeight.Bold,
-                        color = if (rental.status == Rental.STATUS_PAID)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.error
+                        color = if (isPaid) AppColors.Success else AppColors.Danger
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             // Payment Action Section
-            if (rental.status == Rental.STATUS_UNPAID) {
+            if (!isPaid) {
                 Button(
-                    onClick = { showPaymentOptions = true }, // Changed this line
+                    onClick = { showPaymentOptions = true },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(54.dp),
+                    shape = AppShapes.Button,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2196F3)
+                        containerColor = AppColors.Success
                     )
                 ) {
-                    Icon(Icons.Default.Refresh, contentDescription = null)
+                    Icon(Icons.Default.AccountBox, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         "Pay Now - ₹${String.format("%.2f", rental.rentAmount)}",
-                        fontSize = 18.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 OutlinedButton(
                     onClick = { showMarkPaidDialog = true },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = AppShapes.Button,
+                    border = BorderStroke(1.dp, AppColors.Primary),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Primary)
                 ) {
-                    Icon(Icons.Default.Check, stringResource(R.string.mark_paid_button))
+                    Icon(Icons.Default.Check, contentDescription = stringResource(R.string.mark_paid_button), modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.mark_paid_manual))
                 }
             } else {
-                Card(
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFE3F2FD)
-                    )
+                    shape = AppShapes.Card,
+                    color = AppColors.InfoBg
                 ) {
                     Row(
                         modifier = Modifier
@@ -554,8 +611,8 @@ fun RentalDetailScreen(
                         Icon(
                             Icons.Default.CheckCircle,
                             contentDescription = null,
-                            tint = Color(0xFF2196F3),
-                            modifier = Modifier.size(48.dp)
+                            tint = AppColors.Primary,
+                            modifier = Modifier.size(44.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
@@ -563,13 +620,13 @@ fun RentalDetailScreen(
                                 stringResource(R.string.rent_paid),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
-                                color = Color(0xFF1565C0)
+                                color = AppColors.Primary
                             )
                             if (rental.paymentDate.isNotEmpty()) {
                                 Text(
                                     "Paid on: ${rental.paymentDate}",
                                     fontSize = 14.sp,
-                                    color = Color.Gray
+                                    color = AppColors.TextSecondary
                                 )
                             }
                         }
@@ -577,32 +634,36 @@ fun RentalDetailScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Action Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (rental.status == Rental.STATUS_UNPAID) {
+                if (!isPaid) {
                     OutlinedButton(
                         onClick = onEdit,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        shape = AppShapes.Button,
+                        border = BorderStroke(1.dp, AppColors.Border)
                     ) {
-                        Icon(Icons.Default.Edit, stringResource(R.string.edit))
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit), tint = AppColors.Primary, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(R.string.edit))
+                        Text(stringResource(R.string.edit), color = AppColors.Primary)
                     }
                 }
 
                 OutlinedButton(
                     onClick = { showDeleteDialog = true },
                     modifier = Modifier.weight(1f),
+                    shape = AppShapes.Button,
+                    border = BorderStroke(1.dp, AppColors.Danger.copy(alpha = 0.4f)),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.Red
+                        contentColor = AppColors.Danger
                     )
                 ) {
-                    Icon(Icons.Default.Delete, stringResource(R.string.delete))
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(stringResource(R.string.delete))
                 }
@@ -618,11 +679,11 @@ fun RentalDetailScreen(
                 Icon(
                     Icons.Default.Warning,
                     contentDescription = null,
-                    tint = Color.Red,
-                    modifier = Modifier.size(48.dp)
+                    tint = AppColors.Danger,
+                    modifier = Modifier.size(40.dp)
                 )
             },
-            title = { Text(stringResource(R.string.delete_rental)) },
+            title = { Text(stringResource(R.string.delete_rental), fontWeight = FontWeight.Bold) },
             text = { Text(stringResource(R.string.delete_rental_confirm)) },
             confirmButton = {
                 Button(
@@ -631,15 +692,16 @@ fun RentalDetailScreen(
                         onDelete()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
-                    )
+                        containerColor = AppColors.Danger
+                    ),
+                    shape = AppShapes.Button
                 ) {
                     Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(R.string.cancel), color = AppColors.TextSecondary)
                 }
             }
         )
@@ -649,24 +711,24 @@ fun RentalDetailScreen(
     if (showMarkPaidDialog) {
         AlertDialog(
             onDismissRequest = { showMarkPaidDialog = false },
-            title = { Text(stringResource(R.string.mark_as_paid)) },
+            title = { Text(stringResource(R.string.mark_as_paid), fontWeight = FontWeight.Bold) },
             text = { Text(stringResource(R.string.mark_paid_confirm)) },
             confirmButton = {
                 TextButton(onClick = {
                     showMarkPaidDialog = false
                     onMarkPaid()
                 }) {
-                    Text(stringResource(R.string.mark_paid_title))
+                    Text(stringResource(R.string.mark_paid_title), color = AppColors.Success, fontWeight = FontWeight.SemiBold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showMarkPaidDialog = false }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(R.string.cancel), color = AppColors.TextSecondary)
                 }
             }
         )
     }
-// Add this dialog call at the bottom of RentalDetailScreen (alongside other dialogs):
+
     if (showPaymentOptions) {
         PaymentOptionsDialog(
             rental = rental,
@@ -677,35 +739,32 @@ fun RentalDetailScreen(
         )
     }
 
-
     // Call Permission Dialog
     if (showCallDialog) {
         AlertDialog(
             onDismissRequest = { showCallDialog = false },
-            title = { Text(stringResource(R.string.call_permission_required)) },
+            title = { Text(stringResource(R.string.call_permission_required), fontWeight = FontWeight.Bold) },
             text = { Text(stringResource(R.string.call_permission_desc)) },
             confirmButton = {
                 TextButton(onClick = {
                     showCallDialog = false
-                    // Open app settings for permission
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = Uri.parse("package:${context.packageName}")
                     }
                     context.startActivity(intent)
                 }) {
-                    Text("Open Settings")
+                    Text("Open Settings", color = AppColors.Primary)
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showCallDialog = false
-                    // Fallback to dial
                     val dialIntent = Intent(Intent.ACTION_DIAL).apply {
                         data = Uri.parse("tel:${rental.contactNo}")
                     }
                     context.startActivity(dialIntent)
                 }) {
-                    Text(stringResource(R.string.use_dialer))
+                    Text(stringResource(R.string.use_dialer), color = AppColors.TextSecondary)
                 }
             }
         )
@@ -729,9 +788,15 @@ fun EditRentalScreen(
     var contactNo by remember { mutableStateOf(rental.contactNo) }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.edit_rental)) },
+                title = { Text(stringResource(R.string.edit_rental), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -743,22 +808,30 @@ fun EditRentalScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(AppDimens.ScreenPadding)
+                .fillMaxSize()
         ) {
-            OutlinedTextField(value = tenantName, onValueChange = { tenantName = it }, label = { Text(stringResource(R.string.tenant_name)) })
-            OutlinedTextField(value = property, onValueChange = { property = it }, label = { Text(stringResource(R.string.property_shop)) })
-            OutlinedTextField(value = rentAmount, onValueChange = { rentAmount = it }, label = { Text(stringResource(R.string.rent_amount)) })
-            OutlinedTextField(
-                value = month,
-                onValueChange = { month = it },
-                label = { Text("Month (YYYY-MM)") },
-                leadingIcon = { Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.date)) }
-            )
-            OutlinedTextField(value = contactNo, onValueChange = { contactNo = it }, label = { Text(stringResource(R.string.contact_number)) })
+            FormSectionCard(title = "Rental details") {
+                OutlinedTextField(value = tenantName, onValueChange = { tenantName = it }, label = { Text(stringResource(R.string.tenant_name)) }, shape = AppShapes.CardSmall, colors = mybizzFieldColors(), modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(14.dp))
+                OutlinedTextField(value = property, onValueChange = { property = it }, label = { Text(stringResource(R.string.property_shop)) }, shape = AppShapes.CardSmall, colors = mybizzFieldColors(), modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(14.dp))
+                OutlinedTextField(value = rentAmount, onValueChange = { rentAmount = it }, label = { Text(stringResource(R.string.rent_amount)) }, prefix = { Text("₹") }, shape = AppShapes.CardSmall, colors = mybizzFieldColors(), modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(14.dp))
+                OutlinedTextField(
+                    value = month,
+                    onValueChange = { month = it },
+                    label = { Text("Month (YYYY-MM)") },
+                    leadingIcon = { Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.date), tint = AppColors.Primary) },
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+                OutlinedTextField(value = contactNo, onValueChange = { contactNo = it }, label = { Text(stringResource(R.string.contact_number)) }, shape = AppShapes.CardSmall, colors = mybizzFieldColors(), modifier = Modifier.fillMaxWidth())
+            }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(22.dp))
 
             Button(
                 onClick = {
@@ -775,9 +848,13 @@ fun EditRentalScreen(
                         onRentalUpdated()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = AppShapes.Button,
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
             ) {
-                Text(stringResource(R.string.update_rental))
+                Text(stringResource(R.string.update_rental), fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -791,16 +868,22 @@ fun TenantPropertiesScreen(
     onBack: () -> Unit
 ) {
     val tenantName = viewModel.selectedTenantName
-    val rentals    = viewModel.selectedTenantRentals   // live — updates if ViewModel refreshed
+    val rentals    = viewModel.selectedTenantRentals
 
     val totalRent   = rentals.sumOf { it.rentAmount }
     val paidCount   = rentals.count { it.status == Rental.STATUS_PAID }
     val unpaidCount = rentals.size - paidCount
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(tenantName) },
+                title = { Text(tenantName, fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -820,7 +903,7 @@ fun TenantPropertiesScreen(
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No properties found for $tenantName")
+                Text("No properties found for $tenantName", color = AppColors.TextSecondary)
             }
             return@Scaffold
         }
@@ -828,7 +911,7 @@ fun TenantPropertiesScreen(
         LazyColumn(
             modifier            = Modifier
                 .padding(padding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = AppDimens.ScreenPadding)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             contentPadding      = PaddingValues(vertical = 16.dp)
@@ -836,29 +919,32 @@ fun TenantPropertiesScreen(
 
             // ── Summary header ──────────────────────────────────────────────
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors   = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    elevation = CardDefaults.cardElevation(4.dp)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(AppShapes.Card)
+                        .background(
+                            androidx.compose.ui.graphics.Brush.linearGradient(
+                                colors = listOf(AppColors.Primary, AppColors.PrimaryLight)
+                            )
+                        )
+                        .padding(18.dp)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            // Big initial circle
-                            Surface(
-                                modifier = Modifier.size(56.dp),
-                                shape    = MaterialTheme.shapes.extraLarge,
-                                color    = MaterialTheme.colorScheme.primary
+                            Box(
+                                modifier = Modifier
+                                    .size(52.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.White.copy(alpha = 0.18f)),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text       = tenantName.take(1).uppercase(),
-                                        color      = MaterialTheme.colorScheme.onPrimary,
-                                        fontSize   = 24.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
+                                Text(
+                                    text       = tenantName.take(1).uppercase(),
+                                    color      = Color.White,
+                                    fontSize   = 22.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
 
                             Spacer(modifier = Modifier.width(14.dp))
@@ -868,40 +954,40 @@ fun TenantPropertiesScreen(
                                     text       = tenantName,
                                     style      = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold,
-                                    color      = MaterialTheme.colorScheme.onPrimaryContainer
+                                    color      = Color.White
                                 )
                                 Text(
                                     text  = "Total rent: ₹$totalRent / month",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    color = Color.White.copy(alpha = 0.85f)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
-                        HorizontalDivider(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f))
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
+                        Divider(color = Color.White.copy(alpha = 0.2f))
+                        Spacer(modifier = Modifier.height(14.dp))
 
-                        // Stats row
                         Row(
                             modifier              = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            StatBox(label = "Properties", value = "${rentals.size}")
-                            StatBox(label = "Paid",       value = "$paidCount",   valueColor = MaterialTheme.colorScheme.primary)
-                            StatBox(label = "Unpaid",     value = "$unpaidCount", valueColor = MaterialTheme.colorScheme.error)
+                            StatBox(label = "Properties", value = "${rentals.size}", valueColor = Color.White)
+                            StatBox(label = "Paid",       value = "$paidCount",   valueColor = Color.White)
+                            StatBox(label = "Unpaid",     value = "$unpaidCount", valueColor = Color.White)
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text  = "Rented Properties",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = AppColors.TextSecondary
                 )
+                Spacer(modifier = Modifier.height(10.dp))
             }
 
             // ── One card per property ───────────────────────────────────────
@@ -926,8 +1012,10 @@ private fun PropertyDetailCard(rental: Rental, onClick: () -> Unit) {
         modifier  = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        shape = AppShapes.CardSmall,
+        colors    = CardDefaults.cardColors(containerColor = AppColors.Surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = BorderStroke(1.dp, AppColors.Border)
     ) {
         Row(
             modifier            = Modifier
@@ -941,18 +1029,19 @@ private fun PropertyDetailCard(rental: Rental, onClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier          = Modifier.weight(1f)
             ) {
-                // Property icon circle
-                Surface(
-                    modifier = Modifier.size(42.dp),
-                    shape    = MaterialTheme.shapes.medium,
-                    color    = if (isPaid)
-                        MaterialTheme.colorScheme.primaryContainer
-                    else
-                        MaterialTheme.colorScheme.errorContainer
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                        .background(if (isPaid) AppColors.SuccessBg else AppColors.DangerBg),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(text = "🏠", fontSize = 18.sp)
-                    }
+                    Icon(
+                        Icons.Default.Home,
+                        contentDescription = null,
+                        tint = if (isPaid) AppColors.Success else AppColors.Danger,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -961,18 +1050,19 @@ private fun PropertyDetailCard(rental: Rental, onClick: () -> Unit) {
                     Text(
                         text       = rental.property,
                         style      = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
                     )
                     Text(
                         text  = "₹${rental.rentAmount}  •  ${rental.month}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AppColors.TextSecondary
                     )
                     if (rental.paymentDate.isNotEmpty()) {
                         Text(
                             text  = "Paid on: ${rental.paymentDate}",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.outline
+                            color = AppColors.TextMuted
                         )
                     }
                 }
@@ -980,25 +1070,12 @@ private fun PropertyDetailCard(rental: Rental, onClick: () -> Unit) {
 
             // Right: status pill + chevron
             Column(horizontalAlignment = Alignment.End) {
-                Surface(
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = if (isPaid) MaterialTheme.colorScheme.primaryContainer
-                    else        MaterialTheme.colorScheme.errorContainer
-                ) {
-                    Text(
-                        text     = if (isPaid) "PAID" else "UNPAID",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style    = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color    = if (isPaid) MaterialTheme.colorScheme.onPrimaryContainer
-                        else        MaterialTheme.colorScheme.onErrorContainer
-                    )
-                }
+                RentalStatusPill(if (isPaid) "PAID" else "UNPAID", isPaid = isPaid)
                 Spacer(modifier = Modifier.height(4.dp))
                 Icon(
                     imageVector        = Icons.Default.KeyboardArrowRight,
                     contentDescription = null,
-                    tint               = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint               = AppColors.TextMuted,
                     modifier           = Modifier.size(18.dp)
                 )
             }
@@ -1013,7 +1090,7 @@ private fun PropertyDetailCard(rental: Rental, onClick: () -> Unit) {
 private fun StatBox(
     label: String,
     value: String,
-    valueColor: Color = MaterialTheme.colorScheme.onPrimaryContainer
+    valueColor: Color = AppColors.TextPrimary
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
@@ -1025,7 +1102,7 @@ private fun StatBox(
         Text(
             text  = label,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+            color = valueColor.copy(alpha = 0.75f)
         )
     }
 }
