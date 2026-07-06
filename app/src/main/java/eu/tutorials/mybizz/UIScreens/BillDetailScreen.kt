@@ -1,12 +1,14 @@
 package eu.tutorials.mybizz.UIScreens
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -143,9 +145,16 @@ fun BillDetailsScreen(
     }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.bill_details)) },
+                title = { Text(stringResource(R.string.bill_details), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -166,7 +175,6 @@ fun BillDetailsScreen(
                 }
             )
         },
-        // REMOVED: Mark as Paid FAB - replaced with Pay Now button
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -179,7 +187,7 @@ fun BillDetailsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = AppColors.Accent)
                 }
             } else if (error != null) {
                 Box(
@@ -189,10 +197,14 @@ fun BillDetailsScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = error!!,
-                            color = MaterialTheme.colorScheme.error,
+                            color = AppColors.Danger,
                             modifier = Modifier.padding(16.dp)
                         )
-                        Button(onClick = { reloadBillDetails() }) {
+                        Button(
+                            onClick = { reloadBillDetails() },
+                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary),
+                            shape = AppShapes.Button
+                        ) {
                             Text(stringResource(R.string.retry))
                         }
                     }
@@ -207,10 +219,10 @@ fun BillDetailsScreen(
             } else {
                 BillDetailsContent(bill = bill!!)
 
-                // NEW: Payment Action Section
-                Spacer(modifier = Modifier.height(24.dp))
+                // Payment Action Section
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Column(modifier = Modifier.padding(horizontal = AppDimens.ScreenPadding)) {
                     if (bill!!.status == Bill.STATUS_UNPAID) {
                         // Pay Now Button
                         Button(
@@ -219,42 +231,47 @@ fun BillDetailsScreen(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(56.dp),
+                                .height(54.dp),
+                            shape = AppShapes.Button,
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF4CAF50) // Green
+                                containerColor = AppColors.Success
                             )
                         ) {
                             Icon(
-                                Icons.Default.Clear,
+                                Icons.Default.AccountBox,
                                 contentDescription = stringResource(R.string.pay_now),
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(22.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 "Pay Now - ₹${String.format("%.2f", bill!!.amount)}",
-                                fontSize = 18.sp,
+                                fontSize = 17.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         // Alternative: Manual Mark as Paid
                         OutlinedButton(
                             onClick = { showMarkPaidDialog = true },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp),
+                            shape = AppShapes.Button,
+                            border = BorderStroke(1.dp, AppColors.Primary),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Primary)
                         ) {
-                            Icon(Icons.Default.Check, stringResource(R.string.mark_as_paid))
+                            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.mark_as_paid), modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(stringResource(R.string.mark_paid_manual))
                         }
                     } else {
                         // Show Paid Status Card
-                        Card(
+                        Surface(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFE8F5E9) // Light green
-                            )
+                            shape = AppShapes.Card,
+                            color = AppColors.SuccessBg
                         ) {
                             Row(
                                 modifier = Modifier
@@ -262,32 +279,39 @@ fun BillDetailsScreen(
                                     .padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    Icons.Default.CheckCircle,
-                                    contentDescription = null,
-                                    tint = Color(0xFF4CAF50),
-                                    modifier = Modifier.size(48.dp)
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .background(AppColors.Success.copy(alpha = 0.15f), CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Default.CheckCircle,
+                                        contentDescription = null,
+                                        tint = AppColors.Success,
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                }
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column {
                                     Text(
                                         stringResource(R.string.payment_completed),
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp,
-                                        color = Color(0xFF2E7D32)
+                                        fontSize = 17.sp,
+                                        color = AppColors.Success
                                     )
                                     if (bill!!.paidDate.isNotEmpty()) {
                                         Text(
                                             "Paid on: ${bill!!.paidDate}",
-                                            fontSize = 14.sp,
-                                            color = Color.Gray
+                                            fontSize = 13.sp,
+                                            color = AppColors.TextSecondary
                                         )
                                     }
                                     if (bill!!.paidBy.isNotEmpty()) {
                                         Text(
                                             "Paid by: ${bill!!.paidBy}",
-                                            fontSize = 14.sp,
-                                            color = Color.Gray
+                                            fontSize = 13.sp,
+                                            color = AppColors.TextSecondary
                                         )
                                     }
                                 }
@@ -304,6 +328,8 @@ fun BillDetailsScreen(
                     isLoading = isLoadingHistory,
                     currentBillNumber = bill!!.billNumber
                 )
+
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
@@ -312,16 +338,16 @@ fun BillDetailsScreen(
     if (showMarkPaidDialog) {
         AlertDialog(
             onDismissRequest = { showMarkPaidDialog = false },
-            title = { Text(stringResource(R.string.mark_as_paid)) },
+            title = { Text(stringResource(R.string.mark_as_paid), fontWeight = FontWeight.Bold) },
             text = { Text(stringResource(R.string.mark_paid_confirm)) },
             confirmButton = {
                 TextButton(onClick = { markBillAsPaid() }) {
-                    Text(stringResource(R.string.mark_as_paid))
+                    Text(stringResource(R.string.mark_as_paid), color = AppColors.Success, fontWeight = FontWeight.SemiBold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showMarkPaidDialog = false }) {
-                    Text(stringResource(R.string.mark_as_paid))
+                    Text(stringResource(R.string.cancel), color = AppColors.TextSecondary)
                 }
             }
         )
@@ -330,42 +356,38 @@ fun BillDetailsScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(R.string.delete_bill)) },
+            title = { Text(stringResource(R.string.delete_bill), fontWeight = FontWeight.Bold) },
             text = { Text(stringResource(R.string.delete_bill_confirm)) },
             confirmButton = {
                 TextButton(
                     onClick = { deleteBill() },
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
+                        contentColor = AppColors.Danger
                     )
                 ) {
-                    Text(stringResource(R.string.delete))
+                    Text(stringResource(R.string.delete), fontWeight = FontWeight.SemiBold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(R.string.cancel), color = AppColors.TextSecondary)
                 }
             }
         )
     }
 }
 
-// Keep all other composables the same (BillDetailsContent, BillHistorySection, etc.)
 @Composable
 fun BillDetailsContent(bill: Bill) {
-    Column(modifier = Modifier.padding(16.dp)) {
+    val isPaid = bill.status == Bill.STATUS_PAID
+    Column(modifier = Modifier.padding(AppDimens.ScreenPadding)) {
         // Status Card
-        Card(
+        Surface(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = if (bill.status == Bill.STATUS_PAID)
-                    MaterialTheme.colorScheme.primaryContainer
-                else
-                    MaterialTheme.colorScheme.errorContainer
-            )
+            shape = AppShapes.Card,
+            color = if (isPaid) AppColors.SuccessBg else AppColors.DangerBg
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(18.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -376,87 +398,96 @@ fun BillDetailsContent(bill: Bill) {
                             text = bill.status.replaceFirstChar { it.uppercase() },
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = if (bill.status == Bill.STATUS_PAID)
-                                MaterialTheme.colorScheme.primary
-                            else
-                                MaterialTheme.colorScheme.error
+                            color = if (isPaid) AppColors.Success else AppColors.Danger
                         )
                         Text(
-                            text = if (bill.status == Bill.STATUS_PAID) "Paid on ${bill.paidDate}"
-                            else "Due on ${bill.dueDate}",
-                            style = MaterialTheme.typography.bodyMedium
+                            text = if (isPaid) "Paid on ${bill.paidDate}" else "Due on ${bill.dueDate}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AppColors.TextSecondary
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = "Bill: ${bill.billNumber} | Version: ${bill.version}",
+                            text = "Bill: ${bill.billNumber}  ·  Version: ${bill.version}",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            color = AppColors.TextMuted
                         )
                     }
                     Text(
                         text = "₹${"%.2f".format(bill.amount)}",
                         style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
                     )
                 }
 
-                if (bill.status == Bill.STATUS_PAID && bill.paidBy.isNotEmpty()) {
+                if (isPaid && bill.paidBy.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Paid by: ${bill.paidBy}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                        color = AppColors.TextSecondary
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimens.SectionGap))
 
         Text(
             text = stringResource(R.string.bill_info),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
+            color = AppColors.TextPrimary,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        InfoRow(label = "Title", value = bill.title)
-        InfoRow(label = "Category", value = bill.category)
-        InfoRow(label = "Description", value = bill.description.ifEmpty { "No description" })
-        InfoRow(label = "Due Date", value = bill.dueDate)
-        InfoRow(label = "Created Date", value = bill.createdDate)
-        InfoRow(label = "Created By", value = bill.createdBy)
-        InfoRow(label = "Last Modified", value = bill.modifiedDate)
-        InfoRow(label = "Last Modified By", value = bill.modifiedBy)
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = AppShapes.Card,
+            color = AppColors.Surface,
+            border = BorderStroke(1.dp, AppColors.Border)
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                InfoRow(label = "Title", value = bill.title)
+                InfoRow(label = "Category", value = bill.category)
+                InfoRow(label = "Description", value = bill.description.ifEmpty { "No description" })
+                InfoRow(label = "Due Date", value = bill.dueDate)
+                InfoRow(label = "Created Date", value = bill.createdDate)
+                InfoRow(label = "Created By", value = bill.createdBy)
+                InfoRow(label = "Last Modified", value = bill.modifiedDate)
+                InfoRow(label = "Last Modified By", value = bill.modifiedBy, showDivider = isPaid)
 
-        if (bill.status == Bill.STATUS_PAID) {
-            InfoRow(label = stringResource(R.string.paid_on), value = bill.paidDate)
-            if (bill.paidBy.isNotEmpty()) {
-                InfoRow(label = stringResource(R.string.paid_by), value = bill.paidBy)
+                if (isPaid) {
+                    InfoRow(label = stringResource(R.string.paid_on), value = bill.paidDate)
+                    if (bill.paidBy.isNotEmpty()) {
+                        InfoRow(label = stringResource(R.string.paid_by), value = bill.paidBy, showDivider = false)
+                    }
+                }
             }
         }
 
-        if (bill.status == Bill.STATUS_PAID) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Card(
+        if (isPaid) {
+            Spacer(modifier = Modifier.height(14.dp))
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                shape = AppShapes.CardSmall,
+                color = AppColors.SurfaceMuted
             ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = stringResource(R.string.bill_info),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = AppColors.Success
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(R.string.bill_paid_info),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AppColors.TextSecondary
                     )
                 }
             }
@@ -470,7 +501,7 @@ fun BillHistorySection(
     isLoading: Boolean,
     currentBillNumber: String
 ) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Column(modifier = Modifier.padding(horizontal = AppDimens.ScreenPadding)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -479,17 +510,18 @@ fun BillHistorySection(
             Text(
                 text = "Bill History - #$currentBillNumber",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = AppColors.TextPrimary
             )
 
             Text(
-                text = "Total Versions: ${billHistory.size}",
+                text = "${billHistory.size} versions",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                color = AppColors.TextSecondary
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         if (isLoading) {
             Box(
@@ -498,12 +530,13 @@ fun BillHistorySection(
                     .height(100.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = AppColors.Accent)
             }
         } else if (billHistory.isEmpty()) {
-            Card(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                shape = AppShapes.Card,
+                color = AppColors.SurfaceMuted
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
@@ -512,32 +545,35 @@ fun BillHistorySection(
                     Icon(
                         imageVector = Icons.Default.Warning,
                         contentDescription = stringResource(R.string.no_history),
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        modifier = Modifier.size(36.dp),
+                        tint = AppColors.TextMuted
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text =  stringResource(R.string.no_history),
+                        text = stringResource(R.string.no_history),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = stringResource(R.string.bill_modifications_appear),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AppColors.TextSecondary
                     )
                 }
             }
         } else {
-            Card(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                shape = AppShapes.Card,
+                color = AppColors.Surface,
+                border = BorderStroke(1.dp, AppColors.Border)
             ) {
                 Column {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.primary)
+                            .background(AppColors.Primary, RoundedCornerShape(topStart = AppDimens.CardRadius, topEnd = AppDimens.CardRadius))
                             .padding(12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -621,15 +657,13 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                if (isCreated) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                else MaterialTheme.colorScheme.surface
+                if (isCreated) AppColors.InfoBg else AppColors.Surface
             )
             .padding(12.dp)
             .border(
-                1.dp,
-                if (isCreated) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                else Color.Transparent,
-                RoundedCornerShape(4.dp)
+                width = if (isCreated) 1.dp else 0.dp,
+                color = if (isCreated) AppColors.Primary.copy(alpha = 0.2f) else Color.Transparent,
+                shape = RoundedCornerShape(4.dp)
             ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -639,7 +673,8 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1.2f),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = AppColors.TextPrimary
         )
 
         Column(
@@ -650,19 +685,19 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
                 text = "V${historyEntry.version}",
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
-                color = if (isCreated) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                color = if (isCreated) AppColors.Primary else AppColors.TextPrimary
             )
             if (isCreated) {
                 Text(
                     text = stringResource(R.string.created),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = AppColors.Primary
                 )
             } else {
                 Text(
                     text = stringResource(R.string.updated),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = AppColors.Accent
                 )
             }
         }
@@ -672,14 +707,16 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.weight(1.5f),
             textAlign = TextAlign.Center,
-            maxLines = 1
+            maxLines = 1,
+            color = AppColors.TextPrimary
         )
 
         Text(
             text = historyEntry.modifiedDate.split(" ").getOrNull(0) ?: historyEntry.modifiedDate,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.weight(1.5f),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = AppColors.TextSecondary
         )
 
         Column(
@@ -689,12 +726,13 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
             Text(
                 text = "₹${"%.2f".format(historyEntry.amount)}",
                 style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                color = AppColors.TextPrimary
             )
             Text(
                 text = stringResource(R.string.total),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                color = AppColors.TextMuted
             )
         }
 
@@ -708,42 +746,43 @@ fun HistoryTableRow(historyEntry: BillHistoryEntry, billHistory: List<BillHistor
                     else "₹${"%.2f".format(amountChange)}",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color = if (amountChange > 0) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.error
+                    color = if (amountChange > 0) AppColors.Success else AppColors.Danger
                 )
                 Text(
                     text = if (amountChange > 0) stringResource(R.string.increase) else stringResource(R.string.decrease),
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (amountChange > 0) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.error
+                    color = if (amountChange > 0) AppColors.Success else AppColors.Danger
                 )
             } else {
                 Text(
                     text = "—",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    color = AppColors.TextMuted
                 )
                 Text(
                     text = if (historyEntry.version == 1) stringResource(R.string.initial) else stringResource(R.string.no_change),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    color = AppColors.TextMuted
                 )
             }
         }
     }
+    Divider(color = AppColors.Border, thickness = 1.dp)
 }
 
 @Composable
 fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
-    Card(
+    Surface(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        shape = AppShapes.Card,
+        color = AppColors.SurfaceMuted
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = stringResource(R.string.version_history_summary),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
+                color = AppColors.TextPrimary,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
@@ -763,12 +802,13 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
                     Text(
                         text = stringResource(R.string.current_version_label),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AppColors.TextSecondary
                     )
                     Text(
                         text = "V${latestVersion?.version ?: 1}",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
                     )
                 }
 
@@ -776,12 +816,13 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
                     Text(
                         text = stringResource(R.string.modifications),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AppColors.TextSecondary
                     )
                     Text(
                         text = "$modifications",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
                     )
                 }
 
@@ -789,20 +830,21 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
                     Text(
                         text = stringResource(R.string.amount_change),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AppColors.TextSecondary
                     )
                     Text(
                         text = if (totalChange >= 0) "+₹${"%.2f".format(totalChange)}"
                         else "₹${"%.2f".format(totalChange)}",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (totalChange >= 0) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.error
+                        color = if (totalChange >= 0) AppColors.Success else AppColors.Danger
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+            Divider(color = AppColors.Border)
+            Spacer(modifier = Modifier.height(12.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -812,12 +854,13 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
                     Text(
                         text = stringResource(R.string.created),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AppColors.TextSecondary
                     )
                     Text(
                         text = createdEntry?.modifiedDate?.split(" ")?.get(0) ?: "N/A",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = AppColors.TextPrimary
                     )
                 }
 
@@ -825,12 +868,13 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
                     Text(
                         text = stringResource(R.string.last_updated),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AppColors.TextSecondary
                     )
                     Text(
                         text = latestVersion?.modifiedDate?.split(" ")?.get(0) ?: "N/A",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = AppColors.TextPrimary
                     )
                 }
 
@@ -838,13 +882,13 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
                     Text(
                         text = stringResource(R.string.current_amount),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = AppColors.TextSecondary
                     )
                     Text(
                         text = "₹${"%.2f".format(currentAmount)}",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = AppColors.Primary
                     )
                 }
             }
@@ -853,20 +897,25 @@ fun HistorySummarySection(billHistory: List<BillHistoryEntry>) {
 }
 
 @Composable
-fun InfoRow(label: String, value: String) {
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+fun InfoRow(label: String, value: String, showDivider: Boolean = true) {
+    Column(modifier = Modifier.padding(vertical = 10.dp)) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = AppColors.TextSecondary
         )
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
+            color = AppColors.TextPrimary,
             modifier = Modifier.fillMaxWidth()
         )
-        Divider(modifier = Modifier.padding(vertical = 4.dp))
+        if (showDivider) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Divider(color = AppColors.Border)
+        }
     }
 }
 
