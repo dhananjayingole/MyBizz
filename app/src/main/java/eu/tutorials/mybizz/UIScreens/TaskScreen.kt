@@ -1,16 +1,16 @@
-// UIScreens/TaskScreen.kt
 package eu.tutorials.mybizz.UIScreens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import eu.tutorials.mybizz.Logic.Task.TaskRepository
@@ -28,6 +29,12 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import eu.tutorials.mybizz.R
+
+private fun taskStatusColors(status: String): Pair<Color, Color> = when (status) {
+    "Completed" -> AppColors.SuccessBg to AppColors.Success
+    "In Progress" -> AppColors.InfoBg to AppColors.Primary
+    else -> AppColors.SurfaceMuted to AppColors.TextSecondary
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,9 +64,15 @@ fun TaskListScreen(
     }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.edit_task)) },
+            TopAppBar(
+                title = { Text(stringResource(R.string.task), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -72,9 +85,10 @@ fun TaskListScreen(
                 onClick = {
                     navController.navigate(Routes.AddTaskScreen)
                 },
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = AppColors.Accent,
+                contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_task), tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_task))
             }
         }
     ) { padding ->
@@ -82,50 +96,84 @@ fun TaskListScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(AppDimens.ScreenPadding)
         ) {
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 label = { Text(stringResource(R.string.search_tasks)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search)) },
-                modifier = Modifier.fillMaxWidth()
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search), tint = AppColors.TextMuted) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = AppShapes.CardSmall,
+                colors = mybizzFieldColors()
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             if (isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = AppColors.Accent)
                 }
             } else if (filteredTasks.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        if (searchQuery.isNotEmpty()) "No tasks found for '$searchQuery'"
-                        else stringResource(R.string.no_tasks_found),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Default.Info, contentDescription = null, tint = AppColors.TextMuted, modifier = Modifier.size(36.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            if (searchQuery.isNotEmpty()) "No tasks found for '$searchQuery'"
+                            else stringResource(R.string.no_tasks_found),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AppColors.TextSecondary
+                        )
+                    }
                 }
             } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(bottom = 88.dp)
+                ) {
                     items(filteredTasks) { task ->
+                        val (bg, fg) = taskStatusColors(task.status)
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
                                     navController.navigate("task_detail/${task.id}")
                                 },
-                            elevation = CardDefaults.cardElevation(6.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            shape = MaterialTheme.shapes.medium
+                            shape = AppShapes.CardSmall,
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                            colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
+                            border = BorderStroke(1.dp, AppColors.Border)
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(task.title, style = MaterialTheme.typography.titleMedium)
-                                Text("👤 ${task.assignedTo}")
-                                Text("📅 Due: ${task.dueDate}")
-                                Text("🔄 Status: ${task.status}", style = MaterialTheme.typography.bodyMedium)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(task.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = AppColors.TextPrimary)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.Person, contentDescription = null, tint = AppColors.TextMuted, modifier = Modifier.size(14.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(task.assignedTo, style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary)
+                                    }
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.DateRange, contentDescription = null, tint = AppColors.TextMuted, modifier = Modifier.size(14.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Due: ${task.dueDate}", style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary)
+                                    }
+                                }
+                                Surface(shape = AppShapes.Chip, color = bg) {
+                                    Text(
+                                        task.status,
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = fg
+                                    )
+                                }
                             }
                         }
                     }
@@ -154,14 +202,19 @@ fun AddTaskScreen(
     val statusOptions = listOf("Pending", "In Progress", "Completed")
     var expanded by remember { mutableStateOf(false) }
 
-    // For Date Picker
     val datePickerState = rememberDatePickerState()
     var showDatePicker by remember { mutableStateOf(false) }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.add_task)) },
+            TopAppBar(
+                title = { Text(stringResource(R.string.add_task), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -192,89 +245,108 @@ fun AddTaskScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(AppDimens.ScreenPadding)
+                .fillMaxSize()
         ) {
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text(stringResource(R.string.task_title)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text(stringResource(R.string.description)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                singleLine = false
-            )
-
-            OutlinedTextField(
-                value = assignedTo,
-                onValueChange = { assignedTo = it },
-                label = { Text(stringResource(R.string.assigned_to)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Status Dropdown
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
-            ) {
+            FormSectionCard(title = "Task details") {
                 OutlinedTextField(
-                    value = status,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(stringResource(R.string.status)) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text(stringResource(R.string.task_title)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors()
                 )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    statusOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option) },
-                            onClick = {
-                                status = option
-                                expanded = false
-                            }
-                        )
-                    }
-                }
+                Spacer(modifier = Modifier.height(14.dp))
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text(stringResource(R.string.description)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp),
+                    singleLine = false,
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors()
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+                OutlinedTextField(
+                    value = assignedTo,
+                    onValueChange = { assignedTo = it },
+                    label = { Text(stringResource(R.string.assigned_to)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors()
+                )
             }
 
-            // Due Date with Date Picker
-            OutlinedTextField(
-                value = dueDate,
-                onValueChange = {},
-                label = { Text(stringResource(R.string.due_date)) },
-                readOnly = true,
-                placeholder = { Text("YYYY-MM-DD") },
-                trailingIcon = {
-                    IconButton(onClick = { showDatePicker = true }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Pick Due Date")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            FormSectionCard(title = "Schedule & status") {
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = status,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.status)) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth(),
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        statusOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option) },
+                                onClick = {
+                                    status = option
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+                }
 
-            OutlinedTextField(
-                value = notes,
-                onValueChange = { notes = it },
-                label = { Text(stringResource(R.string.notes)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp),
-                singleLine = false
-            )
+                Spacer(modifier = Modifier.height(14.dp))
 
-            Spacer(modifier = Modifier.height(24.dp))
+                OutlinedTextField(
+                    value = dueDate,
+                    onValueChange = {},
+                    label = { Text(stringResource(R.string.due_date)) },
+                    readOnly = true,
+                    placeholder = { Text("YYYY-MM-DD") },
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(Icons.Default.DateRange, contentDescription = "Pick Due Date", tint = AppColors.Primary)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors()
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                OutlinedTextField(
+                    value = notes,
+                    onValueChange = { notes = it },
+                    label = { Text(stringResource(R.string.notes)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp),
+                    singleLine = false,
+                    shape = AppShapes.CardSmall,
+                    colors = mybizzFieldColors()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(22.dp))
 
             Button(
                 onClick = {
@@ -294,10 +366,14 @@ fun AddTaskScreen(
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = AppShapes.Button,
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent),
                 enabled = title.isNotEmpty() && assignedTo.isNotEmpty()
             ) {
-                Text(stringResource(R.string.save_task))
+                Text(stringResource(R.string.save_task), fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -325,9 +401,15 @@ fun TaskDetailScreen(
     }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(task?.title ?: stringResource(R.string.task_details)) },
+            TopAppBar(
+                title = { Text(task?.title ?: stringResource(R.string.task_details), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -342,7 +424,7 @@ fun TaskDetailScreen(
                 .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = AppColors.Accent)
             }
         } else if (task == null) {
             Box(modifier = Modifier
@@ -350,7 +432,7 @@ fun TaskDetailScreen(
                 .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text(stringResource(R.string.task_not_found))
+                Text(stringResource(R.string.task_not_found), color = AppColors.TextSecondary)
             }
         } else {
             TaskDetailContent(
@@ -379,58 +461,88 @@ fun TaskDetailContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val (bg, fg) = taskStatusColors(task.status)
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(AppDimens.ScreenPadding),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         // Status Badge
-        Box(
-            modifier = Modifier
-                .background(
-                    color = when (task.status) {
-                        "Completed" -> Color.Green.copy(alpha = 0.2f)
-                        "In Progress" -> Color.Blue.copy(alpha = 0.2f)
-                        else -> Color.Gray.copy(alpha = 0.2f)
-                    },
-                    shape = RoundedCornerShape(4.dp)
-                )
-                .padding(horizontal = 12.dp, vertical = 6.dp)
-        ) {
-            Text(task.status, color = when (task.status) {
-                "Completed" -> Color.Green
-                "In Progress" -> Color.Blue
-                else -> Color.Gray
-            })
+        Surface(shape = AppShapes.Chip, color = bg) {
+            Text(
+                task.status,
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                color = fg,
+                fontWeight = FontWeight.SemiBold
+            )
         }
 
-        // Task Details
-        DetailItem(label = stringResource(R.string.description), value = task.description)
-        DetailItem(label = stringResource(R.string.assigned_to), value = task.assignedTo)
-        DetailItem(label = stringResource(R.string.due_date), value = task.dueDate)
-        DetailItem(label = stringResource(R.string.notes), value = task.notes)
+        Spacer(modifier = Modifier.height(4.dp))
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = AppShapes.Card,
+            color = AppColors.Surface,
+            border = BorderStroke(1.dp, AppColors.Border)
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                TaskDetailItem(label = stringResource(R.string.description), value = task.description)
+                TaskDetailItem(label = stringResource(R.string.assigned_to), value = task.assignedTo)
+                TaskDetailItem(label = stringResource(R.string.due_date), value = task.dueDate)
+                TaskDetailItem(label = stringResource(R.string.notes), value = task.notes, showDivider = false)
+            }
+        }
 
-        // Action Buttons
+        Spacer(modifier = Modifier.height(16.dp))
+
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = onEdit, modifier = Modifier.weight(1f)) {
+            Button(
+                onClick = onEdit,
+                modifier = Modifier.weight(1f),
+                shape = AppShapes.Button,
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
+            ) {
                 Text(stringResource(R.string.edit))
             }
-            OutlinedButton(onClick = onDelete, modifier = Modifier.weight(1f)) {
+            OutlinedButton(
+                onClick = onDelete,
+                modifier = Modifier.weight(1f),
+                shape = AppShapes.Button,
+                border = BorderStroke(1.dp, AppColors.Danger),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Danger)
+            ) {
                 Text(stringResource(R.string.delete))
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
+        OutlinedButton(
             onClick = onBack,
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            shape = AppShapes.Button,
+            border = BorderStroke(1.dp, AppColors.Border),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.TextSecondary)
         ) {
             Text(stringResource(R.string.back))
+        }
+    }
+}
+
+@Composable
+private fun TaskDetailItem(label: String, value: String, showDivider: Boolean = true) {
+    if (value.isNotEmpty()) {
+        Column(modifier = Modifier.padding(vertical = 10.dp)) {
+            Text(label, style = MaterialTheme.typography.bodySmall, color = AppColors.TextSecondary, fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(value, style = MaterialTheme.typography.bodyMedium, color = AppColors.TextPrimary)
+            if (showDivider) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Divider(color = AppColors.Border)
+            }
         }
     }
 }
@@ -458,7 +570,6 @@ fun EditTaskScreen(
     val statusOptions = listOf("Pending", "In Progress", "Completed")
     var expanded by remember { mutableStateOf(false) }
 
-    // For Date Picker
     val datePickerState = rememberDatePickerState()
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -479,9 +590,15 @@ fun EditTaskScreen(
     }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.edit_task)) },
+            TopAppBar(
+                title = { Text(stringResource(R.string.edit_task), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -515,7 +632,7 @@ fun EditTaskScreen(
                 .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = AppColors.Accent)
             }
         } else if (task == null) {
             Box(modifier = Modifier
@@ -523,95 +640,114 @@ fun EditTaskScreen(
                 .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text(stringResource(R.string.task_not_found))
+                Text(stringResource(R.string.task_not_found), color = AppColors.TextSecondary)
             }
         } else {
             Column(
                 modifier = Modifier
                     .padding(padding)
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(AppDimens.ScreenPadding)
+                    .fillMaxSize()
             ) {
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text(stringResource(R.string.task_title)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text(stringResource(R.string.description)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
-                    singleLine = false
-                )
-
-                OutlinedTextField(
-                    value = assignedTo,
-                    onValueChange = { assignedTo = it },
-                    label = { Text(stringResource(R.string.assigned_to)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                // Status Dropdown
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
-                ) {
+                FormSectionCard(title = "Task details") {
                     OutlinedTextField(
-                        value = status,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.status)) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                        value = title,
+                        onValueChange = { title = it },
+                        label = { Text(stringResource(R.string.task_title)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors()
                     )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        statusOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option) },
-                                onClick = {
-                                    status = option
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
+                    Spacer(modifier = Modifier.height(14.dp))
+                    OutlinedTextField(
+                        value = description,
+                        onValueChange = { description = it },
+                        label = { Text(stringResource(R.string.description)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        singleLine = false,
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors()
+                    )
+                    Spacer(modifier = Modifier.height(14.dp))
+                    OutlinedTextField(
+                        value = assignedTo,
+                        onValueChange = { assignedTo = it },
+                        label = { Text(stringResource(R.string.assigned_to)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors()
+                    )
                 }
 
-                // Due Date with Date Picker
-                OutlinedTextField(
-                    value = dueDate,
-                    onValueChange = {},
-                    label = { Text(stringResource(R.string.due_date)) },
-                    readOnly = true,
-                    placeholder = { Text("YYYY-MM-DD") },
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.select_due_date))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                FormSectionCard(title = "Schedule & status") {
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded }
+                    ) {
+                        OutlinedTextField(
+                            value = status,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.status)) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            modifier = Modifier.menuAnchor().fillMaxWidth(),
+                            shape = AppShapes.CardSmall,
+                            colors = mybizzFieldColors()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            statusOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        status = option
+                                        expanded = false
+                                    }
+                                )
+                            }
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    }
 
-                OutlinedTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
-                    label = { Text(stringResource(R.string.notes)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp),
-                    singleLine = false
-                )
+                    Spacer(modifier = Modifier.height(14.dp))
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    OutlinedTextField(
+                        value = dueDate,
+                        onValueChange = {},
+                        label = { Text(stringResource(R.string.due_date)) },
+                        readOnly = true,
+                        placeholder = { Text("YYYY-MM-DD") },
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.select_due_date), tint = AppColors.Primary)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors()
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = { notes = it },
+                        label = { Text(stringResource(R.string.notes)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp),
+                        singleLine = false,
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors()
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(22.dp))
 
                 Button(
                     onClick = {
@@ -631,10 +767,14 @@ fun EditTaskScreen(
                             }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = AppShapes.Button,
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent),
                     enabled = title.isNotEmpty() && assignedTo.isNotEmpty()
                 ) {
-                    Text(stringResource(R.string.update_task))
+                    Text(stringResource(R.string.update_task), fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -645,8 +785,8 @@ fun EditTaskScreen(
 fun DetailItem(label: String, value: String) {
     if (value.isNotEmpty()) {
         Column(modifier = Modifier.padding(vertical = 4.dp)) {
-            Text(label, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-            Text(value, style = MaterialTheme.typography.bodyMedium)
+            Text(label, style = MaterialTheme.typography.labelMedium, color = AppColors.TextSecondary)
+            Text(value, style = MaterialTheme.typography.bodyMedium, color = AppColors.TextPrimary)
         }
     }
 }
