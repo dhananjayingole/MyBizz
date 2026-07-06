@@ -2,8 +2,11 @@
 package eu.tutorials.mybizz.UIScreens
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -121,9 +124,15 @@ fun EditBillScreen(
     }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.edit_bill)) },
+                title = { Text(stringResource(R.string.edit_bill), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = androidx.compose.ui.graphics.Color.White,
+                    navigationIconContentColor = androidx.compose.ui.graphics.Color.White
+                ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -134,14 +143,18 @@ fun EditBillScreen(
     ) { innerPadding ->
         if (isLoading) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = AppColors.Accent)
             }
         } else if (bill == null) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(stringResource(R.string.bill_not_found))
@@ -149,34 +162,48 @@ fun EditBillScreen(
         } else if (bill?.status == Bill.STATUS_PAID) {
             // Show message for paid bills - cannot edit
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(24.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Warning,
-                        contentDescription = stringResource(R.string.cannot_edit_paid),
-                        modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .background(AppColors.DangerBg, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = stringResource(R.string.cannot_edit_paid),
+                            modifier = Modifier.size(36.dp),
+                            tint = AppColors.Danger
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(18.dp))
                     Text(
                         text = stringResource(R.string.cannot_edit_paid),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.error
+                        color = AppColors.TextPrimary
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.cannot_edit_paid_desc),
                         style = MaterialTheme.typography.bodyMedium,
+                        color = AppColors.TextSecondary,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-                    Button(onClick = { navController.popBackStack() }) {
+                    Button(
+                        onClick = { navController.popBackStack() },
+                        shape = AppShapes.Button,
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary)
+                    ) {
                         Text(stringResource(R.string.go_back))
                     }
                 }
@@ -187,185 +214,193 @@ fun EditBillScreen(
                     .padding(innerPadding)
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
+                    .padding(AppDimens.ScreenPadding)
             ) {
-                // Bill Info
-                Card(
+                // Bill Info banner
+                Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    shape = AppShapes.CardSmall,
+                    color = AppColors.InfoBg
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(14.dp)) {
                         Text(
                             text = "Bill #${bill!!.billNumber}",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.TextPrimary
                         )
                         Text(
                             text = "Current Version: ${bill!!.version}",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = AppColors.TextSecondary
                         )
                         Text(
                             text = "Editing will create version ${bill!!.version + 1}",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
+                            color = AppColors.Primary,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Title Field
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text(stringResource(R.string.bill_title)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    isError = title.isBlank() && error != null,
-                    supportingText = {
-                        if (title.isBlank() && error != null) {
-                            Text(stringResource(R.string.title_required))
-                        }
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Description Field
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text(stringResource(R.string.description)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
-                    maxLines = 4
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Amount Field
-                OutlinedTextField(
-                    value = amount,
-                    onValueChange = {
-                        if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) {
-                            amount = it
-                        }
-                    },
-                    label = { Text(stringResource(R.string.bill_amount)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    prefix = { Text("₹") },
-                    isError = (amount.isBlank() || amount.toDoubleOrNull() == null) && error != null,
-                    supportingText = {
-                        if (amount.isBlank() && error != null) {
-                            Text(stringResource(R.string.amount_required))
-                        } else if (amount.isNotBlank() && amount.toDoubleOrNull() == null) {
-                            Text(stringResource(R.string.enter_valid_number))
-                        }
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Due Date Field with Date Picker
-                Text(
-                    text = stringResource(R.string.due_date),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                OutlinedTextField(
-                    value = dueDate,
-                    onValueChange = { },
-                    label = { Text(stringResource(R.string.select_due_date)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.select_valid_date))
-                        }
-                    },
-                    placeholder = { Text(stringResource(R.string.tap_to_select_date)) },
-                    isError = dueDate.isBlank() && error != null,
-                    supportingText = {
-                        if (dueDate.isBlank() && error != null) {
-                            Text(stringResource(R.string.due_date_required))
-                        } else if (dueDate.isNotBlank() && !isValidDate(dueDate)) {
-                            Text(stringResource(R.string.select_valid_date))
-                        }
-                    }
-                )
-
-                // Quick date selection buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    listOf(
-                        "Today" to 0,
-                        "Tomorrow" to 1,
-                        "Next Week" to 7,
-                    ).forEach { (label, days) ->
-                        FilterChip(
-                            selected = false,
-                            onClick = {
-                                val calendar = Calendar.getInstance()
-                                calendar.add(Calendar.DAY_OF_MONTH, days)
-                                val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                                dueDate = sdf.format(calendar.time)
-                            },
-                            label = { Text(label) },
-                            modifier = Modifier.padding(4.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Category Dropdown
-                Text(
-                    text = stringResource(R.string.category),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                var expanded by remember { mutableStateOf(false) }
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
-                ) {
+                FormSectionCard(title = "Bill details") {
+                    // Title Field
                     OutlinedTextField(
-                        value = category,
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(),
-                        placeholder = { Text(stringResource(R.string.select_category)) }
+                        value = title,
+                        onValueChange = { title = it },
+                        label = { Text(stringResource(R.string.bill_title)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors(),
+                        isError = title.isBlank() && error != null,
+                        supportingText = {
+                            if (title.isBlank() && error != null) {
+                                Text(stringResource(R.string.title_required))
+                            }
+                        }
                     )
 
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Description Field
+                    OutlinedTextField(
+                        value = description,
+                        onValueChange = { description = it },
+                        label = { Text(stringResource(R.string.description)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        maxLines = 4,
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors()
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Amount Field
+                    OutlinedTextField(
+                        value = amount,
+                        onValueChange = {
+                            if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) {
+                                amount = it
+                            }
+                        },
+                        label = { Text(stringResource(R.string.bill_amount)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors(),
+                        prefix = { Text("₹") },
+                        isError = (amount.isBlank() || amount.toDoubleOrNull() == null) && error != null,
+                        supportingText = {
+                            if (amount.isBlank() && error != null) {
+                                Text(stringResource(R.string.amount_required))
+                            } else if (amount.isNotBlank() && amount.toDoubleOrNull() == null) {
+                                Text(stringResource(R.string.enter_valid_number))
+                            }
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                FormSectionCard(title = stringResource(R.string.due_date)) {
+                    OutlinedTextField(
+                        value = dueDate,
+                        onValueChange = { },
+                        label = { Text(stringResource(R.string.select_due_date)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = true,
+                        shape = AppShapes.CardSmall,
+                        colors = mybizzFieldColors(),
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.select_valid_date), tint = AppColors.Primary)
+                            }
+                        },
+                        placeholder = { Text(stringResource(R.string.tap_to_select_date)) },
+                        isError = dueDate.isBlank() && error != null,
+                        supportingText = {
+                            if (dueDate.isBlank() && error != null) {
+                                Text(stringResource(R.string.due_date_required))
+                            } else if (dueDate.isNotBlank() && !isValidDate(dueDate)) {
+                                Text(stringResource(R.string.select_valid_date))
+                            }
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Quick date selection buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Bill.CATEGORIES.forEach { selectionOption ->
-                            DropdownMenuItem(
-                                text = { Text(selectionOption) },
+                        listOf(
+                            "Today" to 0,
+                            "Tomorrow" to 1,
+                            "Next Week" to 7,
+                        ).forEach { (label, days) ->
+                            FilterChip(
+                                selected = false,
                                 onClick = {
-                                    category = selectionOption
-                                    expanded = false
-                                }
+                                    val calendar = Calendar.getInstance()
+                                    calendar.add(Calendar.DAY_OF_MONTH, days)
+                                    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                    dueDate = sdf.format(calendar.time)
+                                },
+                                label = { Text(label) },
+                                modifier = Modifier.weight(1f),
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = AppColors.SurfaceMuted
+                                )
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                FormSectionCard(title = stringResource(R.string.category)) {
+                    var expanded by remember { mutableStateOf(false) }
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded }
+                    ) {
+                        OutlinedTextField(
+                            value = category,
+                            onValueChange = {},
+                            readOnly = true,
+                            shape = AppShapes.CardSmall,
+                            colors = mybizzFieldColors(),
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            placeholder = { Text(stringResource(R.string.select_category)) }
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            Bill.CATEGORIES.forEach { selectionOption ->
+                                DropdownMenuItem(
+                                    text = { Text(selectionOption) },
+                                    onClick = {
+                                        category = selectionOption
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(22.dp))
 
                 // Update Button
                 Button(
@@ -404,48 +439,51 @@ fun EditBillScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(52.dp),
                     enabled = !isLoading,
-                    shape = MaterialTheme.shapes.medium
+                    shape = AppShapes.Button,
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Accent)
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
+                            color = androidx.compose.ui.graphics.Color.White,
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.updating_bill))
                     } else {
-                        Text("Update Bill (Version ${bill!!.version + 1})", style = MaterialTheme.typography.bodyLarge)
+                        Text("Update Bill (Version ${bill!!.version + 1})", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
                     }
                 }
 
                 error?.let {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
+                    Spacer(modifier = Modifier.height(14.dp))
+                    Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        shape = AppShapes.CardSmall,
+                        color = AppColors.DangerBg
                     ) {
                         Row(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Warning,
                                 contentDescription = stringResource(R.string.error),
-                                tint = MaterialTheme.colorScheme.error
+                                tint = AppColors.Danger
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = it,
-                                color = MaterialTheme.colorScheme.error,
+                                color = AppColors.Danger,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
