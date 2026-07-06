@@ -1,19 +1,23 @@
 // BillsListScreen.kt
 package eu.tutorials.mybizz.UIScreens
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -130,19 +134,25 @@ fun BillsListScreen(
     }
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.bills_management)) },
+                title = { Text(stringResource(R.string.bills_management), fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Primary,
+                    titleContentColor = androidx.compose.ui.graphics.Color.White
+                )
             )
         },
         floatingActionButton = {
             // Both users and admins can add bills
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = { navController.navigate("add_bill") },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_bill))
-            }
+                containerColor = AppColors.Accent,
+                contentColor = androidx.compose.ui.graphics.Color.White,
+                icon = { Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_bill)) },
+                text = { Text("New Bill") }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -150,33 +160,37 @@ fun BillsListScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            // Search Bar code
-            Card(
+            // Search Bar
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    .padding(horizontal = AppDimens.ScreenPadding, vertical = 12.dp),
+                shape = AppShapes.CardSmall,
+                color = AppColors.Surface,
+                border = BorderStroke(1.dp, AppColors.Border)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 14.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = stringResource(R.string.search),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = AppColors.TextMuted
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     TextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier.weight(1f),
-                        placeholder = { Text(stringResource(R.string.search_bills)) },
+                        placeholder = { Text(stringResource(R.string.search_bills), color = AppColors.TextMuted) },
                         colors = TextFieldDefaults.colors(
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                            focusedContainerColor = MaterialTheme.colorScheme.surface
+                            unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                            focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                            unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+                            focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
                         ),
                         singleLine = true
                     )
@@ -187,7 +201,7 @@ fun BillsListScreen(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = stringResource(R.string.search_clear),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = AppColors.TextMuted
                             )
                         }
                     }
@@ -199,8 +213,8 @@ fun BillsListScreen(
                 Text(
                     text = "Found ${filteredBills.size} bills matching \"$searchQuery\"",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    color = AppColors.TextSecondary,
+                    modifier = Modifier.padding(horizontal = AppDimens.ScreenPadding)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -210,7 +224,7 @@ fun BillsListScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = AppColors.Accent)
                 }
             } else if (error != null) {
                 Box(
@@ -220,10 +234,14 @@ fun BillsListScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = error!!,
-                            color = MaterialTheme.colorScheme.error,
+                            color = AppColors.Danger,
                             modifier = Modifier.padding(16.dp)
                         )
-                        Button(onClick = { reloadBills() }) {
+                        Button(
+                            onClick = { reloadBills() },
+                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Primary),
+                            shape = AppShapes.Button
+                        ) {
                             Text(stringResource(R.string.retry))
                         }
                     }
@@ -235,12 +253,43 @@ fun BillsListScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Box(
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .clip(CircleShape)
+                                    .background(AppColors.SurfaceMuted),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Email,
+                                    contentDescription = null,
+                                    tint = AppColors.TextMuted,
+                                    modifier = Modifier.size(30.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
                             if (searchQuery.isNotEmpty()) {
-                                Text("No bills found matching \"$searchQuery\"")
-                                Text(stringResource(R.string.try_different_search), style = MaterialTheme.typography.bodySmall)
+                                Text(
+                                    "No bills found matching \"$searchQuery\"",
+                                    fontWeight = FontWeight.Medium,
+                                    color = AppColors.TextPrimary
+                                )
+                                Text(
+                                    stringResource(R.string.try_different_search),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = AppColors.TextSecondary
+                                )
                             } else {
-                                Text(stringResource(R.string.no_bills_found))
-                                Text(stringResource(R.string.add_first_bill))
+                                Text(
+                                    stringResource(R.string.no_bills_found),
+                                    fontWeight = FontWeight.Medium,
+                                    color = AppColors.TextPrimary
+                                )
+                                Text(
+                                    stringResource(R.string.add_first_bill),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = AppColors.TextSecondary
+                                )
                             }
                         }
                     }
@@ -252,25 +301,38 @@ fun BillsListScreen(
                     val totalAmount = filteredBills.sumOf { it.amount }
                     val unpaidAmount = filteredBills.filter { it.status == Bill.STATUS_UNPAID }.sumOf { it.amount }
 
-                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Column(modifier = Modifier.padding(horizontal = AppDimens.ScreenPadding)) {
                         // Statistics Cards
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            StatCard(title = stringResource(R.string.total), value = totalBills.toString())
-                            StatCard(title = stringResource(R.string.paid), value = paidBills.toString(), isPaid = true)
-                            StatCard(title = stringResource(R.string.unpaid), value = unpaidBills.toString(), isPaid = false)
+                            StatCard(
+                                title = stringResource(R.string.total),
+                                value = totalBills.toString(),
+                                modifier = Modifier.weight(1f)
+                            )
+                            StatCard(
+                                title = stringResource(R.string.paid),
+                                value = paidBills.toString(),
+                                isPaid = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                            StatCard(
+                                title = stringResource(R.string.unpaid),
+                                value = unpaidBills.toString(),
+                                isPaid = false,
+                                modifier = Modifier.weight(1f)
+                            )
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Amount Summary
-                        Card(
+                        Surface(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
+                            shape = AppShapes.CardSmall,
+                            color = AppColors.SurfaceMuted
                         ) {
                             Row(
                                 modifier = Modifier
@@ -278,41 +340,52 @@ fun BillsListScreen(
                                     .padding(16.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Column(horizontalAlignment = Alignment.Start) {
+                                    Text(
+                                        text = stringResource(R.string.total_amount),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = AppColors.TextSecondary
+                                    )
                                     Text(
                                         text = "₹${"%.2f".format(totalAmount)}",
                                         style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        color = AppColors.TextPrimary
                                     )
-                                    Text(stringResource(R.string.total_amount), style = MaterialTheme.typography.bodySmall)
                                 }
 
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = stringResource(R.string.due_date),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = AppColors.TextSecondary
+                                    )
                                     Text(
                                         text = "₹${"%.2f".format(unpaidAmount)}",
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.error
+                                        color = AppColors.Danger
                                     )
-                                    Text(stringResource(R.string.due_date), style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
 
                         Text(
                             text = if (searchQuery.isNotEmpty()) "Search Results (${filteredBills.size})"
                             else "All Bills (${filteredBills.size})",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.TextPrimary
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         LazyColumn(
                             modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            contentPadding = PaddingValues(bottom = 88.dp)
                         ) {
                             items(filteredBills.reversed()) { bill ->
                                 BillItem(
@@ -337,49 +410,48 @@ fun BillItem(
     onMarkAsPaid: (String) -> Unit,
     onClick: () -> Unit
 ) {
+    val isPaid = bill.status == Bill.STATUS_PAID
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = AppShapes.CardSmall,
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = BorderStroke(1.dp, AppColors.Border)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    // NEW: Bill Number display
                     Text(
                         text = "Bill #${bill.billNumber}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = AppColors.Accent,
                         fontWeight = FontWeight.Bold
                     )
-
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = bill.title,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
                     )
                     Text(
                         text = bill.category,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        color = AppColors.TextSecondary
                     )
+                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "Due: ${bill.dueDate}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-
-                    // NEW: Version info
-                    Text(
-                        text = "Version: ${bill.version}",
+                        text = "Due: ${bill.dueDate}  ·  v${bill.version}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        color = AppColors.TextMuted
                     )
 
-                    if (bill.status == Bill.STATUS_PAID) {
+                    if (isPaid) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = if (bill.paidBy.isNotEmpty()) {
@@ -388,13 +460,13 @@ fun BillItem(
                                 stringResource(R.string.paid)
                             },
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
+                            color = AppColors.Success
                         )
                         if (bill.paidDate.isNotEmpty()) {
                             Text(
                                 text = "On: ${bill.paidDate}",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                color = AppColors.TextMuted
                             )
                         }
                     }
@@ -404,39 +476,56 @@ fun BillItem(
                     Text(
                         text = "₹${"%.2f".format(bill.amount)}",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
                     )
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = if (bill.status == Bill.STATUS_PAID) Icons.Default.Check else Icons.Default.Close,
-                            contentDescription = bill.status,
-                            tint = if (bill.status == Bill.STATUS_PAID) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.error
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = bill.status.replaceFirstChar { it.uppercase() },
-                            color = if (bill.status == Bill.STATUS_PAID) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.error
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    StatusChip(isPaid = isPaid)
                 }
             }
 
             // Both users and admins can mark bills as paid, but only unpaid bills
-            if (bill.status == Bill.STATUS_UNPAID) {
-                Spacer(modifier = Modifier.height(8.dp))
+            if (!isPaid) {
+                Spacer(modifier = Modifier.height(12.dp))
                 Button(
                     onClick = { onMarkAsPaid(bill.id) },
                     modifier = Modifier.fillMaxWidth(),
+                    shape = AppShapes.Button,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = AppColors.Success
                     )
                 ) {
+                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(stringResource(R.string.mark_as_paid))
                 }
             }
+        }
+    }
+}
+
+/** Small pill used to communicate paid / unpaid at a glance. */
+@Composable
+fun StatusChip(isPaid: Boolean) {
+    val bg = if (isPaid) AppColors.SuccessBg else AppColors.DangerBg
+    val fg = if (isPaid) AppColors.Success else AppColors.Danger
+    val label = if (isPaid) "Paid" else "Unpaid"
+    Surface(
+        shape = AppShapes.Chip,
+        color = bg
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = if (isPaid) Icons.Default.Check else Icons.Default.Close,
+                contentDescription = label,
+                tint = fg,
+                modifier = Modifier.size(12.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(label, style = MaterialTheme.typography.labelSmall, color = fg, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -463,32 +552,39 @@ private suspend fun loadBills(
 }
 
 @Composable
-fun StatCard(title: String, value: String, isPaid: Boolean? = null) {
-    Card(
-        modifier = Modifier
-            .width(100.dp)
-            .height(80.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = when (isPaid) {
-                true -> MaterialTheme.colorScheme.primaryContainer
-                false -> MaterialTheme.colorScheme.errorContainer
-                null -> MaterialTheme.colorScheme.surfaceVariant
-            }
-        )
+fun StatCard(
+    title: String,
+    value: String,
+    isPaid: Boolean? = null,
+    modifier: Modifier = Modifier
+) {
+    val (bg, fg) = when (isPaid) {
+        true -> AppColors.SuccessBg to AppColors.Success
+        false -> AppColors.DangerBg to AppColors.Danger
+        null -> AppColors.SurfaceMuted to AppColors.TextPrimary
+    }
+    Surface(
+        modifier = modifier.height(76.dp),
+        shape = AppShapes.CardSmall,
+        color = bg
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = fg
             )
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = fg.copy(alpha = 0.85f)
             )
         }
     }
