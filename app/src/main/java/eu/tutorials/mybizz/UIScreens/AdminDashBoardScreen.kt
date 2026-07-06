@@ -5,16 +5,21 @@ import eu.tutorials.mybizz.pdfgen.PdfGenerator
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -61,9 +66,15 @@ fun AdminDashboardScreen(
     )
 
     Scaffold(
+        containerColor = AppColors.Background,
         topBar = {
             TopAppBar(
-                title = { Text("Admin Dashboard") },
+                title = { Text("Admin Dashboard", fontWeight = FontWeight.SemiBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.PrimaryDark,
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                ),
                 actions = {
                     // Three-dot menu button
                     IconButton(onClick = { showMenu = true }) {
@@ -88,7 +99,8 @@ fun AdminDashboardScreen(
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.DateRange,
-                                    contentDescription = stringResource(R.string.monthly_summary)
+                                    contentDescription = stringResource(R.string.monthly_summary),
+                                    tint = AppColors.Primary
                                 )
                             }
                         )
@@ -105,13 +117,14 @@ fun AdminDashboardScreen(
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Info,
-                                    contentDescription = "Generate PDF"
+                                    contentDescription = "Generate PDF",
+                                    tint = AppColors.Primary
                                 )
                             }
                         )
 
                         Divider()
-//                        Moves to the BankSMS Screen
+                        // Moves to the BankSMS Screen
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.banking_sms)) },
                             onClick = {
@@ -121,7 +134,8 @@ fun AdminDashboardScreen(
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Notifications,
-                                    contentDescription = "Generate PDF"
+                                    contentDescription = "Banking SMS",
+                                    tint = AppColors.Primary
                                 )
                             }
                         )
@@ -134,42 +148,65 @@ fun AdminDashboardScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(AppDimens.ScreenPadding)
         ) {
-            // Welcome Section
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+            // Welcome Section — deep gradient card marks this clearly as the
+            // admin surface (darker than the user dashboard's header).
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(AppShapes.Card)
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(AppColors.PrimaryDark, AppColors.Primary)
+                        )
+                    )
+                    .padding(20.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.welcome_admin),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = stringResource(R.string.manage_business),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.15f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(14.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.welcome_admin),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            text = stringResource(R.string.manage_business),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.85f)
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppDimens.SectionGap))
 
-            Text(
-                text = stringResource(R.string.quick_actions),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+            SectionHeading(
+                title = stringResource(R.string.quick_actions),
+                subtitle = "Manage every part of the business"
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(menuItems) { item ->
                     MenuItemCard(
@@ -188,157 +225,59 @@ fun AdminDashboardScreen(
         }
     }
 
-    // PDF Generation Dialog
+    // PDF Generation Dialog (shared component, defined in UserDashboardScreen.kt)
     if (showPdfDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                if (!isGeneratingPdf) {
-                    showPdfDialog = false
-                }
-            },
-            icon = {
-                Icon(
-                    Icons.Default.Info,
-                    contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            title = {
-                Text(
-                    stringResource(R.string.generate_monthly_pdf),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            },
-            text = {
-                Column {
-                    if (isGeneratingPdf) {
-                        // Loading state
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp)
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                stringResource(R.string.generating_pdf),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                stringResource(R.string.may_take_seconds),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    } else {
-                        // Information state
-                        Column {
-                            if (monthlyReport != null) {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                                    )
-                                ) {
-                                    Column(modifier = Modifier.padding(12.dp)) {
-                                        Text(
-                                            stringResource(R.string.report_details),
-                                            style = MaterialTheme.typography.titleSmall,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text("📅 Month: $selectedMonth")
-                                        Text("📊 Bills: ${monthlyReport.billsSummary.totalCount}")
-                                        Text("🏠 Rentals: ${monthlyReport.rentalsSummary.totalCount}")
-                                        Text("✓ Tasks: ${monthlyReport.tasksSummary.totalCount}")
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(16.dp))
-                            }
+        MonthlyPdfDialog(
+            isGeneratingPdf = isGeneratingPdf,
+            monthlyReport = monthlyReport,
+            selectedMonth = selectedMonth,
+            includesList = listOf(
+                "Financial Overview",
+                "Bills Summary & Details",
+                "Rentals Summary & Details",
+                "Tasks Summary & Details"
+            ),
+            onDismiss = { if (!isGeneratingPdf) showPdfDialog = false },
+            onGenerate = {
+                scope.launch {
+                    isGeneratingPdf = true
+                    monthlyReport?.let { report ->
+                        val pdfGenerator = PdfGenerator(context)
+                        val pdfFile = pdfGenerator.generateMonthlyReport(report, selectedMonth)
 
-                            Text(
-                                stringResource(R.string.pdf_includes),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Column(modifier = Modifier.padding(start = 8.dp)) {
-                                Text("• Financial Overview", style = MaterialTheme.typography.bodySmall)
-                                Text("• Bills Summary & Details", style = MaterialTheme.typography.bodySmall)
-                                Text("• Rentals Summary & Details", style = MaterialTheme.typography.bodySmall)
-                                Text("• Tasks Summary & Details", style = MaterialTheme.typography.bodySmall)
-                            }
-
-                            if (monthlyReport == null) {
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Text(
-                                    stringResource(R.string.loading_report_data),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                        pdfFile?.let { file ->
+                            // Open PDF with system PDF viewer
+                            try {
+                                val uri = FileProvider.getUriForFile(
+                                    context,
+                                    "${context.packageName}.provider",
+                                    file
                                 )
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    setDataAndType(uri, "application/pdf")
+                                    flags = Intent.FLAG_ACTIVITY_NO_HISTORY or
+                                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                }
+                                context.startActivity(Intent.createChooser(intent, "Open PDF Report"))
+                            } catch (e: Exception) {
+                                e.printStackTrace()
                             }
                         }
                     }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        scope.launch {
-                            isGeneratingPdf = true
-                            monthlyReport?.let { report ->
-                                val pdfGenerator = PdfGenerator(context)
-                                val pdfFile = pdfGenerator.generateMonthlyReport(report, selectedMonth)
-
-                                pdfFile?.let { file ->
-                                    // Open PDF with system PDF viewer
-                                    try {
-                                        val uri = FileProvider.getUriForFile(
-                                            context,
-                                            "${context.packageName}.provider",
-                                            file
-                                        )
-                                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                                            setDataAndType(uri, "application/pdf")
-                                            flags = Intent.FLAG_ACTIVITY_NO_HISTORY or
-                                                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                        }
-                                        context.startActivity(Intent.createChooser(intent, "Open PDF Report"))
-                                    } catch (e: Exception) {
-                                        e.printStackTrace()
-                                    }
-                                }
-                            }
-                            isGeneratingPdf = false
-                            showPdfDialog = false
-                        }
-                    },
-                    enabled = !isGeneratingPdf && monthlyReport != null
-                ) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.generate_pdf))
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { showPdfDialog = false },
-                    enabled = !isGeneratingPdf
-                ) {
-                    Text(stringResource(R.string.cancel))
+                    isGeneratingPdf = false
+                    showPdfDialog = false
                 }
             }
         )
     }
 }
 
+/**
+ * Menu tile used by both the user and admin dashboards.
+ * Redesigned: icon sits in a soft tinted circle, title left-aligned,
+ * chevron signals it's tappable — reads as a settings/navigation row
+ * rather than a plain icon button.
+ */
 @Composable
 fun MenuItemCard(
     menuItem: MenuItem,
@@ -348,27 +287,38 @@ fun MenuItemCard(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .height(104.dp),
+        shape = AppShapes.CardSmall,
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, AppColors.Border)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(14.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Icon(
-                painter = painterResource(id = menuItem.icon),
-                contentDescription = menuItem.title,
-                modifier = Modifier.size(32.dp),
-                tint = androidx.compose.ui.graphics.Color.Unspecified // This removes the tint
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(AppColors.InfoBg),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = menuItem.icon),
+                    contentDescription = menuItem.title,
+                    modifier = Modifier.size(22.dp),
+                    tint = androidx.compose.ui.graphics.Color.Unspecified
+                )
+            }
             Text(
                 text = menuItem.title,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.SemiBold,
+                color = AppColors.TextPrimary,
+                maxLines = 1
             )
         }
     }
